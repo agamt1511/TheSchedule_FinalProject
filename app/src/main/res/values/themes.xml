@@ -2,16 +2,16 @@
     <!-- Base application theme. -->
     <style name="Theme.TheSchedule_FinalProject" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/primary_yellow</item>
-        <item name="colorPrimaryVariant">@color/primary_orange</item>
+        <item name="colorPrimary">@color/primary_navy</item>
+        <item name="colorPrimaryVariant">@color/primary_darkBlue</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/primary_maroon</item>
-        <item name="colorSecondaryVariant">@color/primary_purple</item>
+        <item name="colorSecondary">@color/primary_lightBlue</item>
+        <item name="colorSecondaryVariant">@color/primary_teal</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor">@color/primary_yellow</item>
-        <item name="android:navigationBarColor">@color/primary_orange</item>
+        <item name="android:statusBarColor">@color/primary_navy</item>
+        <item name="android:navigationBarColor">@color/primary_navy</item>
         <!-- Customize your theme here. -->
     </style>
 </resources>
