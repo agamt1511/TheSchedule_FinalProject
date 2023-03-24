@@ -24,31 +24,6 @@
             android:layout_height="0dp"
             android:layout_weight="2" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="15"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="50"
-                android:gravity="center|left"
-                android:text="SIGN UP"
-                android:textColor="@color/primary_darkBlue"
-                android:textSize="48sp"
-                android:textStyle="bold" />
-
-            <ImageView
-                android:id="@+id/imageView2"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="50"
-                app:srcCompat="@drawable/signup" />
-
-        </LinearLayout>
-
         <TextView
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -57,6 +32,15 @@
             android:textColor="@color/black"
             android:textSize="20sp"
             android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_gravity="right"
+            android:layout_weight="15"
+            android:foregroundGravity="right"
+            app:srcCompat="@drawable/signup" />
 
         <Space
             android:layout_width="match_parent"
@@ -107,6 +91,13 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="2" />
+
+        <CheckBox
+            android:id="@+id/checkBox"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="10"
+            android:text="Stay Connected" />
 
         <Button
             android:layout_width="match_parent"

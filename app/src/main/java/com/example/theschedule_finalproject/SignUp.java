@@ -1,6 +1,6 @@
 package com.example.theschedule_finalproject;
 
-import androidx.appcompat.app.AppCompatActivity;
+import static com.example.theschedule_finalproject.FBref.authRef;
 
 import android.os.Bundle;
 import android.util.Patterns;
@@ -9,7 +9,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseAuth;
+import androidx.appcompat.app.AppCompatActivity;
+
 
 public class SignUp extends AppCompatActivity {
 
@@ -34,18 +35,19 @@ public class SignUp extends AppCompatActivity {
 
         Boolean authenticated = dataVerification(email_str,password_str,confirmPassword_str);
 
-        if (authenticated) {
-            create_firebaseAccount(email_str, password_str);
+        if (authenticated == true) {
+            authRef.createUserWithEmailAndPassword(email_str,password_str);
+            Toast.makeText(this, "The Registration Process Was Completed Successfully", Toast.LENGTH_LONG).show();
         }
     }
 
 
-    private Boolean dataVerification(String email, String password, String confirmPassword) {
+    public Boolean dataVerification(String email, String password, String confirmPassword) {
         if(!Patterns.EMAIL_ADDRESS.matcher(email).matches()){
             Toast.makeText(this, "ERROR! Check the email.", Toast.LENGTH_SHORT).show();
             return false;
         }
-        if(password.length()<5){
+        if(password.length()<6){
             Toast.makeText(this, "ERROR! Password too short.", Toast.LENGTH_SHORT).show();
             return false;
         }
@@ -54,11 +56,5 @@ public class SignUp extends AppCompatActivity {
             return false;
         }
         return true;
-    }
-
-    private void create_firebaseAccount(String email, String password) {
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        auth.createUserWithEmailAndPassword(email,password);
-        Toast.makeText(this, "Added", Toast.LENGTH_SHORT).show();
     }
 }
