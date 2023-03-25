@@ -1,19 +1,12 @@
 package com.example.theschedule_finalproject;
 
 import static com.example.theschedule_finalproject.FBref.authRef;
-import static com.example.theschedule_finalproject.FBref.usersRef;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-import com.google.firebase.auth.FirebaseUser;
 
 
 public class SignUp extends AppCompatActivity {
