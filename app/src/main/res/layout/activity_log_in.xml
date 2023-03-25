@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    tools:context=".SignUp">
+    tools:context=".LogIn">
 
     <Space
         android:layout_width="0dp"
@@ -16,7 +15,6 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="90"
-        android:gravity="center"
         android:orientation="vertical">
 
         <Space
@@ -28,7 +26,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="10"
-            android:text="Hello.\nLet's get started!"
+            android:text="Nice To See You Back.\nLet's Go Back To Where We Were"
             android:textColor="@color/black"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -40,20 +38,6 @@
             android:layout_weight="10"
             android:foregroundGravity="right"
             app:srcCompat="@drawable/signup" />
-
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="0.5" />
-
-        <EditText
-            android:id="@+id/name_et"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="10"
-            android:ems="10"
-            android:inputType="textPersonName"
-            android:text="Name" />
 
         <Space
             android:layout_width="match_parent"
@@ -88,17 +72,7 @@
         <Space
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="0.5" />
-
-        <EditText
-            android:id="@+id/passwordConfirm_et"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="10"
-            android:ems="10"
-            android:hint="Confirm Password"
-            android:inputType="textPassword"
-            android:textSize="18dp" />
+            android:layout_weight="2" />
 
         <Space
             android:layout_width="match_parent"
@@ -125,6 +99,11 @@
             android:onClick="create_account"
             android:text="SIGN UP"
             android:textSize="16sp" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.5" />
 
         <Space
             android:layout_width="match_parent"
@@ -177,13 +156,10 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="2" />
-
-
     </LinearLayout>
 
     <Space
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="5" />
-
 </LinearLayout>
