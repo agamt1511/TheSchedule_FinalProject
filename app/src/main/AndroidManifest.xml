@@ -12,13 +12,13 @@
         android:theme="@style/Theme.TheSchedule_FinalProject"
         tools:targetApi="31">
         <activity
+            android:name=".Login"
+            android:exported="false" />
+        <activity
             android:name=".Credits"
             android:exported="false" />
         <activity
             android:name=".Profile"
-            android:exported="false" />
-        <activity
-            android:name=".LogIn"
             android:exported="false" />
         <activity
             android:name=".SignUp"

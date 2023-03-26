@@ -47,13 +47,14 @@
             android:layout_weight="0.5" />
 
         <EditText
-            android:id="@+id/name_et"
+            android:id="@+id/name_etR"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="10"
             android:ems="10"
+            android:hint="Name"
             android:inputType="textPersonName"
-            android:hint="Name" />
+            android:textSize="18sp"/>
 
         <Space
             android:layout_width="match_parent"
@@ -61,14 +62,14 @@
             android:layout_weight="0.5" />
 
         <EditText
-            android:id="@+id/email_et"
+            android:id="@+id/email_etR"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="10"
             android:ems="10"
             android:hint="Email"
             android:inputType="textEmailAddress"
-            android:textSize="18dp" />
+            android:textSize="18sp" />
 
         <Space
             android:layout_width="match_parent"
@@ -76,14 +77,14 @@
             android:layout_weight="0.5" />
 
         <EditText
-            android:id="@+id/password_et"
+            android:id="@+id/password_etR"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="10"
             android:ems="10"
             android:hint="Password"
             android:inputType="textPassword"
-            android:textSize="18dp" />
+            android:textSize="18sp" />
 
         <Space
             android:layout_width="match_parent"
@@ -91,14 +92,14 @@
             android:layout_weight="0.5" />
 
         <EditText
-            android:id="@+id/passwordConfirm_et"
+            android:id="@+id/passwordConfirm_etR"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="10"
             android:ems="10"
             android:hint="Confirm Password"
             android:inputType="textPassword"
-            android:textSize="18dp" />
+            android:textSize="18sp" />
 
         <Space
             android:layout_width="match_parent"
@@ -106,10 +107,10 @@
             android:layout_weight="0.5" />
 
         <CheckBox
-            android:id="@+id/connectView_cb"
+            android:id="@+id/rememberMe_cbR"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="8"
+            android:layout_weight="7"
             android:text="Remember Me" />
 
         <Space
@@ -124,7 +125,7 @@
             android:backgroundTint="@color/primary_darkBlue"
             android:onClick="create_account"
             android:text="SIGN UP"
-            android:textSize="16sp" />
+            android:textSize="18sp" />
 
         <Space
             android:layout_width="match_parent"
@@ -139,8 +140,10 @@
 
             <TextView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="SIGN IN WITH GOOGLE" />
+                android:layout_height="0dp"
+                android:layout_weight="100"
+                android:text="SIGN IN WITH GOOGLE"
+                android:textSize="16sp"/>
         </LinearLayout>
 
         <Space
@@ -155,19 +158,20 @@
             android:orientation="horizontal">
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="50"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="75"
                 android:gravity="center|right"
                 android:text="Already have an account? "
                 android:textSize="20sp" />
 
             <TextView
-                android:id="@+id/login"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="50"
-                android:text="Login"
+                android:id="@+id/login_tvR"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="25"
+                android:gravity="center|left"
+                android:text="Log In"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 

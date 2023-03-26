@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 
 public class SignUp extends AppCompatActivity {
-    EditText email_et, password_et, passwordConfirm_et;
+    EditText email_etR, password_etR, passwordConfirm_etR;
 
 
     @Override
@@ -18,16 +18,16 @@ public class SignUp extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
 
-        email_et = findViewById(R.id.email_et);
-        password_et = findViewById(R.id.password_et);
-        passwordConfirm_et = findViewById(R.id.passwordConfirm_et);
+        email_etR = findViewById(R.id.email_etR);
+        password_etR = findViewById(R.id.password_etR);
+        passwordConfirm_etR = findViewById(R.id.passwordConfirm_etR);
     }
 
 
     public void create_account(View view) {
-        String email_str  = email_et.getText().toString();
-        String password_str  = password_et.getText().toString();
-        String confirmPassword_str  = passwordConfirm_et.getText().toString();
+        String email_str  = email_etR.getText().toString();
+        String password_str  = password_etR.getText().toString();
+        String confirmPassword_str  = passwordConfirm_etR.getText().toString();
 
         Boolean authenticated = dataVerification(email_str,password_str,confirmPassword_str);
 

@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".LogIn">
+    android:gravity="center"
+    tools:context=".Login">
 
     <Space
         android:layout_width="0dp"
@@ -20,7 +21,7 @@
         <Space
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="5" />
+            android:layout_weight="2" />
 
         <TextView
             android:layout_width="match_parent"
@@ -45,14 +46,14 @@
             android:layout_weight="2" />
 
         <EditText
-            android:id="@+id/email_et"
+            android:id="@+id/email_etL"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="10"
             android:ems="10"
             android:hint="Email"
             android:inputType="textEmailAddress"
-            android:textSize="18dp" />
+            android:textSize="18sp"/>
 
         <Space
             android:layout_width="match_parent"
@@ -60,14 +61,14 @@
             android:layout_weight="2" />
 
         <EditText
-            android:id="@+id/password_et"
+            android:id="@+id/password_etL"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="10"
             android:ems="10"
             android:hint="Password"
             android:inputType="textPassword"
-            android:textSize="18dp" />
+            android:textSize="18sp" />
 
         <Space
             android:layout_width="match_parent"
@@ -75,7 +76,7 @@
             android:layout_weight="2" />
 
         <CheckBox
-            android:id="@+id/connectView_cb"
+            android:id="@+id/rememberMe_cbL"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="10"
@@ -91,9 +92,8 @@
             android:layout_height="0dp"
             android:layout_weight="10"
             android:backgroundTint="@color/primary_darkBlue"
-            android:onClick="create_account"
             android:text="LOG IN"
-            android:textSize="16sp" />
+            android:textSize="18sp" />
 
         <Space
             android:layout_width="match_parent"
@@ -109,7 +109,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="5"
+                android:layout_weight="100"
                 android:text="Log IN WITH GOOGLE" />
         </LinearLayout>
 
@@ -127,23 +127,24 @@
             android:textSize="20sp" />
 
         <TextView
-            android:id="@+id/login"
+            android:id="@+id/signUp_tvR"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="5"
             android:gravity="center"
             android:text="Sign Up"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:textSize="20sp"/>
 
         <Space
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="5" />
+            android:layout_weight="6" />
     </LinearLayout>
 
     <Space
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="5" />
+
 </LinearLayout>
