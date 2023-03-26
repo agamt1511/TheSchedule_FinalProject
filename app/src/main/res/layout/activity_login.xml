@@ -92,6 +92,7 @@
             android:layout_height="0dp"
             android:layout_weight="10"
             android:backgroundTint="@color/primary_darkBlue"
+            android:onClick="log_in"
             android:text="LOG IN"
             android:textSize="18sp" />
 
