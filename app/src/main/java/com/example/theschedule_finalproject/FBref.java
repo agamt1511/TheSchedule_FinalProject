@@ -11,6 +11,7 @@ public class FBref {
     public static FirebaseAuth authRef = FirebaseAuth.getInstance();
     public static FirebaseDatabase FBDB = FirebaseDatabase.getInstance();
     public static DatabaseReference usersRef=FBDB.getReference("Users");
+    public static DatabaseReference usersActiveRef=usersRef.child("Active");
 
     public static FirebaseStorage FBST = FirebaseStorage.getInstance();
     public static StorageReference storageRef=FBST.getReference();
