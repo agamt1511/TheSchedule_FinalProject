@@ -1,19 +1,18 @@
 package com.example.theschedule_finalproject;
 
 import static com.example.theschedule_finalproject.FBref.authRef;
-import static com.example.theschedule_finalproject.FBref.usersActiveRef;
 import static com.example.theschedule_finalproject.FBref.usersRef;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -22,9 +21,11 @@ import com.google.firebase.auth.AuthResult;
 
 
 public class SignUp extends AppCompatActivity {
-    EditText name_etR, email_etR, password_etR, passwordConfirm_etR;
-    TextView login_tvR;
-    Intent si;
+    EditText name_etS, email_etS, password_etS, passwordConfirm_etS;
+    CheckBox rememberMe_cbS;
+    Intent intent;
+    Boolean rememberMe_boolS;
+
 
 
     @Override
@@ -32,64 +33,83 @@ public class SignUp extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
 
-        name_etR = (EditText) findViewById(R.id.name_etR);
-        email_etR = (EditText) findViewById(R.id.email_etR);
-        password_etR = (EditText) findViewById(R.id.password_etR);
-        passwordConfirm_etR = (EditText) findViewById(R.id.passwordConfirm_etR);
-        login_tvR = (TextView) findViewById(R.id.login_tvR);
+        name_etS = (EditText) findViewById(R.id.name_etS);
+        email_etS = (EditText) findViewById(R.id.email_etS);
+        password_etS = (EditText) findViewById(R.id.password_etS);
+        passwordConfirm_etS = (EditText) findViewById(R.id.passwordConfirm_etS);
+        rememberMe_cbS = (CheckBox) findViewById(R.id.rememberMe_cbS);
 
-        login_tvR.setOnClickListener(new View.OnClickListener() {
+        rememberMe_boolS = false;
+        rememberMe_cbS.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onClick(View view) {
-                si = new Intent(SignUp.this,Login.class);
-                startActivity(si);
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (compoundButton.isChecked()){
+                    rememberMe_boolS = true;
+                }
+                else{
+                    rememberMe_boolS = false;
+                }
             }
         });
     }
 
 
     public void create_account(View view) {
-        String name_str  = name_etR.getText().toString();
-        String email_str  = email_etR.getText().toString();
-        String password_str  = password_etR.getText().toString();
-        String confirmPassword_str  = passwordConfirm_etR.getText().toString();
+        String name_str  = name_etS.getText().toString();
+        String email_str  = email_etS.getText().toString();
+        String password_str  = password_etS.getText().toString();
+        String confirmPassword_str  = passwordConfirm_etS.getText().toString();
 
-        Boolean authenticated = dataVerification(email_str,password_str,confirmPassword_str);
+        Boolean authenticated = dataVerification(name_str, email_str,password_str,confirmPassword_str);
 
         if (authenticated == true) {
             authRef.createUserWithEmailAndPassword(email_str,password_str).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
-                    User user = new User(name_str, email_str, password_str);
-                    usersActiveRef.child(authRef.getCurrentUser().getUid()). setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()){
-                                Toast.makeText(SignUp.this, "The Registration Process Was Completed Successfully", Toast.LENGTH_LONG).show();
-                                si = new Intent(SignUp.this,Profile.class);
-                                startActivity(si);
-                            }
-                        }
-                    });
+                    User user = new User(name_str);
+                    usersRef.child(authRef.getCurrentUser().getUid()). setValue(user);
+
+                    if (rememberMe_boolS == true){
+                        SharedPreferences sharedPreferences = getSharedPreferences(Login.PREFS_NAME,MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putBoolean("hasLoggedIn",true);
+                        editor.commit();
+                    }
+
+                    intent = new Intent(SignUp.this,Profile.class);
+                    startActivity(intent);
                 }
             });
-
         }
     }
 
-    public Boolean dataVerification(String email, String password, String confirmPassword) {
-        if(!Patterns.EMAIL_ADDRESS.matcher(email).matches()){
-            Toast.makeText(this, "ERROR! Check the email.", Toast.LENGTH_SHORT).show();
-            return false;
+    public Boolean dataVerification(String name, String email, String password, String confirmPassword) {
+        int errorExist = 0;
+        if (name.length()<1){
+            name_etS.setError("ERROR! The filed can't be blank.");
+            errorExist++;
         }
-        if(password.length()<6){
-            Toast.makeText(this, "ERROR! Password too short.", Toast.LENGTH_SHORT).show();
-            return false;
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()){
+            email_etS.setError("ERROR! Check the email.");
+            errorExist++;
         }
-        if(!password.equals(confirmPassword)){
-            Toast.makeText(this, "ERROR! Passwords do not match.", Toast.LENGTH_SHORT).show();
+        if (password.length()<6){
+            password_etS.setError("ERROR! Password too short.");
+            errorExist++;
+        }
+        if (!password.equals(confirmPassword)) {
+            passwordConfirm_etS.setError("ERROR! Passwords do not match");
+            errorExist++;
+        }
+
+        if(errorExist > 0){
             return false;
         }
         return true;
+    }
+
+    public void toLogInAct(View view) {
+        intent = new Intent(SignUp.this,Login.class);
+        startActivity(intent);
     }
 }

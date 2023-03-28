@@ -1,15 +1,12 @@
 package com.example.theschedule_finalproject;
 
 public class User {
-    private String user_name, user_email, user_password;
-    private Boolean user_activity;
+    private String user_name;
 
     public User (){}
 
-    public User (String user_name, String user_email, String user_password){
+    public User (String user_name){
         this.user_name = user_name;
-        this.user_email = user_email;
-        this.user_password = user_password;
     }
 
 
@@ -20,17 +17,4 @@ public class User {
         this.user_name = user_name;
     }
 
-    public String getEmail() {
-        return user_email;
-    }
-    public void setEmail(String user_email) {
-        this.user_email = user_email;
-    }
-
-    public String getPassword() {
-        return user_password;
-    }
-    public void setPassword(String user_password) {
-        this.user_password = user_password;
-    }
 }
