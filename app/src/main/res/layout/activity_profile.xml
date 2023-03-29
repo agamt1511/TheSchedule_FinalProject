@@ -53,13 +53,14 @@
             android:layout_weight="8" />
 
         <EditText
-            android:id="@+id/eTfile"
+            android:id="@+id/name_etP"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="10"
             android:ems="10"
             android:hint="Name"
-            android:inputType="textPersonName" />
+            android:inputType="textPersonName"
+            android:textSize="20sp" />
 
         <Space
             android:layout_width="match_parent"
@@ -67,26 +68,29 @@
             android:layout_weight="5" />
 
         <EditText
-            android:id="@+id/eTcontent"
+            android:id="@+id/email_etP"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="10"
             android:ems="10"
             android:hint="Email"
-            android:inputType="textEmailAddress" />
+            android:inputType="textEmailAddress"
+            android:textSize="20sp" />
 
         <Space
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="5" />
 
-        <EditText
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="10"
-            android:ems="10"
-            android:hint="Password"
-            android:inputType="textPassword" />
+            android:onClick="resetPassword"
+            android:text="Reset Password"
+            android:textColor="@color/primary_darkBlue"
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
         <Space
             android:layout_width="match_parent"
@@ -104,7 +108,9 @@
                 android:layout_height="match_parent"
                 android:layout_weight="40"
                 android:backgroundTint="@color/primary_lightBlue"
-                android:text="Save" />
+                android:onClick="saveChanges"
+                android:text="Save"
+                android:textSize="18sp" />
 
             <Space
                 android:layout_width="0dp"
@@ -116,7 +122,9 @@
                 android:layout_height="match_parent"
                 android:layout_weight="40"
                 android:backgroundTint="@color/primary_lightBlue"
-                android:text="Cancel" />
+                android:onClick="cancelChanges"
+                android:text="Cancel"
+                android:textSize="18sp" />
         </LinearLayout>
 
         <Space
@@ -139,7 +147,9 @@
                 android:layout_height="match_parent"
                 android:layout_weight="40"
                 android:backgroundTint="@color/primary_lightBlue"
-                android:text="LOGOUT" />
+                android:onClick="logout"
+                android:text="LOGOUT"
+                android:textSize="18sp" />
 
             <Space
                 android:layout_width="0dp"

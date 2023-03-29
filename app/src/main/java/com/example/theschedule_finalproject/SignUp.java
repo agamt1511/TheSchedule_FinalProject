@@ -1,6 +1,7 @@
 package com.example.theschedule_finalproject;
 
 import static com.example.theschedule_finalproject.FBref.authRef;
+import static com.example.theschedule_finalproject.FBref.currentUser;
 import static com.example.theschedule_finalproject.FBref.usersRef;
 
 import androidx.annotation.NonNull;
@@ -18,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseUser;
 
 
 public class SignUp extends AppCompatActivity {
@@ -67,7 +69,7 @@ public class SignUp extends AppCompatActivity {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     User user = new User(name_str);
-                    usersRef.child(authRef.getCurrentUser().getUid()). setValue(user);
+                    usersRef.child(authRef.getCurrentUser().getUid()).setValue(user);
 
                     if (rememberMe_boolS == true){
                         SharedPreferences sharedPreferences = getSharedPreferences(Login.PREFS_NAME,MODE_PRIVATE);
@@ -75,7 +77,7 @@ public class SignUp extends AppCompatActivity {
                         editor.putBoolean("hasLoggedIn",true);
                         editor.commit();
                     }
-
+                    currentUser = authRef.getCurrentUser();
                     intent = new Intent(SignUp.this,Profile.class);
                     startActivity(intent);
                 }

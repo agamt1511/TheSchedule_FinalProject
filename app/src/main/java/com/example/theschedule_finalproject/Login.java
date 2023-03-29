@@ -1,6 +1,7 @@
 package com.example.theschedule_finalproject;
 
 import static com.example.theschedule_finalproject.FBref.authRef;
+import static com.example.theschedule_finalproject.FBref.currentUser;
 import static com.example.theschedule_finalproject.FBref.usersRef;
 
 import androidx.annotation.NonNull;
@@ -68,13 +69,22 @@ public class Login extends AppCompatActivity {
                 editor.putBoolean("hasLoggedIn",true);
                 editor.commit();
             }
-
+            currentUser = authRef.getCurrentUser();
             intent = new Intent(Login.this,Profile.class);
             startActivity(intent);
             finish();
         }
     }
 
+    public void toSignUpAct(View view) {
+        intent = new Intent(Login.this,SignUp.class);
+        startActivity(intent);
+    }
+
+    public void forgotPassword(View view) {
+        intent = new Intent(Login.this,ResetPassword.class);
+        startActivity(intent);
+    }
 
     public Boolean dataVerification(String email, String password) {
         int errorExist = 0;
@@ -91,15 +101,5 @@ public class Login extends AppCompatActivity {
             return false;
         }
         return true;
-    }
-
-    public void toSignUpAct(View view) {
-        intent = new Intent(Login.this,SignUp.class);
-        startActivity(intent);
-    }
-
-    public void forgotPassword(View view) {
-        intent = new Intent(Login.this,ResetPassword.class);
-        startActivity(intent);
     }
 }
