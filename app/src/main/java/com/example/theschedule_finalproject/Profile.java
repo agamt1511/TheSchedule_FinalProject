@@ -12,8 +12,6 @@ import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.EditText;
-
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
@@ -33,7 +31,7 @@ public class Profile extends AppCompatActivity {
         name_etP = (EditText) findViewById(R.id.name_etP);
         email_etP = (EditText) findViewById(R.id.email_etP);
 
-        showOriginalData();
+       showOriginalData();
     }
 
     private void showOriginalData() {
@@ -44,7 +42,7 @@ public class Profile extends AppCompatActivity {
                 user = snapshot.getValue(User.class);
                 name_etP.setText(user.getName());
                 email_etP.setText(currentUser.getEmail());
-                }
+            }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {}});
     }
@@ -63,9 +61,8 @@ public class Profile extends AppCompatActivity {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
                     currentUser.updateEmail(email_str);
-                    User user1 = user;
-                    user1.setName(name_str);
-                    usersRef.child(userID).setValue(user1);
+                    user.setName(name_str);
+                    usersRef.child(userID).setValue(user);
                 }
             });
             adb.setNegativeButton("NO", new DialogInterface.OnClickListener() {

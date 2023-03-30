@@ -17,6 +17,7 @@ import android.widget.EditText;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseUser;
@@ -65,9 +66,9 @@ public class SignUp extends AppCompatActivity {
         Boolean authenticated = dataVerification(name_str, email_str,password_str,confirmPassword_str);
 
         if (authenticated == true) {
-            authRef.createUserWithEmailAndPassword(email_str,password_str).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            authRef.createUserWithEmailAndPassword(email_str,password_str).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                 @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
+                public void onSuccess(AuthResult authResult) {
                     User user = new User(name_str);
                     usersRef.child(authRef.getCurrentUser().getUid()).setValue(user);
 
