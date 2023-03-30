@@ -70,7 +70,8 @@ public class SignUp extends AppCompatActivity {
                 @Override
                 public void onSuccess(AuthResult authResult) {
                     User user = new User(name_str);
-                    usersRef.child(authRef.getCurrentUser().getUid()).setValue(user);
+                    currentUser = authRef.getCurrentUser();
+                    usersRef.child(currentUser.getUid()).setValue(user);
 
                     if (rememberMe_boolS == true){
                         SharedPreferences sharedPreferences = getSharedPreferences(Login.PREFS_NAME,MODE_PRIVATE);
@@ -78,7 +79,6 @@ public class SignUp extends AppCompatActivity {
                         editor.putBoolean("hasLoggedIn",true);
                         editor.commit();
                     }
-                    currentUser = authRef.getCurrentUser();
                     intent = new Intent(SignUp.this,Profile.class);
                     startActivity(intent);
                 }
