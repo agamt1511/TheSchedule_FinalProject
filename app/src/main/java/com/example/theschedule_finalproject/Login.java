@@ -61,18 +61,27 @@ public class Login extends AppCompatActivity {
 
         Boolean authenticated = dataVerification(email_str, password_str);
 
-        if (authenticated == true) {
-            authRef.signInWithEmailAndPassword(email_str, password_str);
-            if (rememberMe_boolL == true){
-                SharedPreferences sharedPreferences = getSharedPreferences(Login.PREFS_NAME,MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putBoolean("hasLoggedIn",true);
-                editor.commit();
-            }
-            currentUser = authRef.getCurrentUser();
-            intent = new Intent(Login.this,Profile.class);
-            startActivity(intent);
-            finish();
+        if (authenticated == true){
+            authRef.signInWithEmailAndPassword(email_str,password_str).addOnCompleteListener(Login.this, new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    if (task.isSuccessful()){
+                        Toast.makeText(Login.this, "iii", Toast.LENGTH_SHORT).show();
+                        SharedPreferences sharedPreferences = getSharedPreferences(Login.PREFS_NAME,MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putBoolean("hasLoggedIn",true);
+                        editor.commit();
+                        if (currentUser == null){
+                            currentUser = authRef.getCurrentUser();
+                        }
+                        intent = new Intent(Login.this,Profile.class);
+                        startActivity(intent);
+                    }
+                    else {
+                        Toast.makeText(Login.this, "e-mail or password are wrong!", Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
         }
     }
 

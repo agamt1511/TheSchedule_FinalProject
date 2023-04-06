@@ -9,17 +9,21 @@ import androidx.appcompat.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
 
 
@@ -65,23 +69,35 @@ public class SignUp extends AppCompatActivity {
 
         Boolean authenticated = dataVerification(name_str, email_str,password_str,confirmPassword_str);
 
-        if (authenticated == true) {
-            authRef.createUserWithEmailAndPassword(email_str,password_str).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
+        if (authenticated == true){
+            authRef.createUserWithEmailAndPassword(email_str,password_str).addOnCompleteListener(SignUp.this, new OnCompleteListener<AuthResult>() {
                 @Override
-                public void onSuccess(AuthResult authResult) {
-                    User user = new User(name_str);
-                    currentUser = authRef.getCurrentUser();
-                    usersRef.child(currentUser.getUid()).setValue(user);
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    if (task.isSuccessful()){
+                        User user = new User(name_str);
+                        if (currentUser == null){
+                            currentUser = authRef.getCurrentUser();
+                        }
+                        usersRef.child(currentUser.getUid()).setValue(user);
 
-                    if (rememberMe_boolS == true){
-                        SharedPreferences sharedPreferences = getSharedPreferences(Login.PREFS_NAME,MODE_PRIVATE);
-                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putBoolean("hasLoggedIn",true);
-                        editor.commit();
+                            SharedPreferences sharedPreferences = getSharedPreferences(Login.PREFS_NAME,MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putBoolean("hasLoggedIn",true);
+                            editor.commit();
+
+
+                        intent = new Intent(SignUp.this,Profile.class);
+                        startActivity(intent);
                     }
-                    intent = new Intent(SignUp.this,Profile.class);
-                    startActivity(intent);
+                    else {
+                        if (task.getException() instanceof FirebaseAuthUserCollisionException)
+                            Toast.makeText(SignUp.this, "User with e-mail already exist!", Toast.LENGTH_SHORT).show();
+                        else {
+                            Toast.makeText(SignUp.this, "User create failed.", Toast.LENGTH_LONG).show();
+                        }
+                    }
                 }
+
             });
         }
     }

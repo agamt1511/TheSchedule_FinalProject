@@ -8,6 +8,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
@@ -23,6 +24,7 @@ public class Profile extends AppCompatActivity {
     User user;
     String userID;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,6 +33,7 @@ public class Profile extends AppCompatActivity {
         name_etP = (EditText) findViewById(R.id.name_etP);
         email_etP = (EditText) findViewById(R.id.email_etP);
 
+        currentUser = authRef.getCurrentUser();
        showOriginalData();
     }
 
@@ -86,6 +89,10 @@ public class Profile extends AppCompatActivity {
     }
 
     public void logout(View view) {
+        SharedPreferences sharedPreferences = getSharedPreferences(Login.PREFS_NAME,MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("hasLoggedIn",false);
+        editor.commit();
         authRef.signOut();
         intent = new Intent(Profile.this,SignUp.class);
         startActivity(intent);
