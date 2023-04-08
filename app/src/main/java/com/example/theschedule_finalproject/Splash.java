@@ -30,11 +30,9 @@ public class Splash extends AppCompatActivity {
             public void run() {
                 SharedPreferences sharedPreferences = getSharedPreferences(Login.PREFS_NAME,0);
                 if (sharedPreferences.getBoolean("hasLoggedIn",false)){
-                    Toast.makeText(Splash.this, "eeee", Toast.LENGTH_SHORT).show();
                     intent = new Intent(Splash.this,Profile.class);
                 }
                 else {
-                    Toast.makeText(Splash.this, "rrrrrr", Toast.LENGTH_SHORT).show();
                     intent = new Intent(Splash.this,SignUp.class);
                 }
                 startActivity(intent);

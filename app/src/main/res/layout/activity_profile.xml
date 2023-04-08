@@ -23,34 +23,34 @@
             android:layout_height="0dp"
             android:layout_weight="2" />
 
-        <LinearLayout
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="10"
             android:gravity="center"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="75"
-                android:gravity="center"
-                android:text="PROFILE"
-                android:textColor="@color/primary_lightBlue"
-                android:textSize="60sp"
-                android:textStyle="bold" />
-
-            <ImageView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="25"
-                app:srcCompat="@drawable/profilesymbol" />
-        </LinearLayout>
+            android:text="PROFILE"
+            android:textColor="@color/primary_lightBlue"
+            android:textSize="60sp"
+            android:textStyle="bold" />
 
         <Space
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="8" />
+            android:layout_weight="3" />
+
+        <ImageView
+            android:id="@+id/profilePic"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_gravity="center"
+            android:layout_weight="28"
+            android:onClick="change_profileImage"
+            app:srcCompat="@drawable/profileimage" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2" />
 
         <EditText
             android:id="@+id/name_etP"
@@ -65,7 +65,7 @@
         <Space
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="5" />
+            android:layout_weight="3" />
 
         <EditText
             android:id="@+id/email_etP"
@@ -80,12 +80,12 @@
         <Space
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="5" />
+            android:layout_weight="3" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="10"
+            android:layout_weight="5"
             android:onClick="resetPassword"
             android:text="Reset Password"
             android:textColor="@color/primary_darkBlue"
@@ -95,7 +95,7 @@
         <Space
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="5" />
+            android:layout_weight="3" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -130,37 +130,21 @@
         <Space
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="5" />
+            android:layout_weight="3" />
 
-        <LinearLayout
+        <Button
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="10">
-
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="30" />
-
-            <Button
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="40"
-                android:backgroundTint="@color/primary_lightBlue"
-                android:onClick="logout"
-                android:text="LOGOUT"
-                android:textSize="18sp" />
-
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="30" />
-        </LinearLayout>
+            android:layout_weight="10"
+            android:backgroundTint="@color/primary_lightBlue"
+            android:onClick="logout"
+            android:text="LOGOUT"
+            android:textSize="18sp" />
 
         <Space
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="10" />
+            android:layout_weight="3" />
 
     </LinearLayout>
 

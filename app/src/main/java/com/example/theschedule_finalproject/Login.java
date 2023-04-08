@@ -27,10 +27,8 @@ import com.google.firebase.database.Query;
 
 public class Login extends AppCompatActivity {
     EditText email_etL, password_etL;
-    CheckBox rememberMe_cbL;
     Intent intent;
     public static String PREFS_NAME = "PrefFile";
-    Boolean rememberMe_boolL;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,20 +37,6 @@ public class Login extends AppCompatActivity {
 
         email_etL = (EditText) findViewById(R.id.email_etL);
         password_etL = (EditText) findViewById(R.id.password_etL);
-        rememberMe_cbL = (CheckBox) findViewById(R.id.rememberMe_cbL);
-
-        rememberMe_boolL = false;
-        rememberMe_cbL.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if (compoundButton.isChecked()){
-                    rememberMe_boolL = true;
-                }
-                else{
-                    rememberMe_boolL = false;
-                }
-            }
-        });
     }
 
     public void log_in(View view) {
@@ -66,7 +50,6 @@ public class Login extends AppCompatActivity {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if (task.isSuccessful()){
-                        Toast.makeText(Login.this, "iii", Toast.LENGTH_SHORT).show();
                         SharedPreferences sharedPreferences = getSharedPreferences(Login.PREFS_NAME,MODE_PRIVATE);
                         SharedPreferences.Editor editor = sharedPreferences.edit();
                         editor.putBoolean("hasLoggedIn",true);

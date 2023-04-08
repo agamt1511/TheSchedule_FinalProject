@@ -1,28 +1,52 @@
 package com.example.theschedule_finalproject;
 
+import static com.example.theschedule_finalproject.FBref.FBDB;
 import static com.example.theschedule_finalproject.FBref.authRef;
 import static com.example.theschedule_finalproject.FBref.currentUser;
+import static com.example.theschedule_finalproject.FBref.profilePic_ref;
+import static com.example.theschedule_finalproject.FBref.storageRef;
 import static com.example.theschedule_finalproject.FBref.usersRef;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.StorageReference;
+
+import java.io.File;
+import java.io.IOException;
 
 public class Profile extends AppCompatActivity {
+    ImageView profilePic;
     EditText email_etP, name_etP;
     Intent intent;
-
     User user;
-    String userID;
+    Uri selectedImageUri;
+    String userID, pathToImage;
+    int SELECT_PICTURE = 333;
+    int sourceType;
+    File profilePic_file;
 
 
     @Override
@@ -32,12 +56,14 @@ public class Profile extends AppCompatActivity {
 
         name_etP = (EditText) findViewById(R.id.name_etP);
         email_etP = (EditText) findViewById(R.id.email_etP);
+        profilePic = (ImageView) findViewById (R.id.profilePic);
 
-        currentUser = authRef.getCurrentUser();
-       showOriginalData();
+        showOriginalData();
     }
 
     private void showOriginalData() {
+        currentUser = authRef.getCurrentUser();
+        profilePic_ref = storageRef.child("Users").child(currentUser.getUid()).child("profileImage");
         userID = currentUser.getUid();
         usersRef.child(userID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -45,9 +71,16 @@ public class Profile extends AppCompatActivity {
                 user = snapshot.getValue(User.class);
                 name_etP.setText(user.getName());
                 email_etP.setText(currentUser.getEmail());
+
+                if (!user.getImage().matches("null")){
+                }
             }
+
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {}});
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     public void saveChanges(View view) {
@@ -55,7 +88,7 @@ public class Profile extends AppCompatActivity {
         String email_str = email_etP.getText().toString();
         Boolean authenticated = dataVerification(name_str, email_str);
 
-        if (authenticated == true){
+        if (authenticated == true) {
             AlertDialog.Builder adb;
             adb = new AlertDialog.Builder(Profile.this);
             adb.setTitle("Save Changes");
@@ -80,7 +113,7 @@ public class Profile extends AppCompatActivity {
     }
 
     public void resetPassword(View view) {
-        intent = new Intent(Profile.this,ResetPassword.class);
+        intent = new Intent(Profile.this, ResetPassword.class);
         startActivity(intent);
     }
 
@@ -89,18 +122,18 @@ public class Profile extends AppCompatActivity {
     }
 
     public void logout(View view) {
-        SharedPreferences sharedPreferences = getSharedPreferences(Login.PREFS_NAME,MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences(Login.PREFS_NAME, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean("hasLoggedIn",false);
+        editor.putBoolean("hasLoggedIn", false);
         editor.commit();
         authRef.signOut();
-        intent = new Intent(Profile.this,SignUp.class);
+        intent = new Intent(Profile.this, SignUp.class);
         startActivity(intent);
     }
 
     public Boolean dataVerification(String name, String email) {
         int errorExist = 0;
-        if (name.length()<1){
+        if (name.length() < 1) {
             name_etP.setError("ERROR! The filed can't be blank.");
             errorExist++;
         }
@@ -109,9 +142,51 @@ public class Profile extends AppCompatActivity {
             errorExist++;
         }
 
-        if(errorExist > 0){
+        if (errorExist > 0) {
             return false;
         }
         return true;
     }
+
+    public void change_profileImage(View view) {
+        AlertDialog.Builder adb;
+        adb = new AlertDialog.Builder(Profile.this);
+        adb.setTitle("Profile Picture");
+        adb.setMessage("Choose from where you want to upload a your photo.");
+        adb.setPositiveButton("Gallery", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(intent, "Select Picture"), SELECT_PICTURE);
+            }
+        });
+        adb.setNegativeButton("Camera", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+        AlertDialog ad = adb.create();
+        ad.show();
+    }
+
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if ((requestCode == SELECT_PICTURE) && (resultCode == RESULT_OK) && (null != data)) {
+            selectedImageUri = data.getData();
+            user.setImage(String.valueOf(selectedImageUri));
+            if (selectedImageUri != null) {
+                profilePic_ref = storageRef.child("Users").child(currentUser.getUid()).child("profileImage");
+                profilePic_ref.putFile(selectedImageUri);
+                pathToImage = profilePic_ref.toString();
+                user.setImage(String.valueOf(selectedImageUri));
+                usersRef.child(currentUser.getUid()).setValue(user);
+                profilePic.setImageURI(selectedImageUri);
+            }
+        }
+    }
+
 }

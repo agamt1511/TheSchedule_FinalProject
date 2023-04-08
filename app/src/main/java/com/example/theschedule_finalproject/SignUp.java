@@ -29,9 +29,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class SignUp extends AppCompatActivity {
     EditText name_etS, email_etS, password_etS, passwordConfirm_etS;
-    CheckBox rememberMe_cbS;
     Intent intent;
-    Boolean rememberMe_boolS;
 
 
 
@@ -44,20 +42,7 @@ public class SignUp extends AppCompatActivity {
         email_etS = (EditText) findViewById(R.id.email_etS);
         password_etS = (EditText) findViewById(R.id.password_etS);
         passwordConfirm_etS = (EditText) findViewById(R.id.passwordConfirm_etS);
-        rememberMe_cbS = (CheckBox) findViewById(R.id.rememberMe_cbS);
 
-        rememberMe_boolS = false;
-        rememberMe_cbS.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if (compoundButton.isChecked()){
-                    rememberMe_boolS = true;
-                }
-                else{
-                    rememberMe_boolS = false;
-                }
-            }
-        });
     }
 
 
@@ -66,6 +51,7 @@ public class SignUp extends AppCompatActivity {
         String email_str  = email_etS.getText().toString();
         String password_str  = password_etS.getText().toString();
         String confirmPassword_str  = passwordConfirm_etS.getText().toString();
+        String profilePic = "null";
 
         Boolean authenticated = dataVerification(name_str, email_str,password_str,confirmPassword_str);
 
@@ -74,7 +60,7 @@ public class SignUp extends AppCompatActivity {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if (task.isSuccessful()){
-                        User user = new User(name_str);
+                        User user = new User(name_str,profilePic);
                         if (currentUser == null){
                             currentUser = authRef.getCurrentUser();
                         }
