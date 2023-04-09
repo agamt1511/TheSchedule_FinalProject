@@ -1,5 +1,6 @@
 package com.example.theschedule_finalproject;
 
+import static android.provider.MediaStore.ACTION_IMAGE_CAPTURE;
 import static com.example.theschedule_finalproject.FBref.FBDB;
 import static com.example.theschedule_finalproject.FBref.authRef;
 import static com.example.theschedule_finalproject.FBref.currentUser;
@@ -9,6 +10,7 @@ import static com.example.theschedule_finalproject.FBref.usersRef;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -18,6 +20,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.EditText;
@@ -36,6 +40,8 @@ import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Profile extends AppCompatActivity {
     ImageView profilePic;
@@ -47,7 +53,6 @@ public class Profile extends AppCompatActivity {
     int SELECT_PICTURE = 333;
     int sourceType;
     File profilePic_file;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -156,15 +161,13 @@ public class Profile extends AppCompatActivity {
         adb.setPositiveButton("Gallery", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                intent = new Intent();
-                intent.setType("image/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(intent, "Select Picture"), SELECT_PICTURE);
+                gallery();
             }
         });
         adb.setNegativeButton("Camera", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
+                camera();
 
             }
         });
@@ -172,21 +175,42 @@ public class Profile extends AppCompatActivity {
         ad.show();
     }
 
+    private void camera() {
+        Intent openCamera = new Intent();
+        openCamera.setType("image/*");
+        openCamera.setAction(ACTION_IMAGE_CAPTURE);
+        startActivityForResult(openCamera, 100);
+    }
+
+    public void gallery (){
+        sourceType = 1;
+        intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), SELECT_PICTURE);
+    }
+
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if ((requestCode == SELECT_PICTURE) && (resultCode == RESULT_OK) && (null != data)) {
-            selectedImageUri = data.getData();
-            user.setImage(String.valueOf(selectedImageUri));
-            if (selectedImageUri != null) {
-                profilePic_ref = storageRef.child("Users").child(currentUser.getUid()).child("profileImage");
-                profilePic_ref.putFile(selectedImageUri);
-                pathToImage = profilePic_ref.toString();
+            if (sourceType == 1) {
+                selectedImageUri = data.getData();
                 user.setImage(String.valueOf(selectedImageUri));
-                usersRef.child(currentUser.getUid()).setValue(user);
-                profilePic.setImageURI(selectedImageUri);
+                if (selectedImageUri != null) {
+                    profilePic_ref.putFile(selectedImageUri);
+                    pathToImage = profilePic_ref.toString();
+                    user.setImage(String.valueOf(selectedImageUri));
+                    usersRef.child(currentUser.getUid()).setValue(user);
+                    profilePic.setImageURI(selectedImageUri);
+                }
+            }
+            else {
+                Uri photo = data.getData();
+                profilePic.setImageURI(photo);
             }
         }
     }
+
 
 }

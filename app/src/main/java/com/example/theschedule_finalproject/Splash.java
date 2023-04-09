@@ -33,7 +33,7 @@ public class Splash extends AppCompatActivity {
                     intent = new Intent(Splash.this,Profile.class);
                 }
                 else {
-                    intent = new Intent(Splash.this,SignUp.class);
+                    intent = new Intent(Splash.this,TasksView.class);
                 }
                 startActivity(intent);
                 finish();

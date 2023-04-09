@@ -40,6 +40,9 @@
         android:theme="@style/Theme.TheSchedule_FinalProject"
         tools:targetApi="31">
         <activity
+            android:name=".TasksView"
+            android:exported="false" />
+        <activity
             android:name=".NotesEdit"
             android:exported="false" />
         <activity
@@ -69,6 +72,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.example.theschedule_finalproject.android.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
     </application>
 
 </manifest>
