@@ -47,7 +47,6 @@ public class TasksView extends AppCompatActivity implements OnDialogCloseListner
 
         mList = new ArrayList<>();
         adapter = new TasksAdapter(TasksView.this,mList);
-
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new TouchHelper(adapter));
         itemTouchHelper.attachToRecyclerView(viewTasks_rv);
         showData();
@@ -55,7 +54,7 @@ public class TasksView extends AppCompatActivity implements OnDialogCloseListner
     }
 
     private void showData() {
-        query = firestore.collection("task").orderBy("tim e" , Query.Direction.DESCENDING);
+        query = firestore.collection("task").orderBy("time" , Query.Direction.DESCENDING);
 
         listenerRegistration = query.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
