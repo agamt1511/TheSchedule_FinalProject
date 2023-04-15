@@ -1,4 +1,4 @@
-package com.example.theschedule_finalproject;
+package com.example.theschedule_finalproject.Models;
 
 public class User {
     private String user_name, user_image;
