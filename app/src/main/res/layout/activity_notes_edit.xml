@@ -13,8 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="650dp"
-        android:background="@color/primary_teal"
-        android:backgroundTint="@color/primary_teal"
+        android:background="#FFC400"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -25,7 +24,7 @@
             android:layout_weight="60"
             android:gravity="right"
             android:text="NOTES"
-            android:textColor="@color/primary_navy"
+            android:textColor="@color/primary_lightBlue"
             android:textSize="60dp"
             android:textStyle="bold" />
 
@@ -34,7 +33,7 @@
             android:layout_height="match_parent"
             android:layout_weight="25"
             app:srcCompat="@drawable/baseline_edit"
-            app:tint="@color/primary_navy"/>
+            app:tint="@color/primary_lightBlue"/>
 
         <Space
             android:layout_width="0dp"
@@ -58,9 +57,9 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
-        android:id="@+id/editTextTextMultiLine2"
+        android:id="@+id/txt_etNE"
         android:layout_width="match_parent"
-        android:layout_height="250dp"
+        android:layout_height="400dp"
         android:layout_marginStart="32dp"
         android:layout_marginTop="164dp"
         android:layout_marginEnd="32dp"
@@ -68,19 +67,10 @@
         android:gravity="start|top"
         android:hint="Write Your Note Here ..."
         android:inputType="textMultiLine"
+        app:layout_constraintBottom_toTopOf="@+id/thumbtack_cbNE"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <Spinner
-        android:id="@+id/images_spNE"
-        android:layout_width="match_parent"
-        android:layout_height="125dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginEnd="32dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="431dp" />
 
     <CheckBox
         android:id="@+id/thumbtack_cbNE"
@@ -93,15 +83,18 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/images_spNE" />
+        app:layout_constraintTop_toBottomOf="@+id/txt_etNE" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="258dp"
         android:layout_marginTop="16dp"
-        android:backgroundTint="@color/primary_teal"
+        android:backgroundTint="#FFC400"
         android:text="SAVE"
+        android:textColor="@color/primary_lightBlue"
+        android:textSize="20dp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/thumbtack_cbNE" />

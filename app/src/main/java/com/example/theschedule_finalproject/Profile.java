@@ -16,10 +16,13 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Patterns;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import com.example.theschedule_finalproject.Models.Assignment;
 import com.example.theschedule_finalproject.Models.User;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -195,6 +198,35 @@ public class Profile extends AppCompatActivity {
             }
         }
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.dailySchedule) {
+            intent = new Intent(this, DailyScheduleView.class);
+            startActivity(intent);
+        }
+        else if (id == R.id.assignments) {
+            intent = new Intent(this, AssignmentsView.class);
+            startActivity(intent);
+        }
+        else if (id == R.id.notes) {
+            intent = new Intent(this, NotesView.class);
+            startActivity(intent);
+        }
+        else if (id == R.id.credits) {
+            intent = new Intent(this, Credits.class);
+            startActivity(intent);
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
 
 
 }

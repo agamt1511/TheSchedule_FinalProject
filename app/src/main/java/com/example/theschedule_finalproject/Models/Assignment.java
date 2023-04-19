@@ -4,18 +4,15 @@ import java.util.ArrayList;
 public class Assignment {
     private String title;
     private String txt;// הפנייה לstorage
-
-    private ArrayList<String> images;
     private String assignment_goal_dateTime;
 
 
     public Assignment() {
     }
 
-    public Assignment(String title, String txt, ArrayList<String> images, String assignment_goal_dateTime) {
+    public Assignment(String title, String txt, String assignment_goal_dateTime) {
         this.title = title;
         this.txt = txt;
-        this.images =images;
         this.assignment_goal_dateTime = assignment_goal_dateTime;
     }
 
@@ -34,16 +31,6 @@ public class Assignment {
 
     public void setTxt(String txt) {
         this.txt = txt;
-    }
-
-
-    public ArrayList<String> getImages() {
-        return images;
-    }
-
-
-    public void setImages(ArrayList<String> images) {
-        this.images = images;
     }
 
     public String getAssignment_goal_dateTime() {

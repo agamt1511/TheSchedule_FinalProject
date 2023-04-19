@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/dailySchedule"
+        android:title="Daily Schedule"
+        android:orderInCategory="100"/>
+    <item
+        android:id="@+id/assignments"
+        android:title="Assignments"
+        android:orderInCategory="200"/>
+
+    <item
+        android:id="@+id/notes"
+        android:title="Notes"
+        android:orderInCategory="300"/>
+
+    <item
+        android:id="@+id/profile"
+        android:title="Profile"
+        android:orderInCategory="400"/>
+
+    <item
+        android:id="@+id/credits"
+        android:title="Credits"
+        android:orderInCategory="500"/>
+
+</menu>

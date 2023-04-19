@@ -5,17 +5,15 @@ import java.util.ArrayList;
 public class Event {
     private String title;
     private String txt;// הפנייה לstorage
-    private ArrayList<String> images; //הפנייה לתקייה בstorage
     private String event_dateTime;
 
 
     public Event() {
     }
 
-    public Event (String title, String txt, ArrayList<String>images, String event_dateTime){
+    public Event (String title, String txt, String event_dateTime){
         this.title = title;
         this.txt = txt;
-        this.images = images;
         this.event_dateTime = event_dateTime;
     }
 
@@ -35,15 +33,6 @@ public class Event {
 
     public void setTxt(String txt) {
         this.txt = txt;
-    }
-
-
-    public ArrayList<String> getImages() {
-        return images;
-    }
-
-    public void setImages(ArrayList<String> images) {
-        this.images = images;
     }
 
 

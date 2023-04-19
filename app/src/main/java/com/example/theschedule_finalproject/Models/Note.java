@@ -5,16 +5,14 @@ import java.util.ArrayList;
 public class Note {
     private String title;
     private String txt;// הפנייה לstorage
-    private ArrayList<String> images;
     private String note_dateTime_created;
 
     public Note() {
     }
 
-    public Note(String title, String txt, ArrayList<String> images, String note_dateTime_created) {
+    public Note(String title, String txt, String note_dateTime_created) {
         this.title = title;
         this.txt = txt;
-        this.images = images;
         this.note_dateTime_created = note_dateTime_created;
     }
 
@@ -33,15 +31,6 @@ public class Note {
 
     public void setTxt(String txt) {
         this.txt = txt;
-    }
-
-
-    public ArrayList<String> getImages() {
-        return images;
-    }
-
-    public void setImages(ArrayList<String> images) {
-        this.images = images;
     }
 
 
