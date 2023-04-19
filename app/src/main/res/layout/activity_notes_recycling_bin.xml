@@ -39,19 +39,30 @@
             android:layout_weight="20" />
     </LinearLayout>
 
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2.5" />
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="5"
+        android:layout_weight="10"
         android:gravity="center"
         android:text="Empty Recycle Bin"
         android:textColor="@color/primary_lightBlue"
-        android:textSize="20dp"
+        android:textSize="25dp"
         android:textStyle="bold" />
 
-    <androidx.recyclerview.widget.RecyclerView
+    <Space
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="85" />
+        android:layout_weight="2.5" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/notesBin_rvNRB"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="75" />
 
 </LinearLayout>

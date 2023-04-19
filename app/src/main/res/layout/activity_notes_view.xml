@@ -15,10 +15,10 @@
         android:textColor="@color/primary_lightBlue"
         android:textSize="55dp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/recyclerView2" />
+        app:layout_constraintBottom_toTopOf="@+id/notes_rvNV" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView2"
+        android:id="@+id/notes_rvNV"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="75dp"
