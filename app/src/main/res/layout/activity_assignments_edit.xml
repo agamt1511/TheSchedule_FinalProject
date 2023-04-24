@@ -136,16 +136,16 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="24dp"
         android:layout_marginBottom="32dp"
         android:backgroundTint="#FFEA00"
+        android:onClick="saveAssignment"
+        android:text="SAVE"
         android:textColor="@color/primary_darkBlue"
         android:textSize="20dp"
         android:textStyle="bold"
-        android:text="SAVE"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

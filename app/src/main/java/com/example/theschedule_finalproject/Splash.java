@@ -29,7 +29,7 @@ public class Splash extends AppCompatActivity {
                     intent = new Intent(Splash.this,Profile.class);
                 }
                 else {
-                    intent = new Intent(Splash.this, Credits.class);
+                    intent = new Intent(Splash.this, DailyScheduleView.class);
                 }
                 startActivity(intent);
                 finish();

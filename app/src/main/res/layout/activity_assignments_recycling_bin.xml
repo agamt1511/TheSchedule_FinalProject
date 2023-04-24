@@ -42,6 +42,7 @@
         android:layout_height="0dp"
         android:layout_weight="10"
         android:gravity="center"
+        android:onClick="emptyRecycleBin_assignments"
         android:text="Empty Recycle Bin"
         android:textColor="@color/primary_darkBlue"
         android:textSize="25dp"
