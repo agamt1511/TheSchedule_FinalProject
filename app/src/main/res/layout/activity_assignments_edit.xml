@@ -61,44 +61,26 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
+    <Spinner
+        android:id="@+id/spinner"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="450dp"
-        android:layout_marginEnd="150dp"
-        android:layout_marginBottom="225dp"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="430dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="250dp"
+        app:layout_constraintBottom_toTopOf="@+id/button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="15"
-            app:srcCompat="@drawable/baseline_time"
-            app:tint="@color/black" />
-
-        <EditText
-            android:id="@+id/time_etAE"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="85"
-            android:ems="10"
-            android:hint="Enter DueTime"
-            android:inputType="time" />
-
-    </LinearLayout>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="525dp"
+        android:layout_marginTop="500dp"
         android:layout_marginEnd="150dp"
-        android:layout_marginBottom="150dp"
+        android:layout_marginBottom="175dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -123,19 +105,39 @@
 
     </LinearLayout>
 
-    <CheckBox
-        android:id="@+id/alert_cbAE"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="600dp"
-        android:layout_marginEnd="250dp"
-        android:text="Add An Alert"
+        android:layout_marginTop="570dp"
+        android:layout_marginEnd="150dp"
+        android:layout_marginBottom="105dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="15"
+            app:srcCompat="@drawable/baseline_time"
+            app:tint="@color/black" />
+
+        <EditText
+            android:id="@+id/time_etAE"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="85"
+            android:ems="10"
+            android:hint="Enter DueTime"
+            android:inputType="time" />
+
+    </LinearLayout>
 
     <Button
+        android:id="@+id/button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="24dp"
