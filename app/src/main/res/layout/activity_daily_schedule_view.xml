@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center"
     android:orientation="vertical"
     tools:context=".DailyScheduleView">
 
@@ -125,7 +126,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="10" >
+        android:layout_weight="10">
 
     </androidx.recyclerview.widget.RecyclerView>
 
@@ -151,34 +152,14 @@
                 android:layout_height="0dp"
                 android:layout_weight="5" />
 
-            <LinearLayout
+            <Button
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="10"
-                android:orientation="horizontal">
-
-                <Button
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="40"
-                    android:backgroundTint="#FF3D00"
-                    android:text="New Task"
-                    android:textColor="@color/primary_teal" />
-
-                <Space
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="20" />
-
-                <Button
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="40"
-                    android:backgroundTint="#FF3D00"
-                    android:text="RecycleBin"
-                    android:textColor="@color/primary_teal" />
-
-            </LinearLayout>
+                android:backgroundTint="#FF3D00"
+                android:onClick="addEvent"
+                android:text="New Event"
+                android:textColor="@color/primary_teal" />
 
             <Space
                 android:layout_width="match_parent"

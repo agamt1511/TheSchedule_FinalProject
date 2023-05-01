@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center"
     android:orientation="vertical"
     tools:context=".AssignmentsRecyclingBin">
 
@@ -20,7 +21,7 @@
             android:gravity="center"
             android:text="ASSIGNMENTS"
             android:textColor="@color/primary_darkBlue"
-            android:textSize="50dp"
+            android:textSize="32dp"
             android:textStyle="bold" />
 
         <ImageView
@@ -28,7 +29,7 @@
             android:layout_height="match_parent"
             android:layout_weight="15"
             app:srcCompat="@drawable/baseline_delete"
-            app:tint="@color/primary_darkBlue"/>
+            app:tint="@color/primary_darkBlue" />
 
     </LinearLayout>
 
@@ -37,16 +38,31 @@
         android:layout_height="0dp"
         android:layout_weight="2.5" />
 
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="10"
-        android:gravity="center"
-        android:onClick="emptyRecycleBin_assignments"
-        android:text="Empty Recycle Bin"
-        android:textColor="@color/primary_darkBlue"
-        android:textSize="25dp"
-        android:textStyle="bold" />
+        android:orientation="horizontal">
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="20" />
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="60"
+            android:backgroundTint="@color/primary_darkBlue"
+            android:onClick="emptyRecycleBin_assignments"
+            android:text="Empty Recycle Bin"
+            android:textColor="#FFEA00" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="20" />
+    </LinearLayout>
 
     <Space
         android:layout_width="match_parent"
@@ -81,10 +97,29 @@
         android:layout_height="0dp"
         android:layout_weight="2.5" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/assignmentsBin_ARB"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="62.5" />
+        android:layout_weight="62.5"
+        android:orientation="horizontal">
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="5" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/assignmentsBin_ARB"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="90">
+
+        </androidx.recyclerview.widget.RecyclerView>
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="5" />
+    </LinearLayout>
 
 </LinearLayout>

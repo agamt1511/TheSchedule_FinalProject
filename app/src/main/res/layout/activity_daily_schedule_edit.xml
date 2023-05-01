@@ -52,7 +52,7 @@
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="5" />
+                android:layout_weight="2.5" />
 
             <EditText
                 android:id="@+id/title_etDSE"
@@ -65,13 +65,13 @@
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="5" />
+                android:layout_weight="2.5" />
 
             <EditText
                 android:id="@+id/txt_etDSE"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="30"
+                android:layout_weight="32.5"
                 android:ems="10"
                 android:gravity="start|top"
                 android:hint="Write Your Assignment Here ..."
@@ -80,7 +80,7 @@
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="5" />
+                android:layout_weight="2.5" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -109,7 +109,7 @@
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="5" />
+                android:layout_weight="2.5" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -135,12 +135,22 @@
 
             </LinearLayout>
 
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="2.5" />
+
             <CheckBox
                 android:id="@+id/alert_cbDSE"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="10"
                 android:text="Add An Alert" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="2.5" />
 
             <Button
                 android:layout_width="match_parent"
@@ -156,7 +166,7 @@
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="5" />
+                android:layout_weight="2.5" />
 
         </LinearLayout>
 

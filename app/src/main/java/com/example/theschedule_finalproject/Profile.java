@@ -64,8 +64,7 @@ public class Profile extends AppCompatActivity {
                 //name_etP.setText(user.getName());
                 email_etP.setText(currentUser.getEmail());
 
-                if (!user.getImage().matches("null")){
-                }
+                //if (!user.getImage().matches("null")){}
             }
 
             @Override
