@@ -26,10 +26,10 @@ public class Splash extends AppCompatActivity {
             public void run() {
                 SharedPreferences sharedPreferences = getSharedPreferences(Login.PREFS_NAME,0);
                 if (sharedPreferences.getBoolean("hasLoggedIn",false)){
-                    intent = new Intent(Splash.this,Profile.class);
+                    intent = new Intent(Splash.this,DailyScheduleView.class);
                 }
                 else {
-                    intent = new Intent(Splash.this, DailyScheduleView.class);
+                    intent = new Intent(Splash.this, SignUp.class);
                 }
                 startActivity(intent);
                 finish();

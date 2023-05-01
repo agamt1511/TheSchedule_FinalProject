@@ -49,7 +49,6 @@
         android:onClick="toRecyclingBin_notes"
         app:backgroundTint="#FFFFC400"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintBotton_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/baseline_delete"
         app:tint="@color/primary_lightBlue" />
