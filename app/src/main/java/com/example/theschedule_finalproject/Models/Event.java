@@ -6,6 +6,7 @@ public class Event {
     private String title;
     private String txt;// הפנייה לstorage
     private String event_dateTime;
+    private int count;
 
 
     public Event() {
@@ -15,6 +16,7 @@ public class Event {
         this.title = title;
         this.txt = txt;
         this.event_dateTime = event_dateTime;
+        this.count = 0;
     }
 
 

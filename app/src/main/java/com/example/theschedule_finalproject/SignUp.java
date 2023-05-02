@@ -56,10 +56,11 @@ public class SignUp extends AppCompatActivity {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if (task.isSuccessful()){
-                        User user = new User(name_str,profilePic);
-                        if (currentUser == null){
-                            currentUser = authRef.getCurrentUser();
-                        }
+                        currentUser = authRef.getCurrentUser();
+                        User user = new User(currentUser.getUid(),name_str,profilePic);
+//                        if (currentUser == null){
+//                            currentUser = authRef.getCurrentUser();
+//                        }
                         usersRef.child(currentUser.getUid()).setValue(user);
 
                             SharedPreferences sharedPreferences = getSharedPreferences(Login.PREFS_NAME,MODE_PRIVATE);

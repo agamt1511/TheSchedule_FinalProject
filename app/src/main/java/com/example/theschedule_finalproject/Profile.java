@@ -64,7 +64,7 @@ public class Profile extends AppCompatActivity {
                 //name_etP.setText(user.getName());
                 email_etP.setText(currentUser.getEmail());
 
-                //if (!user.getImage().matches("null")){}
+                if (user.getUser_image() == "Null"){}
             }
 
             @Override
@@ -88,7 +88,7 @@ public class Profile extends AppCompatActivity {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
                     currentUser.updateEmail(email_str);
-                    user.setName(name_str);
+                    user.setUser_name(name_str);
                     usersRef.child(userID).setValue(user);
                 }
             });
@@ -182,11 +182,11 @@ public class Profile extends AppCompatActivity {
         if ((requestCode == SELECT_PICTURE) && (resultCode == RESULT_OK) && (null != data)) {
             if (sourceType == 1) {
                 selectedImageUri = data.getData();
-                user.setImage(String.valueOf(selectedImageUri));
+                user.setUser_image(String.valueOf(selectedImageUri));
                 if (selectedImageUri != null) {
                     profilePic_ref.putFile(selectedImageUri);
                     pathToImage = profilePic_ref.toString();
-                    user.setImage(String.valueOf(selectedImageUri));
+                    user.setUser_image(String.valueOf(selectedImageUri));
                     usersRef.child(currentUser.getUid()).setValue(user);
                     profilePic.setImageURI(selectedImageUri);
                 }
