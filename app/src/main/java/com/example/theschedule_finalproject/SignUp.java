@@ -101,7 +101,7 @@ public class SignUp extends AppCompatActivity {
         }
     }
 
-    //בדיקה האם הפרטים שנכנסו נכונים
+    //בדיקה האם הפרטים שהוכנסו נכונים
     public Boolean dataVerification(String name, String email, String password, String confirmPassword) {
         int errorExist = 0;
         if (name.length()<1){

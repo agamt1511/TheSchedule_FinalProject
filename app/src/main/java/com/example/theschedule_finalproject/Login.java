@@ -93,7 +93,7 @@ public class Login extends AppCompatActivity {
         startActivity(intent);
     }
 
-    //בדיקת האם הפרטים שנכנסו נכונים
+    //בדיקת האם הפרטים שהוכנסו נכונים
     public Boolean dataVerification(String email, String password) {
         int errorExist = 0;
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()){

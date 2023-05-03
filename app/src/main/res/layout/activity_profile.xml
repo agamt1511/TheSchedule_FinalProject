@@ -97,35 +97,14 @@
             android:layout_height="0dp"
             android:layout_weight="3" />
 
-        <LinearLayout
+        <Button
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="10"
-            android:orientation="horizontal">
-
-            <Button
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="40"
-                android:backgroundTint="@color/primary_lightBlue"
-                android:onClick="saveChanges"
-                android:text="Save"
-                android:textSize="18sp" />
-
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="20" />
-
-            <Button
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="40"
-                android:backgroundTint="@color/primary_lightBlue"
-                android:onClick="cancelChanges"
-                android:text="Cancel"
-                android:textSize="18sp" />
-        </LinearLayout>
+            android:backgroundTint="@color/primary_lightBlue"
+            android:onClick="saveChanges"
+            android:text="Save Changes"
+            android:textSize="18sp" />
 
         <Space
             android:layout_width="match_parent"
