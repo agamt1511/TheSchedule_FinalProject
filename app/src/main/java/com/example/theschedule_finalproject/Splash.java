@@ -24,7 +24,7 @@ public class Splash extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                SharedPreferences sharedPreferences = getSharedPreferences(Login.PREFS_NAME,0);
+                SharedPreferences sharedPreferences = getSharedPreferences(Login.PREFS_NAME,MODE_PRIVATE);
                 if (sharedPreferences.getBoolean("hasLoggedIn",false)){
                     intent = new Intent(Splash.this,DailyScheduleView.class);
                 }

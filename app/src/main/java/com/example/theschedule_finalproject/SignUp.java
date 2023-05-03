@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.theschedule_finalproject.Models.User;
@@ -22,8 +23,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 
-
 public class SignUp extends AppCompatActivity {
+    //הכרזה על רכיבי מערכת, משתנים וכדומה
     EditText name_etS, email_etS, password_etS, passwordConfirm_etS;
     Intent intent;
 
@@ -34,6 +35,7 @@ public class SignUp extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
 
+        //התאמה בין רכיב למשתנה
         name_etS = (EditText) findViewById(R.id.name_etS);
         email_etS = (EditText) findViewById(R.id.email_etS);
         password_etS = (EditText) findViewById(R.id.password_etS);
@@ -43,41 +45,54 @@ public class SignUp extends AppCompatActivity {
 
 
     public void create_account(View view) {
+        //המרת פרטים מרכיבי מסך לString
         String name_str  = name_etS.getText().toString();
         String email_str  = email_etS.getText().toString();
         String password_str  = password_etS.getText().toString();
         String confirmPassword_str  = passwordConfirm_etS.getText().toString();
-        String profilePic = "null";
+        String profilePic = "Null";
 
+        //שליחה לפעולת בדיקה ואישור נתונים
         Boolean authenticated = dataVerification(name_str, email_str,password_str,confirmPassword_str);
 
-        if (authenticated == true){
+        //אם הנתונים מאושרים לבצע הרשמה והוספה למערך הנתונים
+        if (authenticated){
+            //יצית משתמש חדש ויצירת מאזין לפעולה
             authRef.createUserWithEmailAndPassword(email_str,password_str).addOnCompleteListener(SignUp.this, new OnCompleteListener<AuthResult>() {
                 @Override
+                //אם הפעולה הושלמה בהצלחה
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if (task.isSuccessful()){
+                        //יצירת עצם User בfirebase realtime database
                         currentUser = authRef.getCurrentUser();
                         User user = new User(currentUser.getUid(),name_str,profilePic);
-//                        if (currentUser == null){
-//                            currentUser = authRef.getCurrentUser();
-//                        }
                         usersRef.child(currentUser.getUid()).setValue(user);
 
-                            SharedPreferences sharedPreferences = getSharedPreferences(Login.PREFS_NAME,MODE_PRIVATE);
-                            SharedPreferences.Editor editor = sharedPreferences.edit();
-                            editor.putBoolean("hasLoggedIn",true);
-                            editor.commit();
+                        //שינוי ערך בוליאני "hasLoggedIn" של SharedPrefrance
+                        SharedPreferences sharedPreferences = getSharedPreferences(Login.PREFS_NAME,MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putBoolean("hasLoggedIn",true);
+                        editor.commit();
 
-
-                        intent = new Intent(SignUp.this,Profile.class);
+                        //מעבר למסך חדש
+                        intent = new Intent(SignUp.this,DailyScheduleView.class);
                         startActivity(intent);
                     }
+                    //אם הרשמת משתמש חדש לא צלחה
                     else {
-                        if (task.getException() instanceof FirebaseAuthUserCollisionException)
-                            Toast.makeText(SignUp.this, "User with e-mail already exist!", Toast.LENGTH_SHORT).show();
-                        else {
-                            Toast.makeText(SignUp.this, "User create failed.", Toast.LENGTH_LONG).show();
+                        AlertDialog.Builder adb;
+                        adb = new AlertDialog.Builder(SignUp.this);
+                        adb.setTitle("Registration Error");
+                        //אם משתמש כבר קיים הצג הודעה מתאימה
+                        if (task.getException() instanceof FirebaseAuthUserCollisionException) {
+                            adb.setMessage("User with this e-mail is already exist!");
                         }
+                        //אם תקלה אחרת הצג הודעה מתאימה
+                        else {
+                            adb.setMessage("The system failed to create a new user. Please try again later.");
+                        }
+                        AlertDialog ad = adb.create();
+                        ad.show();
                     }
                 }
 
@@ -85,6 +100,7 @@ public class SignUp extends AppCompatActivity {
         }
     }
 
+    //בדיקת האם הפרטים שנכנסו נכונים
     public Boolean dataVerification(String name, String email, String password, String confirmPassword) {
         int errorExist = 0;
         if (name.length()<1){
@@ -96,7 +112,7 @@ public class SignUp extends AppCompatActivity {
             errorExist++;
         }
         if (password.length()<6){
-            password_etS.setError("ERROR! Password too short.");
+            password_etS.setError("ERROR! Enter at least 6 characters.");
             errorExist++;
         }
         if (!password.equals(confirmPassword)) {
@@ -110,6 +126,7 @@ public class SignUp extends AppCompatActivity {
         return true;
     }
 
+    //מעבר למסך התחברות
     public void toLogInAct(View view) {
         intent = new Intent(SignUp.this,Login.class);
         startActivity(intent);

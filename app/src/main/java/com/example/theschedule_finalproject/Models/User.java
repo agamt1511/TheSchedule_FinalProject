@@ -14,7 +14,6 @@ public class User {
     public String getUser_uid() {
         return user_uid;
     }
-
     public void setUser_uid(String user_uid) {
         this.user_uid = user_uid;
     }
@@ -29,8 +28,8 @@ public class User {
     public String getUser_image() {
         return user_image;
     }
-
     public void setUser_image(String user_image) {
         this.user_image = user_image;
     }
+
 }
