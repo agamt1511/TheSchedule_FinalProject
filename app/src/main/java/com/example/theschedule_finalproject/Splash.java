@@ -1,7 +1,6 @@
 package com.example.theschedule_finalproject;
 
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -21,6 +20,7 @@ public class Splash extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
+        //יצירת מסך פתיחה קבוע לאפלקיציה ששולח את משתמש למסך המתאים בהתאם לערך הבוליאני "hasLoggedIn" של SharedPrefrance
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -32,7 +32,6 @@ public class Splash extends AppCompatActivity {
                     intent = new Intent(Splash.this, SignUp.class);
                 }
                 startActivity(intent);
-                finish();
             }
         }, SPLASH_TIME_OUT);
     }

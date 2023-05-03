@@ -5,13 +5,11 @@ import static com.example.theschedule_finalproject.FBref.authRef;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.EditText;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
@@ -26,6 +24,9 @@ public class ResetPassword extends AppCompatActivity {
         email_etF = (EditText) findViewById(R.id.email_etF);
     }
 
+    /*קבלת String של אימייל ושליחת מייל לשחזור סיסמה למייל זה
+    הערה: אם למשתמש אין חשבון קיים באפליקציה אז לא יישלח אימייל.
+     */
     public void resetPassword(View view) {
         String email = email_etF.getText().toString();
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()){
