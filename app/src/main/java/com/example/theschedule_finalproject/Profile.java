@@ -11,14 +11,18 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Patterns;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -50,7 +54,7 @@ public class Profile extends AppCompatActivity {
     String user_uid;
     Query query;
     User user;
-    int SelectImage = 3333;
+    int GALLERY_IMAGE = 3333;
     Uri selectedImageUri;
     StorageReference selectedImageUri_ref;
 
@@ -111,6 +115,20 @@ public class Profile extends AppCompatActivity {
         }
     }
 
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(requestCode == GALLERY_IMAGE){
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                chooseFromGallery();
+            }
+            else {
+                Toast.makeText(this, "xxxxx", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
     //שמירת נתונים חדשים שהמשתמש הכניס
     public void saveChanges(View view) {
         String name_str = name_etP.getText().toString();
@@ -156,11 +174,11 @@ public class Profile extends AppCompatActivity {
         adb.setPositiveButton("Gallery", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                Intent profilePic_intent = new Intent();
-                profilePic_intent.setType("image/*");
-                profilePic_intent.setAction(Intent.ACTION_GET_CONTENT);
-
-                startActivityForResult(Intent.createChooser(profilePic_intent, "Select Image"), SelectImage );
+                if (ActivityCompat.checkSelfPermission(Profile.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(Profile.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, GALLERY_IMAGE);
+                } else {
+                    chooseFromGallery();
+                }
             }
         });
         adb.setNegativeButton("Camera", new DialogInterface.OnClickListener() {
@@ -172,11 +190,19 @@ public class Profile extends AppCompatActivity {
         ad.show();
     }
 
-     @Override
+    private void chooseFromGallery() {
+        Intent profilePic_intent = new Intent();
+        profilePic_intent.setType("image/*");
+        profilePic_intent.setAction(Intent.ACTION_GET_CONTENT);
+
+        startActivityForResult(Intent.createChooser(profilePic_intent, "Gallery Image"), GALLERY_IMAGE);
+    }
+
+    @Override
      protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
          super.onActivityResult(requestCode, resultCode, data);
          if ((resultCode == RESULT_OK)&&(data!=null)){
-             if (requestCode == SelectImage){
+             if (requestCode == GALLERY_IMAGE){
                  selectedImageUri = data.getData();
                  String selectedImageUri_path = "Users/"+currentUser.getUid()+"/user_image"+".jpg";
 
