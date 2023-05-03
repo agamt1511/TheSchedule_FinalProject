@@ -5,6 +5,7 @@ import static com.example.theschedule_finalproject.FBref.currentUser;
 import static com.example.theschedule_finalproject.FBref.usersRef;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -26,58 +27,73 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.Query;
 
 public class Login extends AppCompatActivity {
+    //הכרזה על רכיבי תצוגה, משתנים וכדומה
     EditText email_etL, password_etL;
     Intent intent;
-    public static String PREFS_NAME = "PrefFile";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        //התאמה בין רכיב תצוגה למשתנה
         email_etL = (EditText) findViewById(R.id.email_etL);
         password_etL = (EditText) findViewById(R.id.password_etL);
     }
 
     public void log_in(View view) {
+        //המרת פרטים מרכיבי תצוגה לString
         String email_str = email_etL.getText().toString();
         String password_str = password_etL.getText().toString();
 
+        //שליחה לפעולת בדיקה ואישור נתונים
         Boolean authenticated = dataVerification(email_str, password_str);
 
-        if (authenticated == true){
+        //אם הנתונים מאושרים לבצע כניסת משתמש
+        if (authenticated){
             authRef.signInWithEmailAndPassword(email_str,password_str).addOnCompleteListener(Login.this, new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
+                    //אם המשימה צלחה
                     if (task.isSuccessful()){
-                        SharedPreferences sharedPreferences = getSharedPreferences(Login.PREFS_NAME,MODE_PRIVATE);
+                        //שינוי ערך בוליאני userHasLoggedIn של SharedPrefrance
+                        SharedPreferences sharedPreferences = getSharedPreferences(Splash.PREFS_NAME,MODE_PRIVATE);
                         SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putBoolean("hasLoggedIn",true);
+                        editor.putBoolean(Splash.userHasLoggedIn,true);
                         editor.commit();
-                        if (currentUser == null){
-                            currentUser = authRef.getCurrentUser();
-                        }
-                        intent = new Intent(Login.this,Profile.class);
+
+                        //מעבר למסך הבית
+                        intent = new Intent(Login.this,DailyScheduleView.class);
                         startActivity(intent);
                     }
+                    //אם כניסת המשתמש לא צלחה
                     else {
-                        Toast.makeText(Login.this, "e-mail or password are wrong!", Toast.LENGTH_LONG).show();
+                        AlertDialog.Builder adb;
+                        adb = new AlertDialog.Builder(Login.this);
+                        adb.setTitle("Login Error");
+                        adb.setMessage("E-mail or Password are wrong!");
+                        AlertDialog ad = adb.create();
+                        ad.show();
                     }
                 }
             });
         }
     }
 
+    //מעבר למסך הרשמה
     public void toSignUpAct(View view) {
         intent = new Intent(Login.this,SignUp.class);
         startActivity(intent);
     }
 
+    //מעבר למסך שכחתי סיסמה
     public void forgotPassword(View view) {
         intent = new Intent(Login.this,ResetPassword.class);
         startActivity(intent);
     }
 
+    //בדיקת האם הפרטים שנכנסו נכונים
     public Boolean dataVerification(String email, String password) {
         int errorExist = 0;
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()){
@@ -85,7 +101,7 @@ public class Login extends AppCompatActivity {
             errorExist++;
         }
         if (password.length()<6){
-            password_etL.setError("ERROR! Password too short.");
+            password_etL.setError("ERROR! Enter at least 6 characters.");
             errorExist++;
         }
 

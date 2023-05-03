@@ -24,7 +24,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 
 public class SignUp extends AppCompatActivity {
-    //הכרזה על רכיבי מערכת, משתנים וכדומה
+    //הכרזה על רכיבי תצוגה, משתנים וכדומה
     EditText name_etS, email_etS, password_etS, passwordConfirm_etS;
     Intent intent;
 
@@ -35,7 +35,7 @@ public class SignUp extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
 
-        //התאמה בין רכיב למשתנה
+        //התאמה בין רכיב תצוגה למשתנה
         name_etS = (EditText) findViewById(R.id.name_etS);
         email_etS = (EditText) findViewById(R.id.email_etS);
         password_etS = (EditText) findViewById(R.id.password_etS);
@@ -45,7 +45,7 @@ public class SignUp extends AppCompatActivity {
 
 
     public void create_account(View view) {
-        //המרת פרטים מרכיבי מסך לString
+        //המרת פרטים מרכיבי תצוגה לString
         String name_str  = name_etS.getText().toString();
         String email_str  = email_etS.getText().toString();
         String password_str  = password_etS.getText().toString();
@@ -62,19 +62,20 @@ public class SignUp extends AppCompatActivity {
                 @Override
                 //אם הפעולה הושלמה בהצלחה
                 public void onComplete(@NonNull Task<AuthResult> task) {
+                    //אם המשימה צלחה
                     if (task.isSuccessful()){
                         //יצירת עצם User בfirebase realtime database
                         currentUser = authRef.getCurrentUser();
                         User user = new User(currentUser.getUid(),name_str,profilePic);
                         usersRef.child(currentUser.getUid()).setValue(user);
 
-                        //שינוי ערך בוליאני "hasLoggedIn" של SharedPrefrance
-                        SharedPreferences sharedPreferences = getSharedPreferences(Login.PREFS_NAME,MODE_PRIVATE);
+                        //שינוי ערך בוליאני userHasLoggedIn של SharedPrefrance
+                        SharedPreferences sharedPreferences = getSharedPreferences(Splash.PREFS_NAME,MODE_PRIVATE);
                         SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putBoolean("hasLoggedIn",true);
+                        editor.putBoolean(Splash.userHasLoggedIn,true);
                         editor.commit();
 
-                        //מעבר למסך חדש
+                        //מעבר למסך הבית
                         intent = new Intent(SignUp.this,DailyScheduleView.class);
                         startActivity(intent);
                     }
@@ -100,7 +101,7 @@ public class SignUp extends AppCompatActivity {
         }
     }
 
-    //בדיקת האם הפרטים שנכנסו נכונים
+    //בדיקה האם הפרטים שנכנסו נכונים
     public Boolean dataVerification(String name, String email, String password, String confirmPassword) {
         int errorExist = 0;
         if (name.length()<1){

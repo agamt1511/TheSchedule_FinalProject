@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.os.Handler;
 
 public class Splash extends AppCompatActivity {
+    public static String PREFS_NAME = "PrefFile";
+    public static String userHasLoggedIn = "hasLoggedIn";
     private static int SPLASH_TIME_OUT = 3000;
     Intent intent;
 
@@ -24,8 +26,8 @@ public class Splash extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                SharedPreferences sharedPreferences = getSharedPreferences(Login.PREFS_NAME,MODE_PRIVATE);
-                if (sharedPreferences.getBoolean("hasLoggedIn",false)){
+                SharedPreferences sharedPreferences = getSharedPreferences(Splash.PREFS_NAME,MODE_PRIVATE);
+                if (sharedPreferences.getBoolean(Splash.userHasLoggedIn,false)){
                     intent = new Intent(Splash.this,DailyScheduleView.class);
                 }
                 else {

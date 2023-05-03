@@ -113,9 +113,9 @@ public class Profile extends AppCompatActivity {
     }
 
     public void logout(View view) {
-        SharedPreferences sharedPreferences = getSharedPreferences(Login.PREFS_NAME, MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences(Splash.PREFS_NAME, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean("hasLoggedIn", false);
+        editor.putBoolean(Splash.userHasLoggedIn, false);
         editor.commit();
         authRef.signOut();
         intent = new Intent(Profile.this, SignUp.class);
