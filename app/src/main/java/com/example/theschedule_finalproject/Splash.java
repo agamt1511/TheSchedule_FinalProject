@@ -1,17 +1,16 @@
 package com.example.theschedule_finalproject;
 
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 
 public class Splash extends AppCompatActivity {
+    //הכרזה על רכיבי תצוגה, משתנים וכדומה
     public static String PREFS_NAME = "PrefFile";
     public static String userHasLoggedIn = "hasLoggedIn";
     private static int SPLASH_TIME_OUT = 3000;
@@ -24,32 +23,9 @@ public class Splash extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
+        //בדיקת חיבור לאינטרנט באמצעות BrodcastReciever
         broadcastReceiver = new NetworkConnectionReceiver();
-        registerNetworkConnectionBrodcastReceiver();
-    }
-
-    protected void registerNetworkConnectionBrodcastReceiver() {
-        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.N){
-            registerReceiver(broadcastReceiver,new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-        }
-        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
-            registerReceiver(broadcastReceiver,new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-        }
-    }
-
-    protected void unregisterNetworkConnectionBrodcastReceiver(){
-        try {
-            unregisterReceiver(broadcastReceiver);
-        }
-        catch (IllegalArgumentException illegalArgumentException){
-            illegalArgumentException.printStackTrace();
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        unregisterNetworkConnectionBrodcastReceiver();
+        registerReceiver(broadcastReceiver,new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
     }
 
     @Override

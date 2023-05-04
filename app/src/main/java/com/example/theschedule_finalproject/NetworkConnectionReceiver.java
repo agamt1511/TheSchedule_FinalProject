@@ -4,14 +4,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
-import android.net.Network;
 import android.net.NetworkInfo;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
-
 public class NetworkConnectionReceiver extends BroadcastReceiver {
 
+    //שליחה לפעולת בדיקת חיבור לאינטרנט והצגת הודעה מתאימה
     @Override
     public void onReceive(Context context, Intent intent) {
         try {
@@ -24,6 +22,7 @@ public class NetworkConnectionReceiver extends BroadcastReceiver {
         }
     }
 
+    //בדיקת חיבור לאינטרנט ושליחת ערך בוליאני כתשובה
     public boolean isConnected(Context context){
         try {
             ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);

@@ -1,7 +1,6 @@
 package com.example.theschedule_finalproject;
 
 import static com.example.theschedule_finalproject.FBref.authRef;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;

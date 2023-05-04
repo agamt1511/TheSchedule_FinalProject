@@ -1,30 +1,18 @@
 package com.example.theschedule_finalproject;
 
 import static com.example.theschedule_finalproject.FBref.authRef;
-import static com.example.theschedule_finalproject.FBref.currentUser;
-import static com.example.theschedule_finalproject.FBref.usersRef;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.Query;
 
 public class Login extends AppCompatActivity {
     //הכרזה על רכיבי תצוגה, משתנים וכדומה
