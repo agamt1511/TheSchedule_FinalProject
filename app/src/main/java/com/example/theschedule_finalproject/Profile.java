@@ -263,7 +263,11 @@ public class Profile extends AppCompatActivity {
                  uploadTask.addOnFailureListener(new OnFailureListener() {
                      @Override
                      public void onFailure(@NonNull Exception exception) {
-                         Toast.makeText(Profile.this, "FFFFFF", Toast.LENGTH_SHORT).show();
+                         adb = new AlertDialog.Builder(Profile.this);
+                         adb.setTitle("Data Synchronization Problem");
+                         adb.setMessage("An error occurred in the process. Please try again later to change your details.");
+                         AlertDialog ad = adb.create();
+                         ad.show();
                      }
                  }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                      @Override
