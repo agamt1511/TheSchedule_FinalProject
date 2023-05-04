@@ -57,12 +57,9 @@ public class Profile extends AppCompatActivity {
     EditText email_etP, name_etP;
     Intent intent;
     String user_uid;
-    Query query;
     User user;
-    String selectedImage_path;
-    int GALLERY_IMAGE = 3333;
-    int CAMERA_IMAGE = 2222;
-    Uri selectedImageUri;
+    int GALLERY_IMAGE = 3333;//קוד גלריה
+    int CAMERA_IMAGE = 2222;//קוד תמונה
     StorageReference selectedImage_ref;
     AlertDialog.Builder adb;
 
@@ -85,12 +82,12 @@ public class Profile extends AppCompatActivity {
     private void showOriginalData() {
         currentUser = authRef.getCurrentUser();
         user_uid = currentUser.getUid();
-        query = usersRef.orderByChild("user_uid").equalTo(user_uid);
+        email_etP.setText(currentUser.getEmail());
+        Query query = usersRef.orderByChild("user_uid").equalTo(user_uid);
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
-                    email_etP.setText(currentUser.getEmail());
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()){
                         user = dataSnapshot.getValue(User.class);
                         name_etP.setText(user.getUser_name());
@@ -231,16 +228,18 @@ public class Profile extends AppCompatActivity {
         startActivityForResult(Intent.createChooser(profilePic_GalleryIntent, "Gallery Image"), GALLERY_IMAGE);
     }
 
+    //פתיחת מצלמה וצילום תמונה
     private void chooseFromCamera() {
         Intent profilePic_CameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(profilePic_CameraIntent, CAMERA_IMAGE);
     }
 
+    //קבלת נתונים עבור כל אחד מהintent - אחסון והצגת נתונים
     @Override
      protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
          super.onActivityResult(requestCode, resultCode, data);
          if ((resultCode == RESULT_OK)&&(data!=null)){
-             selectedImage_path = "Users/"+currentUser.getUid()+"/user_image"+".jpg";
+             String selectedImage_path = "Users/"+currentUser.getUid()+"/user_image"+".jpg";
              selectedImage_ref = storageRef.child(selectedImage_path);
              if (user.getUser_image().matches("Null")){
                  user.setUser_image(selectedImage_path);
@@ -248,6 +247,7 @@ public class Profile extends AppCompatActivity {
              }
              //עבור תמונה מגלריה
              if (requestCode == GALLERY_IMAGE){
+                 Uri selectedImageUri;
                  selectedImageUri = data.getData();
                  selectedImage_ref.putFile(selectedImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                      @Override
@@ -256,7 +256,11 @@ public class Profile extends AppCompatActivity {
                      }
                  });
              }
-             // עבור תמונה ממצלמה
+             /*
+              עבור תמונה ממצלמה
+              מספיק else כי אם עשינו activityForReult סימן שבחרנו בגלריה (ואז משתמשים בקוד) או שבחרנו במצלמה, אין אופציה אחרת.
+              עדיין יש קוד לתמונה כי כדי שיגיעelase חייב להכניס קוד שונה מזה של הגלריה.
+              */
              else{
                  Bitmap bitmap = (Bitmap) data.getExtras().get("data");
                  ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -337,7 +341,9 @@ public class Profile extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
-
+    /*
+    הערות:
+    - ניתן בכל פעם להשתמש באותו ad כי ניותר להצהיר מחדש, אומנם כל פעם עושיםnew זה כדי למחוק את הכפתורים והתוכן הקודמים של ההתראה.
+     */
 
 }
