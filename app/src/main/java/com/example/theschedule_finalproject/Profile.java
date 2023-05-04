@@ -20,8 +20,10 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Patterns;
 import android.view.Menu;
@@ -34,6 +36,7 @@ import android.widget.Toast;
 import com.example.theschedule_finalproject.Models.Assignment;
 import com.example.theschedule_finalproject.Models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
@@ -42,7 +45,9 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 
@@ -55,8 +60,10 @@ public class Profile extends AppCompatActivity {
     Query query;
     User user;
     int GALLERY_IMAGE = 3333;
+    int CAMERA_IMAGE = 2222;
     Uri selectedImageUri;
     StorageReference selectedImageUri_ref;
+    AlertDialog.Builder adb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +74,7 @@ public class Profile extends AppCompatActivity {
         name_etP = (EditText) findViewById(R.id.name_etP);
         email_etP = (EditText) findViewById(R.id.email_etP);
         profilePic = (ImageView) findViewById (R.id.profilePic);
+
 
         // פעולת פתיחה - הצגת נתונים מקוריים
         showOriginalData();
@@ -98,7 +106,7 @@ public class Profile extends AppCompatActivity {
     }
 
 
-    //העלאת קובץ תמונה לFirebase Storage
+    //הורדת קובץ תמונה מFirebase Storage
     private void uploadProfileImage() {
         try {
             File profileImage = File.createTempFile("profileImage",".jpg");
@@ -116,27 +124,13 @@ public class Profile extends AppCompatActivity {
     }
 
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(requestCode == GALLERY_IMAGE){
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                chooseFromGallery();
-            }
-            else {
-                Toast.makeText(this, "xxxxx", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
     //שמירת נתונים חדשים שהמשתמש הכניס
     public void saveChanges(View view) {
         String name_str = name_etP.getText().toString();
         String email_str = email_etP.getText().toString();
         Boolean authenticated = dataVerification(name_str, email_str);
 
-        if (authenticated == true) {
-            AlertDialog.Builder adb;
+        if (authenticated) {
             adb = new AlertDialog.Builder(Profile.this);
             adb.setTitle("Save Changes");
             adb.setMessage("Are you sure you want to save the changes?");
@@ -167,7 +161,6 @@ public class Profile extends AppCompatActivity {
 
     //שינוי תמונת פרופיל
     public void change_profileImage(View view) {
-        AlertDialog.Builder adb;
         adb = new AlertDialog.Builder(Profile.this);
         adb.setTitle("Profile Picture");
         adb.setMessage("Choose from where you want to upload a your photo.");
@@ -176,7 +169,8 @@ public class Profile extends AppCompatActivity {
             public void onClick(DialogInterface dialogInterface, int i) {
                 if (ActivityCompat.checkSelfPermission(Profile.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(Profile.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, GALLERY_IMAGE);
-                } else {
+                }
+                else {
                     chooseFromGallery();
                 }
             }
@@ -184,24 +178,68 @@ public class Profile extends AppCompatActivity {
         adb.setNegativeButton("Camera", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
+                if (ContextCompat.checkSelfPermission(Profile.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(Profile.this, new String[] {Manifest.permission.CAMERA}, CAMERA_IMAGE);
+                }
+                else{
+                    chooseFromCamera();
+                }
             }
         });
         AlertDialog ad = adb.create();
         ad.show();
     }
 
-    private void chooseFromGallery() {
-        Intent profilePic_intent = new Intent();
-        profilePic_intent.setType("image/*");
-        profilePic_intent.setAction(Intent.ACTION_GET_CONTENT);
+    //הרשאות לגלריה ומצלמה
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(requestCode == GALLERY_IMAGE){
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                chooseFromGallery();
+            }
+            else {
+                problemGettingPernissions();
+            }
+        }
+        else{
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                chooseFromCamera();
+            }
+            else {
+                problemGettingPernissions();
+            }
+        }
+    }
 
-        startActivityForResult(Intent.createChooser(profilePic_intent, "Gallery Image"), GALLERY_IMAGE);
+    //התראה על אי נתינת הרשאות
+    private void problemGettingPernissions() {
+        adb = new AlertDialog.Builder(Profile.this);
+        adb.setTitle("Problem Getting Permissions");
+        adb.setMessage("In order for us to use images from your gallery and camera, you must enable the permissions that the application requests.");
+        AlertDialog ad = adb.create();
+        ad.show();
+    }
+
+    //פתיחת גלריה ובחירת תמונה
+    private void chooseFromGallery() {
+        Intent profilePic_GalleryIntent = new Intent();
+        profilePic_GalleryIntent.setType("image/*");
+        profilePic_GalleryIntent.setAction(Intent.ACTION_GET_CONTENT);
+
+        startActivityForResult(Intent.createChooser(profilePic_GalleryIntent, "Gallery Image"), GALLERY_IMAGE);
+    }
+
+    private void chooseFromCamera() {
+        Intent profilePic_CameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(profilePic_CameraIntent, CAMERA_IMAGE);
     }
 
     @Override
      protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
          super.onActivityResult(requestCode, resultCode, data);
          if ((resultCode == RESULT_OK)&&(data!=null)){
+             //עבור תמונה מגלריה
              if (requestCode == GALLERY_IMAGE){
                  selectedImageUri = data.getData();
                  String selectedImageUri_path = "Users/"+currentUser.getUid()+"/user_image"+".jpg";
@@ -212,6 +250,22 @@ public class Profile extends AppCompatActivity {
                  selectedImageUri_ref = storageRef.child(selectedImageUri_path);
                  selectedImageUri_ref.putFile(selectedImageUri);
                  profilePic.setImageURI(selectedImageUri);
+             }
+             else{
+                 Bitmap bitmap = (Bitmap) data.getExtras().get("data");
+                 profilePic.setImageBitmap(bitmap);
+
+                 String selectedImageUri_path = "Users/"+currentUser.getUid()+"/user_image"+".jpg";
+                 user.setUser_image(selectedImageUri_path);
+                 usersRef.child(user_uid).setValue(user);
+                 selectedImageUri_ref = storageRef.child(selectedImageUri_path);
+
+
+
+                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                 byte[] data1 = baos.toByteArray();
+                 selectedImageUri_ref.putBytes(data1);
              }
          }
      }
