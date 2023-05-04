@@ -59,10 +59,11 @@ public class Profile extends AppCompatActivity {
     String user_uid;
     Query query;
     User user;
+    String selectedImage_path;
     int GALLERY_IMAGE = 3333;
     int CAMERA_IMAGE = 2222;
     Uri selectedImageUri;
-    StorageReference selectedImageUri_ref;
+    StorageReference selectedImage_ref;
     AlertDialog.Builder adb;
 
     @Override
@@ -110,8 +111,8 @@ public class Profile extends AppCompatActivity {
     private void uploadProfileImage() {
         try {
             File profileImage = File.createTempFile("profileImage",".jpg");
-            selectedImageUri_ref = FBST.getReference(user.getUser_image());
-            selectedImageUri_ref.getFile(profileImage).addOnCompleteListener(new OnCompleteListener<FileDownloadTask.TaskSnapshot>() {
+            selectedImage_ref = FBST.getReference(user.getUser_image());
+            selectedImage_ref.getFile(profileImage).addOnCompleteListener(new OnCompleteListener<FileDownloadTask.TaskSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<FileDownloadTask.TaskSnapshot> task) {
                     Bitmap bitmap = BitmapFactory.decodeFile(profileImage.getAbsolutePath());
@@ -239,33 +240,37 @@ public class Profile extends AppCompatActivity {
      protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
          super.onActivityResult(requestCode, resultCode, data);
          if ((resultCode == RESULT_OK)&&(data!=null)){
+             selectedImage_path = "Users/"+currentUser.getUid()+"/user_image"+".jpg";
+             selectedImage_ref = storageRef.child(selectedImage_path);
+             if (user.getUser_image().matches("Null")){
+                 user.setUser_image(selectedImage_path);
+                 usersRef.child(user_uid).setValue(user);
+             }
              //עבור תמונה מגלריה
              if (requestCode == GALLERY_IMAGE){
                  selectedImageUri = data.getData();
-                 String selectedImageUri_path = "Users/"+currentUser.getUid()+"/user_image"+".jpg";
-
-                 user.setUser_image(selectedImageUri_path);
-                 usersRef.child(user_uid).setValue(user);
-
-                 selectedImageUri_ref = storageRef.child(selectedImageUri_path);
-                 selectedImageUri_ref.putFile(selectedImageUri);
+                 selectedImage_ref.putFile(selectedImageUri);
                  profilePic.setImageURI(selectedImageUri);
              }
+             // עבור תמונה ממצלמה
              else{
                  Bitmap bitmap = (Bitmap) data.getExtras().get("data");
-                 profilePic.setImageBitmap(bitmap);
-
-                 String selectedImageUri_path = "Users/"+currentUser.getUid()+"/user_image"+".jpg";
-                 user.setUser_image(selectedImageUri_path);
-                 usersRef.child(user_uid).setValue(user);
-                 selectedImageUri_ref = storageRef.child(selectedImageUri_path);
-
-
-
                  ByteArrayOutputStream baos = new ByteArrayOutputStream();
                  bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-                 byte[] data1 = baos.toByteArray();
-                 selectedImageUri_ref.putBytes(data1);
+                 byte[] selectedImageBytes = baos.toByteArray();
+
+                 UploadTask uploadTask = selectedImage_ref.putBytes(selectedImageBytes);
+                 uploadTask.addOnFailureListener(new OnFailureListener() {
+                     @Override
+                     public void onFailure(@NonNull Exception exception) {
+                         Toast.makeText(Profile.this, "FFFFFF", Toast.LENGTH_SHORT).show();
+                     }
+                 }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                     @Override
+                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                         profilePic.setImageBitmap(bitmap);
+                     }
+                 });
              }
          }
      }
