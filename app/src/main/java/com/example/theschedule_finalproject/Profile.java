@@ -249,8 +249,12 @@ public class Profile extends AppCompatActivity {
              //עבור תמונה מגלריה
              if (requestCode == GALLERY_IMAGE){
                  selectedImageUri = data.getData();
-                 selectedImage_ref.putFile(selectedImageUri);
-                 profilePic.setImageURI(selectedImageUri);
+                 selectedImage_ref.putFile(selectedImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                     @Override
+                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                         profilePic.setImageURI(selectedImageUri);
+                     }
+                 });
              }
              // עבור תמונה ממצלמה
              else{
@@ -260,16 +264,7 @@ public class Profile extends AppCompatActivity {
                  byte[] selectedImageBytes = baos.toByteArray();
 
                  UploadTask uploadTask = selectedImage_ref.putBytes(selectedImageBytes);
-                 uploadTask.addOnFailureListener(new OnFailureListener() {
-                     @Override
-                     public void onFailure(@NonNull Exception exception) {
-                         adb = new AlertDialog.Builder(Profile.this);
-                         adb.setTitle("Data Synchronization Problem");
-                         adb.setMessage("An error occurred in the process. Please try again later to change your details.");
-                         AlertDialog ad = adb.create();
-                         ad.show();
-                     }
-                 }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                 uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                      @Override
                      public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                          profilePic.setImageBitmap(bitmap);
