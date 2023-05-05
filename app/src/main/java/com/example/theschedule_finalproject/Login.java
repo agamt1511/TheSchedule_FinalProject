@@ -4,8 +4,12 @@ import static com.example.theschedule_finalproject.FBref.authRef;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.BroadcastReceiver;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
@@ -18,12 +22,17 @@ public class Login extends AppCompatActivity {
     //הכרזה על רכיבי תצוגה, משתנים וכדומה
     EditText email_etL, password_etL;
     Intent intent;
+    BroadcastReceiver broadcastReceiver;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        //בדיקת חיבור לאינטרנט באמצעות BrodcastReciever
+        broadcastReceiver = new NetworkConnectionReceiver();
+        registerReceiver(broadcastReceiver,new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
         //התאמה בין רכיב תצוגה למשתנה
         email_etL = (EditText) findViewById(R.id.email_etL);

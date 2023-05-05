@@ -4,7 +4,11 @@ import static com.example.theschedule_finalproject.FBref.authRef;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.BroadcastReceiver;
 import android.content.DialogInterface;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
@@ -14,11 +18,16 @@ import com.google.android.gms.tasks.Task;
 
 public class ResetPassword extends AppCompatActivity {
     EditText email_etF;
+    BroadcastReceiver broadcastReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reset_password);
+
+        //בדיקת חיבור לאינטרנט באמצעות BrodcastReciever
+        broadcastReceiver = new NetworkConnectionReceiver();
+        registerReceiver(broadcastReceiver,new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
         email_etF = (EditText) findViewById(R.id.email_etF);
     }

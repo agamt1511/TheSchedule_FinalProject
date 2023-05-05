@@ -13,19 +13,14 @@ public class Splash extends AppCompatActivity {
     //הכרזה על רכיבי תצוגה, משתנים וכדומה
     public static String PREFS_NAME = "PrefFile";
     public static String userHasLoggedIn = "hasLoggedIn";
-    private static int SPLASH_TIME_OUT = 5000;
+    private static int SPLASH_TIME_OUT = 3000;
     Intent intent;
 
-    BroadcastReceiver broadcastReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-
-        //בדיקת חיבור לאינטרנט באמצעות BrodcastReciever
-        broadcastReceiver = new NetworkConnectionReceiver();
-        registerReceiver(broadcastReceiver,new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
     }
 
     @Override

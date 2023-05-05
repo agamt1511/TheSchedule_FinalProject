@@ -11,12 +11,17 @@ public class Credits extends AppCompatActivity {
     Intent newActivity;
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_credits);
     }
 
+
+
+
+    //תפריט מסכים
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);

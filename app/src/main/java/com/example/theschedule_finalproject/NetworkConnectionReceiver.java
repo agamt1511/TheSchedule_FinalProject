@@ -18,7 +18,7 @@ public class NetworkConnectionReceiver extends BroadcastReceiver {
             if (!(isConnected(context))){
                 AlertDialog.Builder adb = new AlertDialog.Builder(context);
                 adb.setTitle("No Network Connection");
-                adb.setMessage("Connect to the network to use this app.");
+                adb.setMessage("Please connect to the network.\nWithout a network connection the application will not work properly.");
                 AlertDialog ad = adb.create();
                 ad.show();
             }

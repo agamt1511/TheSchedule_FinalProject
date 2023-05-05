@@ -4,8 +4,12 @@ import static com.example.theschedule_finalproject.FBref.authRef;
 import static com.example.theschedule_finalproject.FBref.currentUser;
 import static com.example.theschedule_finalproject.FBref.usersRef;
 import androidx.annotation.NonNull;
+
+import android.content.BroadcastReceiver;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
@@ -22,7 +26,7 @@ public class SignUp extends AppCompatActivity {
     //הכרזה על רכיבי תצוגה, משתנים וכדומה
     EditText name_etS, email_etS, password_etS, passwordConfirm_etS;
     Intent intent;
-
+    BroadcastReceiver broadcastReceiver;
 
 
     @Override
@@ -30,12 +34,15 @@ public class SignUp extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
 
+        //בדיקת חיבור לאינטרנט באמצעות BrodcastReciever
+        broadcastReceiver = new NetworkConnectionReceiver();
+        registerReceiver(broadcastReceiver,new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+
         //התאמה בין רכיב תצוגה למשתנה
         name_etS = (EditText) findViewById(R.id.name_etS);
         email_etS = (EditText) findViewById(R.id.email_etS);
         password_etS = (EditText) findViewById(R.id.password_etS);
         passwordConfirm_etS = (EditText) findViewById(R.id.passwordConfirm_etS);
-
     }
 
 

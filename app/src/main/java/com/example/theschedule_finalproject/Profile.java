@@ -12,12 +12,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import android.Manifest;
+import android.content.BroadcastReceiver;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -53,11 +56,16 @@ public class Profile extends AppCompatActivity {
     int CAMERA_IMAGE = 2222;//קוד תמונה
     StorageReference selectedImage_ref;
     AlertDialog.Builder adb;
+    BroadcastReceiver broadcastReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+
+        //בדיקת חיבור לאינטרנט באמצעות BrodcastReciever
+        broadcastReceiver = new NetworkConnectionReceiver();
+        registerReceiver(broadcastReceiver,new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
         //התאמה בין רכיב תצוגה למשתנה
         name_etP = (EditText) findViewById(R.id.name_etP);
