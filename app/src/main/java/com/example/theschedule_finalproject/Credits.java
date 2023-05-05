@@ -35,6 +35,8 @@ public class Credits extends AppCompatActivity {
         readIF();
     }
 
+
+    //כתיבה לקובץ פנימי
     private void writeIF() {
         try {
             FileOutputStream fos = openFileOutput("credits.txt",MODE_PRIVATE);
@@ -50,6 +52,8 @@ public class Credits extends AppCompatActivity {
         }
     }
 
+
+    //קריאה מקובץ פנימי
     private void readIF() {
         try {
             FileInputStream fis= openFileInput("credits.txt");
