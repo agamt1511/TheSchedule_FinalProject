@@ -6,9 +6,22 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 
 public class Credits extends AppCompatActivity {
     Intent newActivity;
+    TextView showCredits;
 
 
 
@@ -16,9 +29,47 @@ public class Credits extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_credits);
+        showCredits = (TextView) findViewById(R.id.showCredits);
+
+        writeIF();
+        readIF();
     }
 
+    private void writeIF() {
+        try {
+            FileOutputStream fos = openFileOutput("credits.txt",MODE_PRIVATE);
+            OutputStreamWriter osw = new OutputStreamWriter(fos);
+            BufferedWriter bw = new BufferedWriter(osw);
+            String strwr = "Created by Agam Toledano.\n" +
+                    "Teacher: Albert Levy.\n";
+            bw.write(strwr);
+            bw.close();
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
+    private void readIF() {
+        try {
+            FileInputStream fis= openFileInput("credits.txt");
+            InputStreamReader isr = new InputStreamReader(fis);
+            BufferedReader br = new BufferedReader(isr);
+            StringBuffer sb = new StringBuffer();
+            String line = br.readLine();
+            while (line != null) {
+                sb.append(line+'\n');
+                line = br.readLine();
+            }
+            String strrd = sb.toString();
+            br.close();
+            showCredits.setText(strrd);
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
 
 
     //תפריט מסכים
