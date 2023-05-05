@@ -7,6 +7,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+
 public class NetworkConnectionReceiver extends BroadcastReceiver {
 
     //שליחה לפעולת בדיקת חיבור לאינטרנט והצגת הודעה מתאימה
@@ -14,7 +16,11 @@ public class NetworkConnectionReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         try {
             if (!(isConnected(context))){
-                Toast.makeText(context, "Please connect to the network to use this application.", Toast.LENGTH_LONG).show();
+                AlertDialog.Builder adb = new AlertDialog.Builder(context);
+                adb.setTitle("No Network Connection");
+                adb.setMessage("Connect to the network to use this app.");
+                AlertDialog ad = adb.create();
+                ad.show();
             }
         }
         catch (NullPointerException nullPointerException){
@@ -34,4 +40,5 @@ public class NetworkConnectionReceiver extends BroadcastReceiver {
             return false;
         }
     }
+
 }

@@ -13,7 +13,7 @@ public class Splash extends AppCompatActivity {
     //הכרזה על רכיבי תצוגה, משתנים וכדומה
     public static String PREFS_NAME = "PrefFile";
     public static String userHasLoggedIn = "hasLoggedIn";
-    private static int SPLASH_TIME_OUT = 3000;
+    private static int SPLASH_TIME_OUT = 5000;
     Intent intent;
 
     BroadcastReceiver broadcastReceiver;
