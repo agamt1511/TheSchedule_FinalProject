@@ -5,15 +5,15 @@ import java.util.ArrayList;
 public class Note {
     private String title;
     private String txt;// הפנייה לstorage
-    private String note_dateTime_created;
+    private String dateTime_created;
 
     public Note() {
     }
 
-    public Note(String title, String txt, String note_dateTime_created) {
+    public Note(String title, String txt, String dateTime_created) {
         this.title = title;
         this.txt = txt;
-        this.note_dateTime_created = note_dateTime_created;
+        this.dateTime_created = dateTime_created;
     }
 
     public String getTitle() {
@@ -34,11 +34,11 @@ public class Note {
     }
 
 
-    public String getNote_dateTime_created() {
-        return note_dateTime_created;
+    public String getDateTime_created() {
+        return dateTime_created;
     }
 
-    public void setNote_dateTime_created(String note_dateTime_created) {
-        this.note_dateTime_created = note_dateTime_created;
+    public void setDateTime_created(String dateTime_created) {
+        this.dateTime_created = dateTime_created;
     }
 }

@@ -85,7 +85,7 @@
                 android:layout_weight="5" />
 
             <Spinner
-                android:id="@+id/spinner"
+                android:id="@+id/importance_spAE"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="10" />

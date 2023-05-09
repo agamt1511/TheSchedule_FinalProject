@@ -4,16 +4,18 @@ import java.util.ArrayList;
 public class Assignment {
     private String title;
     private String txt;// הפנייה לstorage
-    private String assignment_goal_dateTime;
+    private String dateTime_goal;
+    private int count;
 
 
     public Assignment() {
     }
 
-    public Assignment(String title, String txt, String assignment_goal_dateTime) {
+    public Assignment(String title, String txt, String dateTime_goal, int count) {
         this.title = title;
         this.txt = txt;
-        this.assignment_goal_dateTime = assignment_goal_dateTime;
+        this.dateTime_goal = dateTime_goal;
+        this.count = count;
     }
 
     public String getTitle() {
@@ -33,11 +35,21 @@ public class Assignment {
         this.txt = txt;
     }
 
-    public String getAssignment_goal_dateTime() {
-        return assignment_goal_dateTime;
+
+    public String getDateTime_goal() {
+        return dateTime_goal;
     }
 
-    public void setAssignment_goal_dateTime(String assignment_goal_dateTime) {
-        this.assignment_goal_dateTime = assignment_goal_dateTime;
+    public void setDateTime_goal(String dateTime_goal) {
+        this.dateTime_goal = dateTime_goal;
+    }
+
+
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
     }
 }
