@@ -1,7 +1,9 @@
 package com.example.theschedule_finalproject;
 
+import static com.example.theschedule_finalproject.FBref.authRef;
 import static com.example.theschedule_finalproject.FBref.currentUser;
 import static com.example.theschedule_finalproject.FBref.notesRef;
+import static com.example.theschedule_finalproject.FBref.usersRef;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -28,12 +30,13 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
-public class NotesView extends AppCompatActivity implements RecyclerViewInterface {
+public class NotesView extends AppCompatActivity {
     BroadcastReceiver broadcastReceiver;
     Intent newActivity;
     RecyclerView notes_rvNV;
@@ -53,12 +56,24 @@ public class NotesView extends AppCompatActivity implements RecyclerViewInterfac
         notes_rvNV = (RecyclerView) findViewById(R.id.notes_rvNV);
         notes_rvNV.setHasFixedSize(true);
         notes_rvNV.setLayoutManager(new LinearLayoutManager(this));
+        currentUser = authRef.getCurrentUser();
 
         notesDR = notesRef.child(currentUser.getUid()).child("Active");
         noteArrayList = new ArrayList<>();
         noteAdapter= new NoteAdapter(this,noteArrayList);
         notes_rvNV.setAdapter(noteAdapter);
 
+        notesDR.orderByChild("dateTime_created").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        })
         notesDR.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -70,6 +85,8 @@ public class NotesView extends AppCompatActivity implements RecyclerViewInterfac
                 }
                 noteAdapter.notifyDataSetChanged();
             }
+
+
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {

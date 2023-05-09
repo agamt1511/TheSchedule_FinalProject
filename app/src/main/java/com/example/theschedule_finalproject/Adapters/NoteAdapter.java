@@ -22,6 +22,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
     public NoteAdapter(Context context, ArrayList<Note> noteArrayList) {
         this.context = context;
         this.noteArrayList = noteArrayList;
+
     }
 
     @NonNull
@@ -47,7 +48,6 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
 
         public NoteViewHolder(@NonNull View itemView) {
             super(itemView);
-
             note_cell = itemView.findViewById(R.id.note_cell);
         }
     }
