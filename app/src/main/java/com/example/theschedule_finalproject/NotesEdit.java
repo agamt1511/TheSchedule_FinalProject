@@ -27,9 +27,8 @@ public class NotesEdit extends AppCompatActivity {
     //הכרזה על רכיבי תצוגה, משתנים וכדומה
     BroadcastReceiver broadcastReceiver;
     EditText title_etNE, txt_etNE;
-    CheckBox thumbtack_cbNE;
     Note note;
-    String dateTime_created, thumbtackStatus;
+    String dateTime_created;
 
 
     @Override
@@ -44,7 +43,6 @@ public class NotesEdit extends AppCompatActivity {
         //התאמה בין רכיב תצוגה למשתנה
         title_etNE = (EditText) findViewById(R.id.title_etNE);
         txt_etNE = (EditText) findViewById(R.id.txt_etNE);
-        thumbtack_cbNE = (CheckBox) findViewById(R.id.thumbtack_cbNE);
 
         //אתחול והגדרת תוכן למשתנים ועצמים
         note = new Note();
@@ -55,17 +53,16 @@ public class NotesEdit extends AppCompatActivity {
         //קליטת נתונים בסיסיים
         String title = title_etNE.getText().toString();
         String note_txt = txt_etNE.getText().toString();
-        thumbtackStatus = "noThumbtack";
 
         // אם הנתונים תקניים שמירה והעלאה של הקובץ
         if (dataVerification(title,note_txt)){
             note.setTitle(title);
             dateTime_created = getDateAndTime();
             note.setDateTime_created(dateTime_created);
-            String txt = getTxtPath();
+            String txt = "Notes/" + currentUser.getUid() + "/Active/" + dateTime_created + ".txt";
             createTxtFile(note_txt, txt);
             note.setTxt(txt);
-            notesRef.child(currentUser.getUid()).child(thumbtackStatus).child(dateTime_created).setValue(note);
+            notesRef.child(currentUser.getUid()).child("Active").child(dateTime_created).setValue(note);
 
             //סיום ויצאה מהActivity
             Intent newActivity;
@@ -78,16 +75,6 @@ public class NotesEdit extends AppCompatActivity {
     private void createTxtFile(String note_txt, String txtPath) {
         byte[] note_byte = note_txt.getBytes();
         storageRef.child(txtPath).putBytes(note_byte);
-    }
-
-    // יצירת כתובת לאחסון הנתונים
-    private String getTxtPath() {
-        if (thumbtack_cbNE.isChecked()) {
-            thumbtackStatus = "Thumbtack";
-            return ("Notes/" + currentUser.getUid() + "/Thumbtack/" + dateTime_created + ".txt");
-        }
-        else
-            return ("Notes/" + currentUser.getUid() + "/noThumbtack/" + dateTime_created + ".txt");
     }
 
     //בדיקה האם הפרטים שהוכנסו נכונים

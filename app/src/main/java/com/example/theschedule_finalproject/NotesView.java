@@ -1,7 +1,13 @@
 package com.example.theschedule_finalproject;
 
+import static com.example.theschedule_finalproject.FBref.currentUser;
+import static com.example.theschedule_finalproject.FBref.notesRef;
+
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.BroadcastReceiver;
 import android.content.Intent;
@@ -10,18 +16,66 @@ import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 
-public class NotesView extends AppCompatActivity {
+import com.example.theschedule_finalproject.Adapters.NoteAdapter;
+import com.example.theschedule_finalproject.Models.Note;
+import com.example.theschedule_finalproject.Models.User;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+
+public class NotesView extends AppCompatActivity implements RecyclerViewInterface {
     BroadcastReceiver broadcastReceiver;
+    Intent newActivity;
+    RecyclerView notes_rvNV;
+    NoteAdapter noteAdapter;
+    ArrayList<Note> noteArrayList;
+    DatabaseReference notesDR;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notes_view);
+
         //בדיקת חיבור לאינטרנט באמצעות BrodcastReciever
         broadcastReceiver = new NetworkConnectionReceiver();
         registerReceiver(broadcastReceiver,new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+
+        notes_rvNV = (RecyclerView) findViewById(R.id.notes_rvNV);
+        notes_rvNV.setHasFixedSize(true);
+        notes_rvNV.setLayoutManager(new LinearLayoutManager(this));
+
+        notesDR = notesRef.child(currentUser.getUid()).child("Active");
+        noteArrayList = new ArrayList<>();
+        noteAdapter= new NoteAdapter(this,noteArrayList);
+        notes_rvNV.setAdapter(noteAdapter);
+
+        notesDR.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()){
+                        Note note = dataSnapshot.getValue(Note.class);
+                        noteArrayList.add(note);
+                    }
+                }
+                noteAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     @Override
@@ -32,7 +86,6 @@ public class NotesView extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        Intent newActivity;
         int id = item.getItemId();
         if (id == R.id.dailySchedule) {
             newActivity = new Intent(NotesView.this, DailyScheduleView.class);
@@ -54,13 +107,11 @@ public class NotesView extends AppCompatActivity {
     }
 
     public void addNote(View view) {
-        Intent newActivity;
         newActivity = new Intent(NotesView.this, NotesEdit.class);
         startActivity(newActivity);
     }
 
     public void toRecyclingBin_notes(View view) {
-        Intent newActivity;
         newActivity = new Intent(NotesView.this, NotesRecyclingBin.class);
         startActivity(newActivity);
     }
