@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.icu.text.RelativeDateTimeFormatter;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.view.Menu;
@@ -35,6 +36,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 public class NotesView extends AppCompatActivity {
     BroadcastReceiver broadcastReceiver;
@@ -42,7 +45,7 @@ public class NotesView extends AppCompatActivity {
     RecyclerView notes_rvNV;
     NoteAdapter noteAdapter;
     ArrayList<Note> noteArrayList;
-    DatabaseReference notesDR;
+    DatabaseReference notesDBR;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,36 +61,26 @@ public class NotesView extends AppCompatActivity {
         notes_rvNV.setLayoutManager(new LinearLayoutManager(this));
         currentUser = authRef.getCurrentUser();
 
-        notesDR = notesRef.child(currentUser.getUid()).child("Active");
+        notesDBR = notesRef.child(currentUser.getUid()).child("Active");
+
         noteArrayList = new ArrayList<>();
         noteAdapter= new NoteAdapter(this,noteArrayList);
         notes_rvNV.setAdapter(noteAdapter);
 
-        notesDR.orderByChild("dateTime_created").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+        Query query = notesDBR.orderByChild("dateTime_created");
 
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        })
-        notesDR.addValueEventListener(new ValueEventListener() {
+        query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()){
                         Note note = dataSnapshot.getValue(Note.class);
                         noteArrayList.add(note);
+                        Collections.reverse(noteArrayList);
                     }
+                    noteAdapter.notifyDataSetChanged();
                 }
-                noteAdapter.notifyDataSetChanged();
             }
-
-
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 

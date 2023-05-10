@@ -19,121 +19,16 @@
         android:textSize="32dp"
         android:textStyle="bold" />
 
-    <LinearLayout
+    <CalendarView
+        android:id="@+id/calender_cvDSV"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="5"
-        android:orientation="horizontal">
-
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="25"
-            android:onClick="lastWeek"
-            app:srcCompat="@drawable/baseline_arrow_back" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="50"
-            android:gravity="center"
-            android:text="APRIL 2023"
-            android:textColor="@color/black"
-            android:textSize="24sp"
-            android:textStyle="bold" />
-
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="25"
-            android:onClick="nextWeek"
-            app:srcCompat="@drawable/baseline_arrow_forward" />
-
-    </LinearLayout>
+        android:layout_weight="40" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="5"
-        android:gravity="center"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="SUN"
-            android:textColor="@color/black"
-            android:textSize="20sp" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="MON"
-            android:textColor="@color/black"
-            android:textSize="20sp" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="TUE"
-            android:textColor="@color/black"
-            android:textSize="20sp" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="WED"
-            android:textColor="@color/black"
-            android:textSize="20sp" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="THUR"
-            android:textColor="@color/black"
-            android:textSize="20sp" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="FRI"
-            android:textColor="@color/black"
-            android:textSize="20sp" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="SAT"
-            android:textColor="@color/black"
-            android:textSize="20sp" />
-
-    </LinearLayout>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="10">
-
-    </androidx.recyclerview.widget.RecyclerView>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="70"
+        android:layout_weight="50"
         android:orientation="horizontal">
 
         <Space

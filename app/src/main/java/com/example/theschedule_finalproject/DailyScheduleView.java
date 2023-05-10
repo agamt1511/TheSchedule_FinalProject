@@ -2,6 +2,7 @@ package com.example.theschedule_finalproject;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.BroadcastReceiver;
 import android.content.Intent;
@@ -11,9 +12,24 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CalendarView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 public class DailyScheduleView extends AppCompatActivity {
     BroadcastReceiver broadcastReceiver;
+    CalendarView calender_cvDSV;
+    String selectedDayNum;
+
+    String selectedDay;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,7 +39,29 @@ public class DailyScheduleView extends AppCompatActivity {
         //בדיקת חיבור לאינטרנט באמצעות BrodcastReciever
         broadcastReceiver = new NetworkConnectionReceiver();
         registerReceiver(broadcastReceiver,new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+
+        calender_cvDSV = (CalendarView) findViewById(R.id.calender_cvDSV);
+
+        calender_cvDSV.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+            @Override
+            public void onSelectedDayChange(@NonNull CalendarView calendarView, int i, int i1, int i2) {
+                selectedDay = Integer.toString(i) + Integer.toString(i1+1) +Integer.toString(i2);
+                Toast.makeText(DailyScheduleView.this, selectedDay, Toast.LENGTH_SHORT).show();
+                selectedDayData();
+            }
+        });
+
     }
+
+    private String getDateAndTime() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+        Date date = Calendar.getInstance().getTime();
+        return dateFormat.format(date);
+    }
+
+    private void selectedDayData() {
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

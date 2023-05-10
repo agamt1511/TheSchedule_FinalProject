@@ -1,6 +1,7 @@
 package com.example.theschedule_finalproject;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.BroadcastReceiver;
 import android.content.Intent;
@@ -11,6 +12,7 @@ import android.view.View;
 
 public class DailyScheduleEdit extends AppCompatActivity {
     BroadcastReceiver broadcastReceiver;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
