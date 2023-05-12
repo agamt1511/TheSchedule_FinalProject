@@ -3,11 +3,14 @@ package com.example.theschedule_finalproject;
 import static com.example.theschedule_finalproject.FBref.authRef;
 import static com.example.theschedule_finalproject.FBref.currentUser;
 import static com.example.theschedule_finalproject.FBref.notesRef;
+import static com.example.theschedule_finalproject.FBref.usersRef;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.BroadcastReceiver;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
@@ -15,6 +18,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -35,15 +39,19 @@ public class NotesView extends AppCompatActivity{
     Intent newActivity;
     ListView notes_lvNV;
     ArrayList<Note> noteArrayList_thumbtack, noteArrayList_noThumbtack, noteArrayList_complete;
-    DatabaseReference notesDBR_thumbtack, notesDBR_noThumbtack;
+    DatabaseReference notesDBR_thumbtack, notesDBR_noThumbtack ,notesDBR_delete;
 
     Query queryThumbtack, queryNoThumbtack;
     NoteAdapter noteAdapter;
+    AlertDialog.Builder adb;
+    String thumbtack_str;
+    Boolean message;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notes_view);
+        message = false;
 
         //בדיקת חיבור לאינטרנט באמצעות BrodcastReciever
         broadcastReceiver = new NetworkConnectionReceiver();
@@ -51,9 +59,6 @@ public class NotesView extends AppCompatActivity{
 
         notes_lvNV = (ListView) findViewById(R.id.notes_lvNV);
         currentUser = authRef.getCurrentUser();
-
-
-
 
         notesDBR_thumbtack = notesRef.child(currentUser.getUid()).child("Active").child("Thumbtack");
         noteArrayList_thumbtack = new ArrayList<>();
@@ -66,14 +71,15 @@ public class NotesView extends AppCompatActivity{
         queryThumbtack.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.exists()){
-                    noteArrayList_thumbtack.clear();
-                    for (DataSnapshot dataSnapshot : snapshot.getChildren()){
-                        Note note = dataSnapshot.getValue(Note.class);
-                        noteArrayList_thumbtack.add(note);
+                if(message==false) {
+                    if (snapshot.exists()) {
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            Note note = dataSnapshot.getValue(Note.class);
+                            noteArrayList_thumbtack.add(note);
+                        }
+                        Collections.reverse(noteArrayList_thumbtack);
+                        updateNoteAdapter();
                     }
-                    Collections.reverse(noteArrayList_thumbtack);
-                    updateNoteAdapter();
                 }
             }
             @Override
@@ -86,13 +92,15 @@ public class NotesView extends AppCompatActivity{
         queryNoThumbtack.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.exists()){
-                    for (DataSnapshot dataSnapshot : snapshot.getChildren()){
-                        Note note = dataSnapshot.getValue(Note.class);
-                        noteArrayList_noThumbtack.add(note);
+                if(message==false) {
+                    if (snapshot.exists()) {
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            Note note = dataSnapshot.getValue(Note.class);
+                            noteArrayList_noThumbtack.add(note);
+                        }
+                        Collections.reverse(noteArrayList_noThumbtack);
+                        updateNoteAdapter();
                     }
-                    Collections.reverse(noteArrayList_noThumbtack);
-                    updateNoteAdapter();
                 }
             }
             @Override
@@ -104,11 +112,57 @@ public class NotesView extends AppCompatActivity{
         noteArrayList_thumbtack.addAll(noteArrayList_noThumbtack);
         noteAdapter = new NoteAdapter(this,noteArrayList_thumbtack);
         notes_lvNV.setAdapter(noteAdapter);
+
+        setListeners();
     }
+
+    private void setListeners() {
+        notes_lvNV.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long l) {
+                adb = new AlertDialog.Builder(NotesView.this);
+                adb.setTitle("Delete Note");
+                adb.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Note note = (Note) (notes_lvNV.getItemAtPosition(position));
+                        noteArrayList_thumbtack.remove(note);
+                        noteAdapter.notifyDataSetChanged();
+                        message = true;
+                        getThumbtackStatus(note.getThumbtack());
+                        notesDBR_delete = notesRef.child(currentUser.getUid()).child("Not Active").child(thumbtack_str).child(note.getDateTime_created());
+                        notesDBR_delete.setValue(note);
+                        notesDBR_delete = notesRef.child(currentUser.getUid()).child("Active").child(thumbtack_str).child(note.getDateTime_created());
+                        notesDBR_delete.removeValue();
+                    }
+                });
+                adb.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                    }
+                });
+                AlertDialog ad = adb.create();
+                ad.show();
+                return false;
+            }
+        });
+        message = false;
+    }
+
 
     private void updateNoteAdapter() {
         noteArrayList_thumbtack.addAll(noteArrayList_noThumbtack);
         noteAdapter.notifyDataSetChanged();
+    }
+
+    //יצירת String לנעץ בהתאם לערכו הבוליאני
+    private void getThumbtackStatus(Boolean thumbtack) {
+        if (thumbtack){
+            thumbtack_str = "Thumbtack";
+        }
+        else {
+            thumbtack_str = "NoThumbtack";
+        }
     }
 
 
