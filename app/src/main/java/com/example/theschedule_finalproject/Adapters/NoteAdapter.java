@@ -4,51 +4,66 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
+import android.widget.BaseAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.theschedule_finalproject.Models.Note;
 import com.example.theschedule_finalproject.R;
 
-import java.util.ArrayList;
+import org.w3c.dom.Text;
 
-public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder> {
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+
+public class NoteAdapter extends BaseAdapter {
     Context context;
     ArrayList<Note> noteArrayList;
+    LayoutInflater layoutInflater;
 
     public NoteAdapter(Context context, ArrayList<Note> noteArrayList) {
         this.context = context;
         this.noteArrayList = noteArrayList;
-
-    }
-
-    @NonNull
-    @Override
-    public NoteViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(context).inflate(R.layout.note_cell,parent,false);
-        return new NoteViewHolder(v);
+        this.layoutInflater = (LayoutInflater.from(context.getApplicationContext())) ;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull NoteViewHolder holder, int position) {
-        Note note = noteArrayList.get(position);
-        holder.note_cell.setText(note.getTitle());
-    }
-
-    @Override
-    public int getItemCount() {
+    public int getCount() {
         return noteArrayList.size();
     }
 
-    public static class NoteViewHolder extends RecyclerView.ViewHolder {
-        TextView note_cell;
+    @Override
+    public Note getItem(int i) {
+        return noteArrayList.get(i);
+    }
 
-        public NoteViewHolder(@NonNull View itemView) {
-            super(itemView);
-            note_cell = itemView.findViewById(R.id.note_cell);
-        }
+    @Override
+    public long getItemId(int i) {
+        return 0;
+    }
+
+    @Override
+    public View getView(int i, View view, ViewGroup viewGroup) {
+        layoutInflater = ((AppCompatActivity)context).getLayoutInflater();
+        view = layoutInflater.inflate(R.layout.note_cell,viewGroup,false);
+
+        Note note = this.noteArrayList.get(i);
+
+        TextView title_tvNC = (TextView) view.findViewById(R.id.title_tvNC);
+        TextView dateTime_tvNC = (TextView) view.findViewById(R.id.dateTime_tvNC);
+        title_tvNC.setText(note.getTitle());
+        dateTime_tvNC.setText(convertToDate(note.getDateTime_created()));
+
+        return view;
+    }
+
+    private String convertToDate(String dateTime_created) {
+        String dateTime_new = dateTime_created.substring(0,4) +"/" + dateTime_created.substring(4,6) + "/" + dateTime_created.substring(6,8) +
+                "\n" + dateTime_created.substring(8,10) +":" + dateTime_created.substring(10,12) + ":" + dateTime_created.substring(12,14);
+        return dateTime_new;
     }
 }
