@@ -77,8 +77,8 @@
                 android:layout_height="0dp"
                 android:layout_weight="5" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/notes_rvNV"
+            <ListView
+                android:id="@+id/notes_lvNV"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="75" />

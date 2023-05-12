@@ -3,49 +3,42 @@ package com.example.theschedule_finalproject;
 import static com.example.theschedule_finalproject.FBref.authRef;
 import static com.example.theschedule_finalproject.FBref.currentUser;
 import static com.example.theschedule_finalproject.FBref.notesRef;
-import static com.example.theschedule_finalproject.FBref.usersRef;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.icu.text.RelativeDateTimeFormatter;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.Toast;
 
 import com.example.theschedule_finalproject.Adapters.NoteAdapter;
 import com.example.theschedule_finalproject.Models.Note;
-import com.example.theschedule_finalproject.Models.User;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 
-public class NotesView extends AppCompatActivity {
+public class NotesView extends AppCompatActivity{
     BroadcastReceiver broadcastReceiver;
     Intent newActivity;
-    RecyclerView notes_rvNV;
+    ListView notes_lvNV;
+    ArrayList<Note> noteArrayList_thumbtack, noteArrayList_noThumbtack, noteArrayList_complete;
+    DatabaseReference notesDBR_thumbtack, notesDBR_noThumbtack;
+
+    Query queryThumbtack, queryNoThumbtack;
     NoteAdapter noteAdapter;
-    ArrayList<Note> noteArrayList;
-    DatabaseReference notesDBR;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,29 +49,31 @@ public class NotesView extends AppCompatActivity {
         broadcastReceiver = new NetworkConnectionReceiver();
         registerReceiver(broadcastReceiver,new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
-        notes_rvNV = (RecyclerView) findViewById(R.id.notes_rvNV);
-        notes_rvNV.setHasFixedSize(true);
-        notes_rvNV.setLayoutManager(new LinearLayoutManager(this));
+        notes_lvNV = (ListView) findViewById(R.id.notes_lvNV);
         currentUser = authRef.getCurrentUser();
 
-        notesDBR = notesRef.child(currentUser.getUid()).child("Active");
 
-        noteArrayList = new ArrayList<>();
-        noteAdapter= new NoteAdapter(this,noteArrayList);
-        notes_rvNV.setAdapter(noteAdapter);
 
-        Query query = notesDBR.orderByChild("dateTime_created");
 
-        query.addValueEventListener(new ValueEventListener() {
+        notesDBR_thumbtack = notesRef.child(currentUser.getUid()).child("Active").child("Thumbtack");
+        noteArrayList_thumbtack = new ArrayList<>();
+
+        notesDBR_noThumbtack = notesRef.child(currentUser.getUid()).child("Active").child("NoThumbtack");
+        noteArrayList_noThumbtack = new ArrayList<>();
+
+
+        queryThumbtack = notesDBR_thumbtack.orderByChild("dateTime_created");
+        queryThumbtack.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
+                    noteArrayList_thumbtack.clear();
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()){
                         Note note = dataSnapshot.getValue(Note.class);
-                        noteArrayList.add(note);
-                        Collections.reverse(noteArrayList);
+                        noteArrayList_thumbtack.add(note);
                     }
-                    noteAdapter.notifyDataSetChanged();
+                    Collections.reverse(noteArrayList_thumbtack);
+                    updateNoteAdapter();
                 }
             }
             @Override
@@ -86,7 +81,36 @@ public class NotesView extends AppCompatActivity {
 
             }
         });
+
+        queryNoThumbtack = notesDBR_noThumbtack.orderByChild("dateTime_created");
+        queryNoThumbtack.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()){
+                        Note note = dataSnapshot.getValue(Note.class);
+                        noteArrayList_noThumbtack.add(note);
+                    }
+                    Collections.reverse(noteArrayList_noThumbtack);
+                    updateNoteAdapter();
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        noteArrayList_thumbtack.addAll(noteArrayList_noThumbtack);
+        noteAdapter = new NoteAdapter(this,noteArrayList_thumbtack);
+        notes_lvNV.setAdapter(noteAdapter);
     }
+
+    private void updateNoteAdapter() {
+        noteArrayList_thumbtack.addAll(noteArrayList_noThumbtack);
+        noteAdapter.notifyDataSetChanged();
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

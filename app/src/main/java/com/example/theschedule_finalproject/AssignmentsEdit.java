@@ -4,6 +4,8 @@ import static com.example.theschedule_finalproject.FBref.currentUser;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -11,17 +13,26 @@ import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 
 import com.example.theschedule_finalproject.Models.Assignment;
 
-public class AssignmentsEdit extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
+public class AssignmentsEdit extends AppCompatActivity {
     BroadcastReceiver broadcastReceiver;
-    EditText title_etAE, txt_etAE, time_etAE, date_etAE;
+    EditText title_etAE, txt_etAE, time_etAE;
+    Button date_btAE;
     Spinner importance_spAE;
     Assignment assignment;
-    String[] importance = {};
+    String[] priorities = {};
+
+    DatePickerDialog datePickerDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,25 +46,52 @@ public class AssignmentsEdit extends AppCompatActivity implements AdapterView.On
         title_etAE = (EditText) findViewById(R.id.title_etAE);
         txt_etAE = (EditText) findViewById(R.id.txt_etAE);
         time_etAE = (EditText) findViewById(R.id.time_etAE);
-        date_etAE = (EditText) findViewById(R.id.date_etAE);
+        date_btAE = (Button) findViewById(R.id.date_btAE);
         importance_spAE = (Spinner) findViewById(R.id.importance_spAE);
 
-        importance_spAE.setOnItemSelectedListener(this);
-
-
+        datePickerDialogListener();
     }
 
     public void saveAssignment(View view) {
-        assignment = new Assignment();
-        getDateAndTime();
-        getTitleAndTxt();
+        setNewAssignment();
+
+
 
         Intent newActivity;
         newActivity = new Intent(AssignmentsEdit.this, AssignmentsView.class);
         startActivity(newActivity);
     }
 
+    private void datePickerDialogListener() {
+        DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+                month = month + 1;
+            }
+        };
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+
+        int style = AlertDialog.THEME_HOLO_LIGHT;
+        /*SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        String dueDate = dateFormat.format(year+month+day);*/
+        datePickerDialog = new DatePickerDialog(this,style, dateSetListener,year,month,day);
+    }
+
+    private void setNewAssignment() {
+        assignment = new Assignment();
+        getDateAndTime();
+        getPriority();
+        getTitleAndTxt();
+    }
+
     private void getDateAndTime() {
+    }
+
+    private void getPriority() {
     }
 
     private void getTitleAndTxt() {
@@ -64,13 +102,19 @@ public class AssignmentsEdit extends AppCompatActivity implements AdapterView.On
         //String selectedTxt_path = "Assignments/"+currentUser.getUid()+"/txt"+".jpg";
     }
 
-    @Override
-    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+    public void datePicker(View view) {
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-    }
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+                date_btAE.setText(year + "/" + month +"/" + day);
 
-    @Override
-    public void onNothingSelected(AdapterView<?> adapterView) {
-
+            }
+        },
+        year,month,day);
     }
 }

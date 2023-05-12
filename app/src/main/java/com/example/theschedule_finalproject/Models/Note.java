@@ -6,14 +6,16 @@ public class Note {
     private String title;
     private String txt;// הפנייה לstorage
     private String dateTime_created;
+    private Boolean thumbtack;
 
     public Note() {
     }
 
-    public Note(String title, String txt, String dateTime_created) {
+    public Note(String title, String txt, String dateTime_created, Boolean thumbtack) {
         this.title = title;
         this.txt = txt;
         this.dateTime_created = dateTime_created;
+        this.thumbtack = thumbtack;
     }
 
     public String getTitle() {
@@ -40,5 +42,14 @@ public class Note {
 
     public void setDateTime_created(String dateTime_created) {
         this.dateTime_created = dateTime_created;
+    }
+
+
+    public Boolean getThumbtack() {
+        return thumbtack;
+    }
+
+    public void setThumbtack(Boolean thumbtack) {
+        this.thumbtack = thumbtack;
     }
 }
