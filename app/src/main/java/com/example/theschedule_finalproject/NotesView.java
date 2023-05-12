@@ -51,7 +51,7 @@ public class NotesView extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notes_view);
-        message = false;
+        message = true;
 
         //בדיקת חיבור לאינטרנט באמצעות BrodcastReciever
         broadcastReceiver = new NetworkConnectionReceiver();
@@ -71,7 +71,7 @@ public class NotesView extends AppCompatActivity{
         queryThumbtack.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(message==false) {
+                if(message) {
                     if (snapshot.exists()) {
                         for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                             Note note = dataSnapshot.getValue(Note.class);
@@ -92,7 +92,7 @@ public class NotesView extends AppCompatActivity{
         queryNoThumbtack.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(message==false) {
+                if(message) {
                     if (snapshot.exists()) {
                         for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                             Note note = dataSnapshot.getValue(Note.class);
@@ -128,7 +128,7 @@ public class NotesView extends AppCompatActivity{
                         Note note = (Note) (notes_lvNV.getItemAtPosition(position));
                         noteArrayList_thumbtack.remove(note);
                         noteAdapter.notifyDataSetChanged();
-                        message = true;
+                        message = false;
                         getThumbtackStatus(note.getThumbtack());
                         notesDBR_delete = notesRef.child(currentUser.getUid()).child("Not Active").child(thumbtack_str).child(note.getDateTime_created());
                         notesDBR_delete.setValue(note);
@@ -146,7 +146,7 @@ public class NotesView extends AppCompatActivity{
                 return false;
             }
         });
-        message = false;
+        message = true;
     }
 
 
