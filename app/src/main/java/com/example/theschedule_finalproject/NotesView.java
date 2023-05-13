@@ -36,82 +36,92 @@ import java.util.Collections;
 
 public class NotesView extends AppCompatActivity{
     BroadcastReceiver broadcastReceiver;
-    Intent newActivity;
     ListView notes_lvNV;
     ArrayList<Note> noteArrayList_thumbtack, noteArrayList_noThumbtack, noteArrayList_complete;
     DatabaseReference notesDBR_thumbtack, notesDBR_noThumbtack ,notesDBR_delete;
-
     Query queryThumbtack, queryNoThumbtack;
     NoteAdapter noteAdapter;
+    Intent newActivity;
     AlertDialog.Builder adb;
     String thumbtack_str;
-    Boolean message;
+    Boolean message;// הגדרת משתנה למניעת שינוי כפול של LIST VIEW
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notes_view);
-        message = true;
+
 
         //בדיקת חיבור לאינטרנט באמצעות BrodcastReciever
         broadcastReceiver = new NetworkConnectionReceiver();
         registerReceiver(broadcastReceiver,new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
+        //התאמה בין רכיב תצוגה למשתנה
         notes_lvNV = (ListView) findViewById(R.id.notes_lvNV);
         currentUser = authRef.getCurrentUser();
 
+        message = true;// איפשור שינוי ListView
+
+        //הגדרת הפנייה לפתקים נעוצים + יצירת רשימה עצמי Note נעוצים
         notesDBR_thumbtack = notesRef.child(currentUser.getUid()).child("Active").child("Thumbtack");
         noteArrayList_thumbtack = new ArrayList<>();
 
+        //הגדרת הפנייה לפתקים לא נעוצים + יצירת רשימה עצמי Note לא נעוצים
         notesDBR_noThumbtack = notesRef.child(currentUser.getUid()).child("Active").child("NoThumbtack");
         noteArrayList_noThumbtack = new ArrayList<>();
 
+        noteArrayList_complete = new ArrayList<>(); //יצירת רשימה מאוחדת
 
+        //טיפול בפתקים נעוצים
+        //סידור פתקים נעוצים לפי תאריך יצירה - מקטן לגדול
         queryThumbtack = notesDBR_thumbtack.orderByChild("dateTime_created");
+        //יצירת מאזין לשינוי ערכים בNote נעוצים query
         queryThumbtack.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(message) {
+                if(message) {//אם לא שונה כבר בפונקציית מחיקה
                     if (snapshot.exists()) {
                         for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                            Note note = dataSnapshot.getValue(Note.class);
-                            noteArrayList_thumbtack.add(note);
+                            Note note = dataSnapshot.getValue(Note.class); //צור ערך Note חדש והשמה בו ערך שהתקבל בפונקציה
+                            noteArrayList_thumbtack.add(note); //השמת ערך Note חדש ברשימה
                         }
-                        Collections.reverse(noteArrayList_thumbtack);
-                        updateNoteAdapter();
+                        Collections.reverse(noteArrayList_thumbtack);// הפיכת רשימת Note נעוצים - מגדול לקטן
+                        updateNoteAdapter();// עדכון רשימה מחוברת של Note נעוצים ולא נעוצים ועדכון Adapter
                     }
                 }
             }
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
+            public void onCancelled(@NonNull DatabaseError error) {}
         });
 
+
+        //טיפול בפתקים לא נעוצים
+
+        //סידור פתקים לא נעוצים לפי תאריך יצירה - מקטן לגדול
         queryNoThumbtack = notesDBR_noThumbtack.orderByChild("dateTime_created");
+        //יצירת מאזין לשינוי ערכים בNote לא נעוצים query
         queryNoThumbtack.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(message) {
+                if(message) { //אם לא שונה כבר בפונקציית מחיקה
                     if (snapshot.exists()) {
                         for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                            Note note = dataSnapshot.getValue(Note.class);
-                            noteArrayList_noThumbtack.add(note);
+                            Note note = dataSnapshot.getValue(Note.class); //צור ערך Note חדש והשמה בו ערך שהתקבל בפונקציה
+                            noteArrayList_noThumbtack.add(note); //השמת ערך Note חדש ברשימה
                         }
-                        Collections.reverse(noteArrayList_noThumbtack);
-                        updateNoteAdapter();
+                        Collections.reverse(noteArrayList_noThumbtack);// הפיכת רשימת Note נעוצים - מגדול לקטן
+                        updateNoteAdapter();// עדכון רשימה מחוברת של Note נעוצים ולא נעוצים ועדכון Adapter
                     }
                 }
             }
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
+            public void onCancelled(@NonNull DatabaseError error) {}
         });
 
-        noteArrayList_thumbtack.addAll(noteArrayList_noThumbtack);
-        noteAdapter = new NoteAdapter(this,noteArrayList_thumbtack);
-        notes_lvNV.setAdapter(noteAdapter);
+
+        updateNoteArray();
+        noteAdapter = new NoteAdapter(this,noteArrayList_complete); //הגדרת Adapter חדש עם ערכי הרשימה המאוחדת
+        notes_lvNV.setAdapter(noteAdapter); //קישור בין Adapter לרכיב תצוגה
 
         setListeners();
     }
@@ -120,50 +130,73 @@ public class NotesView extends AppCompatActivity{
         notes_lvNV.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long l) {
+                //תיבת דיאלוג לווידוא מחיקה
                 adb = new AlertDialog.Builder(NotesView.this);
                 adb.setTitle("Delete Note");
-                adb.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                adb.setMessage("Are you sure you want to delete this note?");
+
+                adb.setPositiveButton("YES", new DialogInterface.OnClickListener() {//כפתור אישור
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        Note note = (Note) (notes_lvNV.getItemAtPosition(position));
-                        noteArrayList_thumbtack.remove(note);
-                        noteAdapter.notifyDataSetChanged();
-                        message = false;
-                        getThumbtackStatus(note.getThumbtack());
+                        Note note = (Note) (notes_lvNV.getItemAtPosition(position)); //קבלת ערך Note נבחר
+                        getThumbtackStatus(note); // קבלת ערך String של נעץ/לא נעץ
+                        noteAdapter.notifyDataSetChanged(); //התראה בAdapter על שינוי ערך
+
+                        message = false;//הגדרת משתנה כדי שלא יופעלו מאזיני הquery כי כבר ביצענו את המחיקה מהתצוגה
+
+                        //הגדרת ערך Note בעץ הלא פעיל
                         notesDBR_delete = notesRef.child(currentUser.getUid()).child("Not Active").child(thumbtack_str).child(note.getDateTime_created());
                         notesDBR_delete.setValue(note);
+
+                        //מחיקת ערך Note בעץ פעיל
                         notesDBR_delete = notesRef.child(currentUser.getUid()).child("Active").child(thumbtack_str).child(note.getDateTime_created());
                         notesDBR_delete.removeValue();
                     }
                 });
-                adb.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+
+                adb.setNegativeButton("NO", new DialogInterface.OnClickListener() {// כפתור יציאה
                     @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                    }
-                });
+                    public void onClick(DialogInterface dialogInterface, int i) {}}
+                );
+
+                //יצירת והצגת דיאלוג
                 AlertDialog ad = adb.create();
                 ad.show();
+
                 return false;
             }
         });
-        message = true;
+        message = true; //אפשור פעולת מאזינים מחדש
     }
 
-
     private void updateNoteAdapter() {
-        noteArrayList_thumbtack.addAll(noteArrayList_noThumbtack);
-        noteAdapter.notifyDataSetChanged();
+        updateNoteArray();
+        noteAdapter.notifyDataSetChanged(); //התראה לAdapter על שינוי שקרה
+    }
+
+    private void updateNoteArray() {
+        noteArrayList_complete.clear();
+        for (int i=0; i<noteArrayList_thumbtack.size(); i++){
+            noteArrayList_complete.add(noteArrayList_thumbtack.get(i));
+        }
+        noteArrayList_complete.addAll(noteArrayList_noThumbtack);
     }
 
     //יצירת String לנעץ בהתאם לערכו הבוליאני
-    private void getThumbtackStatus(Boolean thumbtack) {
+    private void getThumbtackStatus(Note note) {
+        Boolean thumbtack = note.getThumbtack();
         if (thumbtack){
             thumbtack_str = "Thumbtack";
+            noteArrayList_thumbtack.remove(note); //מחיקת ערך Note מרשימה
         }
         else {
             thumbtack_str = "NoThumbtack";
+            noteArrayList_noThumbtack.remove(note); //מחיקת ערך Note מרשימה
         }
+        updateNoteArray();
     }
+
+
 
 
     @Override
