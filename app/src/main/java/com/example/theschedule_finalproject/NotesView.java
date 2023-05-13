@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class NotesView extends AppCompatActivity{
+    //הכרזה על רכיבי תצוגה, משתנים וכדומה
     BroadcastReceiver broadcastReceiver;
     ListView notes_lvNV;
     ArrayList<Note> noteArrayList_thumbtack, noteArrayList_noThumbtack, noteArrayList_complete;
@@ -72,7 +73,9 @@ public class NotesView extends AppCompatActivity{
 
         noteArrayList_complete = new ArrayList<>(); //יצירת רשימה מאוחדת
 
+
         //טיפול בפתקים נעוצים
+
         //סידור פתקים נעוצים לפי תאריך יצירה - מקטן לגדול
         queryThumbtack = notesDBR_thumbtack.orderByChild("dateTime_created");
         //יצירת מאזין לשינוי ערכים בNote נעוצים query
@@ -169,11 +172,13 @@ public class NotesView extends AppCompatActivity{
         message = true; //אפשור פעולת מאזינים מחדש
     }
 
+    //פעולת עדכון Adapter
     private void updateNoteAdapter() {
-        updateNoteArray();
+        updateNoteArray();// עדכון רשימת Note מאוחדת
         noteAdapter.notifyDataSetChanged(); //התראה לAdapter על שינוי שקרה
     }
 
+    //פעולת עדכון  רשימה
     private void updateNoteArray() {
         noteArrayList_complete.clear();
         for (int i=0; i<noteArrayList_thumbtack.size(); i++){
@@ -195,8 +200,6 @@ public class NotesView extends AppCompatActivity{
         }
         updateNoteArray();
     }
-
-
 
 
     @Override
