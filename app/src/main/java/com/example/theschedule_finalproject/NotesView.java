@@ -1,5 +1,6 @@
 package com.example.theschedule_finalproject;
 
+import static com.example.theschedule_finalproject.FBref.FBST;
 import static com.example.theschedule_finalproject.FBref.authRef;
 import static com.example.theschedule_finalproject.FBref.currentUser;
 import static com.example.theschedule_finalproject.FBref.notesRef;
@@ -25,12 +26,18 @@ import android.widget.Toast;
 
 import com.example.theschedule_finalproject.Adapters.NoteAdapter;
 import com.example.theschedule_finalproject.Models.Note;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.StorageReference;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -147,6 +154,23 @@ public class NotesView extends AppCompatActivity{
 
                         message = false;//הגדרת משתנה כדי שלא יופעלו מאזיני הquery כי כבר ביצענו את המחיקה מהתצוגה
 
+                        //העברת קובץ מהStorage ללא פעיל
+                        try {
+                            File txtFile = File.createTempFile(note.getDateTime_created(), "txt");
+                            StorageReference originalTxtFile_ref = FBST.getReferenceFromUrl(note.getTxt());
+                            originalTxtFile_ref.getFile(txtFile).addOnCompleteListener(new OnCompleteListener<FileDownloadTask.TaskSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<FileDownloadTask.TaskSnapshot> task) {
+                                    String txt = "Notes/" + currentUser.getUid() + "/Active/" + thumbtack_str +"/" + note.getDateTime_created() + ".txt"; //יצירת כתובת להשמה בSTORAGE
+                                    txt_etNE.setText(originalTxtFile.toString());
+                                }
+                            });
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        //מחיקת קובץ Note מהStorage
+                        FBST.getReferenceFromUrl(note.getTxt()).delete();
+
                         //הגדרת ערך Note בעץ הלא פעיל
                         notesDBR_delete = notesRef.child(currentUser.getUid()).child("Not Active").child(thumbtack_str).child(note.getDateTime_created());
                         notesDBR_delete.setValue(note);
@@ -170,6 +194,19 @@ public class NotesView extends AppCompatActivity{
             }
         });
         message = true; //אפשור פעולת מאזינים מחדש
+
+
+        notes_lvNV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                Note note = (Note) (notes_lvNV.getItemAtPosition(position)); //קבלת ערך Note נבחר
+                newActivity = new Intent(NotesView.this, NotesEdit.class);
+                newActivity.putExtra("originalNote_title",note.getTitle());
+                newActivity.putExtra("originalNote_txt",note.getTxt());
+                newActivity.putExtra("originalNote_dateTime",note.getDateTime_created());
+                newActivity.putExtra("originalNote_thumbtack",note.getThumbtack());
+            }
+        });
     }
 
     //פעולת עדכון Adapter

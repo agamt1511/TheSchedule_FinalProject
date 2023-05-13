@@ -1,24 +1,35 @@
 package com.example.theschedule_finalproject;
 
+import static com.example.theschedule_finalproject.FBref.FBST;
 import static com.example.theschedule_finalproject.FBref.authRef;
 import static com.example.theschedule_finalproject.FBref.currentUser;
 import static com.example.theschedule_finalproject.FBref.notesRef;
 import static com.example.theschedule_finalproject.FBref.storageRef;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.os.Bundle;
-import android.util.Patterns;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
 import com.example.theschedule_finalproject.Models.Note;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.StorageReference;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -50,6 +61,44 @@ public class NotesEdit extends AppCompatActivity {
         //אתחול והגדרת תוכן למשתנים ועצמים
         note = new Note();
         currentUser = authRef.getCurrentUser();
+
+        checkGetNote();
+    }
+
+    private void checkGetNote() {
+        Intent noteContent = getIntent();
+        String originalTitle = noteContent.getStringExtra("originalNote_title");
+        if (!(originalTitle.isEmpty())){
+            note.setTitle(originalTitle);
+            title_etNE.setText(originalTitle);
+            String originalTxt = noteContent.getStringExtra("originalNote_txt");
+            note.setTxt(originalTxt);
+            note.setDateTime_created(noteContent.getStringExtra("originalNote_dateTime"));
+            Boolean originalThumbtack = noteContent.getBooleanExtra("originalNote_thumbtack",false);
+            if (originalThumbtack){
+                thumbtack_cbNE.setChecked(true);
+            }
+            note.setThumbtack(originalThumbtack);
+
+            try {
+                File originalTxtFile = File.createTempFile(note.getDateTime_created(), "txt");
+                StorageReference originalTxtFile_ref = FBST.getReferenceFromUrl(originalTxt);
+                originalTxtFile_ref.getFile(originalTxtFile).addOnCompleteListener(new OnCompleteListener<FileDownloadTask.TaskSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<FileDownloadTask.TaskSnapshot> task) {
+                        txt_etNE.setText(originalTxtFile.toString());
+                    }
+                });
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            FBST.getReferenceFromUrl(originalTxt).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+
+                }
+            });
+        }
     }
 
     public void saveNote(View view) {
