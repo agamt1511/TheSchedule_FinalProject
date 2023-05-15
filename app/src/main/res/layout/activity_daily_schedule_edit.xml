@@ -95,14 +95,16 @@
                     app:srcCompat="@drawable/baseline_time"
                     app:tint="@color/black" />
 
-                <EditText
-                    android:id="@+id/time_etDSE"
+                <TextView
+                    android:id="@+id/time_tvDSE"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="85"
-                    android:ems="10"
-                    android:hint="Enter DueTime"
-                    android:inputType="time" />
+                    android:text="Enter DueTime"
+                    android:textSize="20dp"
+                    android:inputType="time"
+                    android:gravity="center"
+                    android:onClick="openTimePicker"/>
 
             </LinearLayout>
 
