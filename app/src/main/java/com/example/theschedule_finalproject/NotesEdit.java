@@ -1,5 +1,6 @@
 package com.example.theschedule_finalproject;
 
+import static com.example.theschedule_finalproject.FBref.FBDB;
 import static com.example.theschedule_finalproject.FBref.FBST;
 import static com.example.theschedule_finalproject.FBref.authRef;
 import static com.example.theschedule_finalproject.FBref.currentUser;
@@ -20,16 +21,23 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.example.theschedule_finalproject.Models.Note;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -42,6 +50,7 @@ public class NotesEdit extends AppCompatActivity {
     Note note;
     String dateTime_created, thumbtack_str;
     Boolean thumbtack;
+    Intent noteContent;
 
 
     @Override
@@ -62,13 +71,13 @@ public class NotesEdit extends AppCompatActivity {
         note = new Note();
         currentUser = authRef.getCurrentUser();
 
+        noteContent = getIntent();
         checkGetNote();
     }
 
     private void checkGetNote() {
-        Intent noteContent = getIntent();
         String originalTitle = noteContent.getStringExtra("originalNote_title");
-        if (!(originalTitle.isEmpty())){
+        if (!(originalTitle.matches("Null"))){
             note.setTitle(originalTitle);
             title_etNE.setText(originalTitle);
             String originalTxt = noteContent.getStringExtra("originalNote_txt");
@@ -80,24 +89,21 @@ public class NotesEdit extends AppCompatActivity {
             }
             note.setThumbtack(originalThumbtack);
 
+
+
             try {
                 File originalTxtFile = File.createTempFile(note.getDateTime_created(), "txt");
-                StorageReference originalTxtFile_ref = FBST.getReferenceFromUrl(originalTxt);
+                StorageReference originalTxtFile_ref = FBST.getReference(originalTxt);
                 originalTxtFile_ref.getFile(originalTxtFile).addOnCompleteListener(new OnCompleteListener<FileDownloadTask.TaskSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<FileDownloadTask.TaskSnapshot> task) {
                         txt_etNE.setText(originalTxtFile.toString());
                     }
                 });
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            FBST.getReferenceFromUrl(originalTxt).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                @Override
-                public void onSuccess(Uri uri) {
-
-                }
-            });
         }
     }
 
@@ -113,11 +119,11 @@ public class NotesEdit extends AppCompatActivity {
             dateTime_created = getDateAndTime();//יצירת תבנית של תאריך וזמן
             note.setDateTime_created(dateTime_created);//השמה של מחרזות תאריך וזמן בDB
             getThumbtackStatus(); // יצירת מחרוזת נעץ בהתאם לערכו הבוליאני
-            String txt = "Notes/" + currentUser.getUid() + "/Active/" + thumbtack_str +"/" + dateTime_created + ".txt"; //יצירת כתובת להשמה בSTORAGE
+            String txt = "Notes/" + currentUser.getUid() + "/" + thumbtack_str +"/" + dateTime_created + ".txt"; //יצירת כתובת להשמה בSTORAGE
             createTxtFile(note_txt, txt); //יצירת קובץ TXT
             note.setTxt(txt); // השמה של כתובת TXT בDB
             note.setThumbtack(thumbtack);//השמת ערך בוליאני של נעץ
-            notesRef.child(currentUser.getUid()).child("Active").child(thumbtack_str).child(dateTime_created).setValue(note);// השמת ערך Note בDB
+            notesRef.child(currentUser.getUid()).child(thumbtack_str).child(dateTime_created).setValue(note);// השמת ערך Note בDB
 
             //סיום ויצאה מהActivity
             Intent newActivity;

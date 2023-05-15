@@ -61,8 +61,5 @@ public class AssignmentsView extends AppCompatActivity {
     }
 
     public void toRecyclingBin_assignments(View view) {
-        Intent newActivity;
-        newActivity = new Intent(AssignmentsView.this, AssignmentsRecyclingBin.class);
-        startActivity(newActivity);
     }
 }

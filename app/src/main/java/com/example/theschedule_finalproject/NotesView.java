@@ -71,11 +71,11 @@ public class NotesView extends AppCompatActivity{
         message = true;// איפשור שינוי ListView
 
         //הגדרת הפנייה לפתקים נעוצים + יצירת רשימה עצמי Note נעוצים
-        notesDBR_thumbtack = notesRef.child(currentUser.getUid()).child("Active").child("Thumbtack");
+        notesDBR_thumbtack = notesRef.child(currentUser.getUid()).child("Thumbtack");
         noteArrayList_thumbtack = new ArrayList<>();
 
         //הגדרת הפנייה לפתקים לא נעוצים + יצירת רשימה עצמי Note לא נעוצים
-        notesDBR_noThumbtack = notesRef.child(currentUser.getUid()).child("Active").child("NoThumbtack");
+        notesDBR_noThumbtack = notesRef.child(currentUser.getUid()).child("NoThumbtack");
         noteArrayList_noThumbtack = new ArrayList<>();
 
         noteArrayList_complete = new ArrayList<>(); //יצירת רשימה מאוחדת
@@ -154,29 +154,11 @@ public class NotesView extends AppCompatActivity{
 
                         message = false;//הגדרת משתנה כדי שלא יופעלו מאזיני הquery כי כבר ביצענו את המחיקה מהתצוגה
 
-                        //העברת קובץ מהStorage ללא פעיל
-                        try {
-                            File txtFile = File.createTempFile(note.getDateTime_created(), "txt");
-                            StorageReference originalTxtFile_ref = FBST.getReferenceFromUrl(note.getTxt());
-                            originalTxtFile_ref.getFile(txtFile).addOnCompleteListener(new OnCompleteListener<FileDownloadTask.TaskSnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<FileDownloadTask.TaskSnapshot> task) {
-                                    String txt = "Notes/" + currentUser.getUid() + "/Active/" + thumbtack_str +"/" + note.getDateTime_created() + ".txt"; //יצירת כתובת להשמה בSTORAGE
-                                    txt_etNE.setText(originalTxtFile.toString());
-                                }
-                            });
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
                         //מחיקת קובץ Note מהStorage
-                        FBST.getReferenceFromUrl(note.getTxt()).delete();
+                        FBST.getReference(note.getTxt()).delete();
 
-                        //הגדרת ערך Note בעץ הלא פעיל
-                        notesDBR_delete = notesRef.child(currentUser.getUid()).child("Not Active").child(thumbtack_str).child(note.getDateTime_created());
-                        notesDBR_delete.setValue(note);
-
-                        //מחיקת ערך Note בעץ פעיל
-                        notesDBR_delete = notesRef.child(currentUser.getUid()).child("Active").child(thumbtack_str).child(note.getDateTime_created());
+                        //מחיקת ערך Note בעץ
+                        notesDBR_delete = notesRef.child(currentUser.getUid()).child(thumbtack_str).child(note.getDateTime_created());
                         notesDBR_delete.removeValue();
                     }
                 });
@@ -205,6 +187,7 @@ public class NotesView extends AppCompatActivity{
                 newActivity.putExtra("originalNote_txt",note.getTxt());
                 newActivity.putExtra("originalNote_dateTime",note.getDateTime_created());
                 newActivity.putExtra("originalNote_thumbtack",note.getThumbtack());
+                startActivity(newActivity);
             }
         });
     }
@@ -269,11 +252,7 @@ public class NotesView extends AppCompatActivity{
 
     public void addNote(View view) {
         newActivity = new Intent(NotesView.this, NotesEdit.class);
-        startActivity(newActivity);
-    }
-
-    public void toRecyclingBin_notes(View view) {
-        newActivity = new Intent(NotesView.this, NotesRecyclingBin.class);
+        newActivity.putExtra("originalNote_title", "Null");
         startActivity(newActivity);
     }
 }

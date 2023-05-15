@@ -56,16 +56,10 @@
             android:name=".DailyScheduleView"
             android:exported="false" />
         <activity
-            android:name=".NotesRecyclingBin"
-            android:exported="false" />
-        <activity
             android:name=".NotesEdit"
             android:exported="false" />
         <activity
             android:name=".NotesView"
-            android:exported="false" />
-        <activity
-            android:name=".AssignmentsRecyclingBin"
             android:exported="false" />
         <activity
             android:name=".AssignmentsEdit"

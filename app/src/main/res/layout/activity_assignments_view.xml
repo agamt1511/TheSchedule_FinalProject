@@ -40,37 +40,15 @@
                 android:layout_height="0dp"
                 android:layout_weight="5" />
 
-            <LinearLayout
+            <Button
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="10"
-                android:orientation="horizontal">
-
-                <Button
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="40"
-                    android:backgroundTint="@color/primary_darkBlue"
-                    android:onClick="addAssignment"
-                    android:text="NEW ASSIGNMENTS"
-                    android:textColor="#FFEA00"
-                    android:textSize="12dp" />
-
-                <Space
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="20" />
-
-                <Button
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="40"
-                    android:backgroundTint="@color/primary_darkBlue"
-                    android:onClick="toRecyclingBin_assignments"
-                    android:text="RECYCLINBIN"
-                    android:textColor="#FFEA00"
-                    android:textSize="12dp" />
-            </LinearLayout>
+                android:backgroundTint="@color/primary_darkBlue"
+                android:onClick="addAssignment"
+                android:text="NEW ASSIGNMENT"
+                android:textColor="#FFEA00"
+                android:textSize="12dp" />
 
             <Space
                 android:layout_width="match_parent"
