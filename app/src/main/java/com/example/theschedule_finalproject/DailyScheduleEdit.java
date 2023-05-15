@@ -38,6 +38,7 @@ import com.example.theschedule_finalproject.databinding.ActivityDailyScheduleEdi
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Random;
 
 public class DailyScheduleEdit extends AppCompatActivity {
     BroadcastReceiver broadcastReceiver;
@@ -128,10 +129,16 @@ public class DailyScheduleEdit extends AppCompatActivity {
     }
 
     private void setAlarm() {
+        if (alert_cbDSE.isChecked()){
+        }
+        else {
+
+        }
         alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         if(alert_cbDSE.isChecked()){
             Intent alarmReceiver_intent = new Intent(DailyScheduleEdit.this,AlarmReceiver.class);
-            pendingIntent = PendingIntent.getBroadcast(DailyScheduleEdit.this,0,alarmReceiver_intent,0);
+            int random = (int) (Math.random()*49+1);
+            pendingIntent = PendingIntent.getBroadcast(DailyScheduleEdit.this,random,alarmReceiver_intent,0);
             alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),AlarmManager.INTERVAL_DAY,pendingIntent);
             Toast.makeText(this, "aaaa", Toast.LENGTH_SHORT).show();
         }

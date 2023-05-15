@@ -15,12 +15,12 @@ import androidx.core.app.NotificationManagerCompat;
 public class AlarmReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        Intent alarmReceiver_intent = new Intent(context, DailyScheduleEdit.class);
+        Intent alarmReceiver_intent = new Intent(context, DailyScheduleView.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, alarmReceiver_intent, 0);
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, "SpringTime")
-                .setSmallIcon(R.drawable.baseline_time)
+                .setSmallIcon(R.drawable.baseline_event)
                 .setContentTitle("SPRING TIME - REMINDER")
                 .setContentText("It's Time For Your Event")
                 .setAutoCancel(true)
