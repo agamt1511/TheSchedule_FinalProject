@@ -5,18 +5,20 @@ import java.util.ArrayList;
 public class Event {
     private String title;
     private String txt;// הפנייה לstorage
-    private String event_dateTime;
+    private String event_date;
+    private String event_time;
     private int count;
 
 
     public Event() {
     }
 
-    public Event (String title, String txt, String event_dateTime){
+    public Event(String title, String txt, String event_date, String event_time, int count) {
         this.title = title;
         this.txt = txt;
-        this.event_dateTime = event_dateTime;
-        this.count = 0;
+        this.event_date = event_date;
+        this.event_time = event_time;
+        this.count = count;
     }
 
 
@@ -28,7 +30,6 @@ public class Event {
         this.title = title;
     }
 
-
     public String getTxt() {
         return txt;
     }
@@ -38,11 +39,29 @@ public class Event {
     }
 
 
-    public String getEvent_dateTime() {
-        return event_dateTime;
+    public String getEvent_date() {
+        return event_date;
     }
 
-    public void setEvent_dateTime(String event_dateTime) {
-        this.event_dateTime = event_dateTime;
+    public void setEvent_date(String event_date) {
+        this.event_date = event_date;
+    }
+
+
+    public String getEvent_time() {
+        return event_time;
+    }
+
+    public void setEvent_time(String event_time) {
+        this.event_time = event_time;
+    }
+
+
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
     }
 }

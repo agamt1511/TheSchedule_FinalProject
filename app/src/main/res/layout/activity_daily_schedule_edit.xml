@@ -124,14 +124,16 @@
                     app:srcCompat="@drawable/baseline_calendar_today"
                     app:tint="@color/black" />
 
-                <EditText
-                    android:id="@+id/date_etDSE"
+                <TextView
+                    android:id="@+id/date_tvDSE"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="85"
-                    android:ems="10"
-                    android:hint="Enter DueDate"
-                    android:inputType="date" />
+                    android:text="Enter DueDate"
+                    android:textSize="20dp"
+                    android:inputType="date"
+                    android:onClick="openDatePicker"
+                    android:gravity="center"/>
 
             </LinearLayout>
 

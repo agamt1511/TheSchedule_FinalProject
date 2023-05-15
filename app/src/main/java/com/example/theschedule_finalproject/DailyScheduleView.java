@@ -44,19 +44,26 @@ public class DailyScheduleView extends AppCompatActivity {
 
         calender_cvDSV.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
-            public void onSelectedDayChange(@NonNull CalendarView calendarView, int i, int i1, int i2) {
-                selectedDay = Integer.toString(i) + Integer.toString(i1+1) +Integer.toString(i2);
-                Toast.makeText(DailyScheduleView.this, selectedDay, Toast.LENGTH_SHORT).show();
+            public void onSelectedDayChange(@NonNull CalendarView calendarView, int year, int month, int day) {
+                String year_str, month_str, day_str;
+                year_str = Integer.toString(year);
+                if (month<10){
+                    month_str = "0" + Integer.toString(month);
+                }
+                else{
+                    month_str = Integer.toString(month);
+                }
+                if (day<10){
+                    day_str = "0" + Integer.toString(day);
+                }
+                else{
+                    day_str = Integer.toString(day);
+                }
+                selectedDay = year_str + month_str + day_str;
                 selectedDayData();
             }
         });
 
-    }
-
-    private String getDateAndTime() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-        Date date = Calendar.getInstance().getTime();
-        return dateFormat.format(date);
     }
 
     private void selectedDayData() {
@@ -98,9 +105,4 @@ public class DailyScheduleView extends AppCompatActivity {
         startActivity(newActivity);
     }
 
-    public void lastWeek(View view) {
-    }
-
-    public void nextWeek(View view) {
-    }
 }

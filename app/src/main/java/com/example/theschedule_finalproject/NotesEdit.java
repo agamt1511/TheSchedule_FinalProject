@@ -92,14 +92,30 @@ public class NotesEdit extends AppCompatActivity {
 
 
             try {
-                File originalTxtFile = File.createTempFile(note.getDateTime_created(), "txt");
+                File originalTxtFile = File.createTempFile(note.getDateTime_created(), ".txt");
                 StorageReference originalTxtFile_ref = FBST.getReference(originalTxt);
-                originalTxtFile_ref.getFile(originalTxtFile).addOnCompleteListener(new OnCompleteListener<FileDownloadTask.TaskSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<FileDownloadTask.TaskSnapshot> task) {
-                        txt_etNE.setText(originalTxtFile.toString());
-                    }
-                });
+//                originalTxtFile_ref.getFile(originalTxtFile).addOnCompleteListener(new OnCompleteListener<FileDownloadTask.TaskSnapshot>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<FileDownloadTask.TaskSnapshot> task) {
+//                            try {
+//                                String fileName = note.getDateTime_created() + ".txt";
+//                                FileInputStream fis = openFileInput(fileName);
+//                                InputStreamReader isr = new InputStreamReader(fis);
+//                                BufferedReader br = new BufferedReader(isr);
+//                                StringBuffer sb = new StringBuffer();
+//                                String line = br.readLine();
+//                                while (line != null) {
+//                                    sb.append(line + '\n');
+//                                    line = br.readLine();
+//                                }
+//                                String strrd = sb.toString();
+//                                br.close();
+//                                txt_etNE.setText(strrd);
+//                            } catch (IOException e) {
+//                                throw new RuntimeException(e);
+//                            }
+//                    }
+//                });
             }
             catch (IOException e) {
                 throw new RuntimeException(e);
