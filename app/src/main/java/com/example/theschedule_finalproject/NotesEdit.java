@@ -156,7 +156,7 @@ public class NotesEdit extends AppCompatActivity {
             errorExist++;
         }
         if (txt.length()<1){
-            txt_etNE.setError("ERROR! Check the email.");
+            txt_etNE.setError("ERROR! The filed can't be blank.");
             errorExist++;
         }
         if(errorExist > 0){

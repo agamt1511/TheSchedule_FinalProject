@@ -63,7 +63,7 @@ public class DailyScheduleEdit extends AppCompatActivity {
     private AlarmManager alarmManager;
     private PendingIntent pendingIntent;
     Query query;
-    String hour_str, minute_str;
+    String time_str, date_str;
 
 
 
@@ -87,32 +87,15 @@ public class DailyScheduleEdit extends AppCompatActivity {
         currentUser = authRef.getCurrentUser();
         calendar = Calendar.getInstance();
 
+        time_str = "null";
+        date_str = "null";
         event = new Event();
         setListeners();
-        //setCount();
+
     }
 
     private void setCount() {
-        query = eventsRef.child(event.getEvent_date()).child(event.getEvent_time()).orderByChild("count").limitToLast(1);
-        query.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                        Event event_count = dataSnapshot.getValue(Event.class);
-                        event.setCount(event_count.getCount());
-                    }
-                }
-                else {
-                    event.setCount(0);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
+        event.setCount((int) (Math.random()*1000+1));
     }
 
     private void setListeners() {
@@ -123,48 +106,78 @@ public class DailyScheduleEdit extends AppCompatActivity {
                 calendar.set(Calendar.MONTH,month);
                 calendar.set(Calendar.DAY_OF_MONTH,day);
 
-                date_tvDSE.setText((Integer.toString(year) + "/" + Integer.toString(month+1)  + "/" + Integer.toString(day)));
+                date_str = Integer.toString(year) + "/" + Integer.toString(month+1)  + "/" + Integer.toString(day);
+
+                date_tvDSE.setText(date_str);
             }
         };
 
         timeSetListener = new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker timePicker, int hour, int minute) {
+                String hour_str, minute_str;
                 timePicker.setIs24HourView(true);
                 calendar.set(Calendar.HOUR, hour);
                 calendar.set(Calendar.MINUTE,minute);
                 calendar.set(Calendar.MILLISECOND,0);
                 if(hour<10){
-                    hour_str = "0" + Integer.toString(hour);
+                    hour_str = "0" + hour;
                 }
                 else {
                     hour_str = Integer.toString(hour);
                 }
 
                 if(minute<10){
-                    minute_str = "0" + Integer.toString(minute);
+                    minute_str = "0" + minute;
                 }
                 else {
                     minute_str = Integer.toString(minute);
                 }
-                time_tvDSE.setText(calendar.get(HOUR) + ":" + (calendar.get(MINUTE)));
+                time_str = hour_str + minute_str;
+                time_tvDSE.setText(hour_str + ":" + minute_str);
             }
         };
 
     }
 
     public void saveEvent(View view) {
-        setTime();
-        setDate();
-        setTitleAndTxt();
-        setAlarm();
-        event.setCount(0);
+        if (dataVerification()){
+            setTime();
+            setDate();
+            setTitleAndTxt();
+            setAlarm();
+            setCount();
 
-        eventsRef.child(currentUser.getUid()).child(event.getEvent_time()).child(event.getEvent_time());
+            eventsRef.child(currentUser.getUid()).child(event.getEvent_date()).child(event.getEvent_time()+ String.valueOf(event.getCount())).setValue(event);
 
-        Intent newActivity;
-        newActivity = new Intent(DailyScheduleEdit.this, DailyScheduleView.class);
-        startActivity(newActivity);
+            Intent newActivity;
+            newActivity = new Intent(DailyScheduleEdit.this, DailyScheduleView.class);
+            startActivity(newActivity);
+        }
+    }
+
+    private boolean dataVerification() {
+        int errorExist = 0;
+        if (title_etDSE.getText().toString().length()<1){
+            title_etDSE.setError("ERROR! The filed can't be blank.");
+            errorExist++;
+        }
+        if (txt_etDSE.getText().toString().length()<1){
+            txt_etDSE.setError("ERROR! The filed can't be blank.");
+            errorExist++;
+        }
+        if (time_str.matches("null")){
+            time_tvDSE.setText("The filed can't be blank.");
+            errorExist++;
+        }
+        if (date_str.matches("null")){
+            date_tvDSE.setText("The filed can't be blank.");
+            errorExist++;
+        }
+        if(errorExist > 0){
+            return false;
+        }
+        return true;
     }
 
 
@@ -192,7 +205,7 @@ public class DailyScheduleEdit extends AppCompatActivity {
     }
 
     private void setTime() {
-        event.setEvent_time(hour_str+minute_str);
+        event.setEvent_time(time_str);
     }
 
     private void setDate() {
@@ -203,7 +216,7 @@ public class DailyScheduleEdit extends AppCompatActivity {
     private void setTitleAndTxt() {
         event.setTitle(title_etDSE.getText().toString());
         byte[] txt_context = txt_etDSE.getText().toString().getBytes();
-        String txt_path = "Events/" + currentUser.getUid() + "/" + event.getEvent_date() + "/" + event.getEvent_time() + ".txt";
+        String txt_path = "Events/" + currentUser.getUid() + "/" + event.getEvent_date() + "/" + event.getEvent_time() +"/" + event.getCount() + ".txt";
         storageRef.child(txt_path).putBytes(txt_context);
         event.setTxt(txt_path);
     }
