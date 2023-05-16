@@ -34,6 +34,7 @@ import com.google.firebase.storage.StorageReference;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -51,6 +52,7 @@ public class NotesEdit extends AppCompatActivity {
     String dateTime_created, thumbtack_str;
     Boolean thumbtack;
     Intent noteContent;
+    File originalTxtFile;
 
 
     @Override
@@ -69,6 +71,7 @@ public class NotesEdit extends AppCompatActivity {
 
         //אתחול והגדרת תוכן למשתנים ועצמים
         note = new Note();
+
         currentUser = authRef.getCurrentUser();
 
         noteContent = getIntent();
@@ -77,49 +80,55 @@ public class NotesEdit extends AppCompatActivity {
 
     private void checkGetNote() {
         String originalTitle = noteContent.getStringExtra("originalNote_title");
-        if (!(originalTitle.matches("Null"))){
+        if (!(originalTitle.matches("Null"))) {
             note.setTitle(originalTitle);
             title_etNE.setText(originalTitle);
             String originalTxt = noteContent.getStringExtra("originalNote_txt");
             note.setTxt(originalTxt);
             note.setDateTime_created(noteContent.getStringExtra("originalNote_dateTime"));
-            Boolean originalThumbtack = noteContent.getBooleanExtra("originalNote_thumbtack",false);
-            if (originalThumbtack){
+            Boolean originalThumbtack = noteContent.getBooleanExtra("originalNote_thumbtack", false);
+            if (originalThumbtack) {
                 thumbtack_cbNE.setChecked(true);
             }
             note.setThumbtack(originalThumbtack);
 
 
-
+            originalTxtFile = null;
             try {
-                File originalTxtFile = File.createTempFile(note.getDateTime_created(), ".txt");
+                originalTxtFile = File.createTempFile("note", ".txt");
                 StorageReference originalTxtFile_ref = FBST.getReference(originalTxt);
                 originalTxtFile_ref.getFile(originalTxtFile).addOnCompleteListener(new OnCompleteListener<FileDownloadTask.TaskSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<FileDownloadTask.TaskSnapshot> task) {
-                            try {
-                                String fileName = note.getDateTime_created() + ".txt";
-                                FileInputStream fis = openFileInput(fileName);
-                                InputStreamReader isr = new InputStreamReader(fis);
-                                BufferedReader br = new BufferedReader(isr);
-                                StringBuffer sb = new StringBuffer();
-                                String line = br.readLine();
-                                while (line != null) {
-                                    sb.append(line + '\n');
-                                    line = br.readLine();
-                                }
-                                String strrd = sb.toString();
-                                br.close();
-                                txt_etNE.setText(strrd);
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
+                        if (task.isSuccessful()) {
+                            readFile();
+                        }
                     }
                 });
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+        }
+    }
+
+    private void readFile() {
+        try {
+            Toast.makeText(this, originalTxtFile.getName(), Toast.LENGTH_SHORT).show();
+            FileInputStream fis= new FileInputStream (new File(originalTxtFile.getPath()));
+            InputStreamReader isr = new InputStreamReader(fis);
+            BufferedReader br = new BufferedReader(isr);
+            StringBuffer sb = new StringBuffer();
+            String line = br.readLine();
+            while (line != null) {
+                sb.append(line+'\n');
+                line = br.readLine();
+            }
+            String strrd = sb.toString();
+            br.close();
+            txt_etNE.setText(strrd);
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
