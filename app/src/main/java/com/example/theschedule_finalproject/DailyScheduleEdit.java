@@ -2,17 +2,20 @@ package com.example.theschedule_finalproject;
 
 import static com.example.theschedule_finalproject.FBref.authRef;
 import static com.example.theschedule_finalproject.FBref.currentUser;
+import static com.example.theschedule_finalproject.FBref.eventsRef;
 import static com.example.theschedule_finalproject.FBref.storageRef;
 
 import static java.util.Calendar.HOUR;
 import static java.util.Calendar.MINUTE;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.DatePickerDialog;
+import android.app.DownloadManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -33,10 +36,16 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.theschedule_finalproject.Models.Event;
+import com.example.theschedule_finalproject.Models.Note;
 import com.example.theschedule_finalproject.databinding.ActivityDailyScheduleEditBinding;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Random;
 
@@ -53,6 +62,8 @@ public class DailyScheduleEdit extends AppCompatActivity {
     private ActivityDailyScheduleEditBinding dailyScheduleEditBinding;
     private AlarmManager alarmManager;
     private PendingIntent pendingIntent;
+    Query query;
+    String hour_str, minute_str;
 
 
 
@@ -78,6 +89,30 @@ public class DailyScheduleEdit extends AppCompatActivity {
 
         event = new Event();
         setListeners();
+        //setCount();
+    }
+
+    private void setCount() {
+        query = eventsRef.child(event.getEvent_date()).child(event.getEvent_time()).orderByChild("count").limitToLast(1);
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                        Event event_count = dataSnapshot.getValue(Event.class);
+                        event.setCount(event_count.getCount());
+                    }
+                }
+                else {
+                    event.setCount(0);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     private void setListeners() {
@@ -95,10 +130,10 @@ public class DailyScheduleEdit extends AppCompatActivity {
         timeSetListener = new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker timePicker, int hour, int minute) {
-                calendar.set(Calendar.HOUR,hour);
-                calendar.set(MINUTE,minute);
-
-                String hour_str, minute_str;
+                timePicker.setIs24HourView(true);
+                calendar.set(Calendar.HOUR, hour);
+                calendar.set(Calendar.MINUTE,minute);
+                calendar.set(Calendar.MILLISECOND,0);
                 if(hour<10){
                     hour_str = "0" + Integer.toString(hour);
                 }
@@ -112,7 +147,7 @@ public class DailyScheduleEdit extends AppCompatActivity {
                 else {
                     minute_str = Integer.toString(minute);
                 }
-                time_tvDSE.setText(hour_str + ":" + minute_str);
+                time_tvDSE.setText(calendar.get(HOUR) + ":" + (calendar.get(MINUTE)));
             }
         };
 
@@ -123,40 +158,41 @@ public class DailyScheduleEdit extends AppCompatActivity {
         setDate();
         setTitleAndTxt();
         setAlarm();
+        event.setCount(0);
+
+        eventsRef.child(currentUser.getUid()).child(event.getEvent_time()).child(event.getEvent_time());
+
         Intent newActivity;
         newActivity = new Intent(DailyScheduleEdit.this, DailyScheduleView.class);
         startActivity(newActivity);
     }
 
-    private void setAlarm() {
-        if (alert_cbDSE.isChecked()){
-        }
-        else {
 
-        }
+    private void setAlarm() {
         alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent alarmReceiver_intent = new Intent(DailyScheduleEdit.this,AlarmReceiver.class);
+
         if(alert_cbDSE.isChecked()){
-            Intent alarmReceiver_intent = new Intent(DailyScheduleEdit.this,AlarmReceiver.class);
-            int random = (int) (Math.random()*49+1);
-            pendingIntent = PendingIntent.getBroadcast(DailyScheduleEdit.this,random,alarmReceiver_intent,0);
+            if (event.getAlarm()==0){
+                event.setAlarm((int) (Math.random()*10000+1));//מגדירים Request קוד חדש
+            }
+            pendingIntent = PendingIntent.getBroadcast(DailyScheduleEdit.this,event.getAlarm(),alarmReceiver_intent,0);
             alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),AlarmManager.INTERVAL_DAY,pendingIntent);
-            Toast.makeText(this, "aaaa", Toast.LENGTH_SHORT).show();
         }
         else{
-            Intent alarmReceiver_intent = new Intent(DailyScheduleEdit.this,AlarmReceiver.class);
-            pendingIntent = PendingIntent.getBroadcast(DailyScheduleEdit.this,0,alarmReceiver_intent,0);
-
-            if (alarmManager == null){
-                alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+            if (event.getAlarm()!=0) {
+                pendingIntent = PendingIntent.getBroadcast(DailyScheduleEdit.this, event.getAlarm(), alarmReceiver_intent, 0);
+                if (alarmManager == null) {
+                    alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+                }
+                alarmManager.cancel(pendingIntent);
             }
-            alarmManager.cancel(pendingIntent);
-            Toast.makeText(this, "ccccc", Toast.LENGTH_SHORT).show();
+            event.setAlarm(0);
         }
     }
 
     private void setTime() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("HHmm");
-        event.setEvent_date(dateFormat.format(calendar.getTime()));
+        event.setEvent_time(hour_str+minute_str);
     }
 
     private void setDate() {
@@ -169,6 +205,7 @@ public class DailyScheduleEdit extends AppCompatActivity {
         byte[] txt_context = txt_etDSE.getText().toString().getBytes();
         String txt_path = "Events/" + currentUser.getUid() + "/" + event.getEvent_date() + "/" + event.getEvent_time() + ".txt";
         storageRef.child(txt_path).putBytes(txt_context);
+        event.setTxt(txt_path);
     }
 
     public void openDatePicker(View view) {
