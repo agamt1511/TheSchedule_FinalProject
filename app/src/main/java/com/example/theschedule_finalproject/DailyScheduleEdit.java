@@ -6,6 +6,7 @@ import static com.example.theschedule_finalproject.FBref.eventsRef;
 import static com.example.theschedule_finalproject.FBref.storageRef;
 
 import static java.util.Calendar.HOUR;
+import static java.util.Calendar.HOUR_OF_DAY;
 import static java.util.Calendar.MINUTE;
 
 import androidx.annotation.NonNull;
@@ -116,10 +117,9 @@ public class DailyScheduleEdit extends AppCompatActivity {
             @Override
             public void onTimeSet(TimePicker timePicker, int hour, int minute) {
                 String hour_str, minute_str;
-                timePicker.setIs24HourView(true);
-                calendar.set(Calendar.HOUR, hour);
+                calendar.set(HOUR_OF_DAY, hour);
                 calendar.set(Calendar.MINUTE,minute);
-                calendar.set(Calendar.MILLISECOND,0);
+                calendar.set(Calendar.SECOND,0);
                 if(hour<10){
                     hour_str = "0" + hour;
                 }
@@ -145,6 +145,7 @@ public class DailyScheduleEdit extends AppCompatActivity {
             setTime();
             setDate();
             setTitleAndTxt();
+            event.setAlarm(0);
             setAlarm();
             setCount();
 
@@ -182,25 +183,22 @@ public class DailyScheduleEdit extends AppCompatActivity {
 
 
     private void setAlarm() {
-        alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        Intent alarmReceiver_intent = new Intent(DailyScheduleEdit.this,AlarmReceiver.class);
-
         if(alert_cbDSE.isChecked()){
-            if (event.getAlarm()==0){
-                event.setAlarm((int) (Math.random()*10000+1));//מגדירים Request קוד חדש
-            }
-            pendingIntent = PendingIntent.getBroadcast(DailyScheduleEdit.this,event.getAlarm(),alarmReceiver_intent,0);
-            alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(),AlarmManager.INTERVAL_DAY,pendingIntent);
+            alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+            Intent intent = new Intent(DailyScheduleEdit.this, AlarmReceiver.class);
+            pendingIntent = PendingIntent.getBroadcast(DailyScheduleEdit.this, 0, intent, 0);
+            alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                    AlarmManager.INTERVAL_DAY, pendingIntent);
+            Toast.makeText(DailyScheduleEdit.this, "Alarm Set", Toast.LENGTH_SHORT).show();
         }
         else{
-            if (event.getAlarm()!=0) {
-                pendingIntent = PendingIntent.getBroadcast(DailyScheduleEdit.this, event.getAlarm(), alarmReceiver_intent, 0);
-                if (alarmManager == null) {
-                    alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-                }
-                alarmManager.cancel(pendingIntent);
+            Intent intent = new Intent(DailyScheduleEdit.this, AlarmReceiver.class);
+            pendingIntent = PendingIntent.getBroadcast(DailyScheduleEdit.this, 0, intent, 0);
+            if (alarmManager == null){
+                alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
             }
-            event.setAlarm(0);
+            alarmManager.cancel(pendingIntent);
+            Toast.makeText(DailyScheduleEdit.this, "Alarm Canceled", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -226,7 +224,7 @@ public class DailyScheduleEdit extends AppCompatActivity {
     }
 
     public void openTimePicker(View view) {
-        new TimePickerDialog(DailyScheduleEdit.this,timeSetListener,calendar.get(HOUR),calendar.get(MINUTE),true).show();
+        new TimePickerDialog(DailyScheduleEdit.this,timeSetListener,calendar.get(HOUR_OF_DAY),calendar.get(MINUTE),true).show();
     }
 
     private void createNotificationChannel(){
