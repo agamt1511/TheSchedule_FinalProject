@@ -44,13 +44,19 @@ import java.util.Collections;
 public class NotesView extends AppCompatActivity{
     //הכרזה על רכיבי תצוגה, משתנים וכדומה
     BroadcastReceiver broadcastReceiver;
+
     ListView notes_lvNV;
-    ArrayList<Note> noteArrayList_thumbtack, noteArrayList_noThumbtack, noteArrayList_complete;
+
     DatabaseReference notesDBR_thumbtack, notesDBR_noThumbtack ,notesDBR_delete;
     Query queryThumbtack, queryNoThumbtack;
+
     NoteAdapter noteAdapter;
+    ArrayList<Note> noteArrayList_thumbtack, noteArrayList_noThumbtack, noteArrayList_complete;
+
     Intent newActivity;
+
     AlertDialog.Builder adb;
+
     String thumbtack_str;
     Boolean message;// הגדרת משתנה למניעת שינוי כפול של LIST VIEW
 
@@ -66,7 +72,8 @@ public class NotesView extends AppCompatActivity{
 
         //התאמה בין רכיב תצוגה למשתנה
         notes_lvNV = (ListView) findViewById(R.id.notes_lvNV);
-        currentUser = authRef.getCurrentUser();
+
+        currentUser = authRef.getCurrentUser(); //קבלת UID של משתמש מחובר
 
         message = true;// איפשור שינוי ListView
 
@@ -133,10 +140,11 @@ public class NotesView extends AppCompatActivity{
         noteAdapter = new NoteAdapter(this,noteArrayList_complete); //הגדרת Adapter חדש עם ערכי הרשימה המאוחדת
         notes_lvNV.setAdapter(noteAdapter); //קישור בין Adapter לרכיב תצוגה
 
-        setListeners();
+        setListeners();// יצירת מאזינים
     }
 
     private void setListeners() {
+        //לחיצה ארוכה - מחיקת ערך Note
         notes_lvNV.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long l) {
@@ -178,6 +186,7 @@ public class NotesView extends AppCompatActivity{
         message = true; //אפשור פעולת מאזינים מחדש
 
 
+        //כאשר נלחץ על אחד מעצמי הNote נקבל את ערכיו ונשלח לActivity עריכה
         notes_lvNV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
@@ -190,12 +199,6 @@ public class NotesView extends AppCompatActivity{
                 startActivity(newActivity);
             }
         });
-    }
-
-    //פעולת עדכון Adapter
-    private void updateNoteAdapter() {
-        updateNoteArray();// עדכון רשימת Note מאוחדת
-        noteAdapter.notifyDataSetChanged(); //התראה לAdapter על שינוי שקרה
     }
 
     //פעולת עדכון  רשימה
@@ -221,7 +224,21 @@ public class NotesView extends AppCompatActivity{
         updateNoteArray();
     }
 
+    //פעולת עדכון Adapter
+    private void updateNoteAdapter() {
+        updateNoteArray();// עדכון רשימת Note מאוחדת
+        noteAdapter.notifyDataSetChanged(); //התראה לAdapter על שינוי שקרה
+    }
 
+    //צעבר לACtivity יצירת פתק חדש
+    public void addNote(View view) {
+        newActivity = new Intent(NotesView.this, NotesEdit.class);
+        newActivity.putExtra("originalNote_title", "Null"); //השמת ערך כדי לא להפעיל ייבוא פתק
+        startActivity(newActivity);
+    }
+
+
+    //תפריט מסכים
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
@@ -248,11 +265,5 @@ public class NotesView extends AppCompatActivity{
             startActivity(newActivity);
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    public void addNote(View view) {
-        newActivity = new Intent(NotesView.this, NotesEdit.class);
-        newActivity.putExtra("originalNote_title", "Null");
-        startActivity(newActivity);
     }
 }

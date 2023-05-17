@@ -46,13 +46,17 @@ import java.util.Date;
 public class NotesEdit extends AppCompatActivity {
     //הכרזה על רכיבי תצוגה, משתנים וכדומה
     BroadcastReceiver broadcastReceiver;
+
     EditText title_etNE, txt_etNE;
     CheckBox thumbtack_cbNE;
-    Note note;
-    String dateTime_created, thumbtack_str;
-    Boolean thumbtack;
-    Intent noteContent;
+
     File originalTxtFile;
+
+    Intent noteContent;
+
+    Note note;
+
+    String originalTitle;
 
 
     @Override
@@ -72,38 +76,41 @@ public class NotesEdit extends AppCompatActivity {
         //אתחול והגדרת תוכן למשתנים ועצמים
         note = new Note();
 
-        currentUser = authRef.getCurrentUser();
+        currentUser = authRef.getCurrentUser(); //קבלת UID של משתמש מחובר
 
-        noteContent = getIntent();
-        checkGetNote();
+        noteContent = getIntent();//קבלת Intent מפעילות קודמת
+        checkGetNote();//קבלת נתונים מIntent פעילות קודמת
     }
 
     private void checkGetNote() {
-        String originalTitle = noteContent.getStringExtra("originalNote_title");
+        originalTitle = noteContent.getStringExtra("originalNote_title"); //קבלת ערך כותרת של הפתק/ משתנה בדיקה מאיפה הגיע הפתק
+
+        //בדיקה: האם הIntent התקבל מלחמיצה על note או מלחציה על כפתור של new note
         if (!(originalTitle.matches("Null"))) {
-            note.setTitle(originalTitle);
-            title_etNE.setText(originalTitle);
-            String originalTxt = noteContent.getStringExtra("originalNote_txt");
-            note.setTxt(originalTxt);
-            note.setDateTime_created(noteContent.getStringExtra("originalNote_dateTime"));
-            Boolean originalThumbtack = noteContent.getBooleanExtra("originalNote_thumbtack", false);
-            note.setThumbtack(originalThumbtack);
-            if (originalThumbtack) {
+
+            note.setTitle(originalTitle); //השמת כותרת בעצם Note
+            title_etNE.setText(originalTitle);// הצגה כותרת בActivity
+
+            String originalTxt = noteContent.getStringExtra("originalNote_txt");//קבלת ערך כתובת txt של הפתק
+            note.setTxt(originalTxt);//השמת כתובת txt בעצם Note
+
+            note.setDateTime_created(noteContent.getStringExtra("originalNote_dateTime"));//השמת תאריך יצירה בעצם Note
+
+            note.setThumbtack(noteContent.getBooleanExtra("originalNote_thumbtack", false));//השמת ערך בוליאני של נעץ בעצם Note
+            if (note.getThumbtack()) { // סימון check box בהתאם לערך בוליאני של נעץ
                 thumbtack_cbNE.setChecked(true);
             }
-            note.setThumbtack(originalThumbtack);
 
-
+            //קבלת תוכן txt של העצם Note
             originalTxtFile = null;
             try {
-                originalTxtFile = File.createTempFile("note", ".txt");
-                StorageReference originalTxtFile_ref = FBST.getReference(originalTxt);
+                originalTxtFile = File.createTempFile("note", ".txt"); //יצירת קובץ לקבלת נתונים
+                StorageReference originalTxtFile_ref = FBST.getReference(originalTxt);//יצירת הפנייה למיקום של קובץ txt
                 originalTxtFile_ref.getFile(originalTxtFile).addOnCompleteListener(new OnCompleteListener<FileDownloadTask.TaskSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<FileDownloadTask.TaskSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            readFile();
-                            deleteNoteContext();
+                        if (task.isSuccessful()) { //כאשר ההורדה הסתיימה בהצלחה
+                            readFile(); //קריאה והצגה של קובץ txt
                         }
                     }
                 });
@@ -113,21 +120,9 @@ public class NotesEdit extends AppCompatActivity {
         }
     }
 
-    private void deleteNoteContext() {
-        if (note.getThumbtack()){
-            thumbtack_str = "Thumbtack";
-        }
-        else {
-            thumbtack_str = "NoThumbtack";
-        }
-        FBST.getReference(note.getTxt()).delete();
-        notesRef.child(currentUser.getUid()).child(thumbtack_str).child(note.getDateTime_created()).removeValue();
-
-    }
-
     private void readFile() {
         try {
-            Toast.makeText(this, originalTxtFile.getName(), Toast.LENGTH_SHORT).show();
+            //קריאת קובץ מקומי
             FileInputStream fis= new FileInputStream (new File(originalTxtFile.getPath()));
             InputStreamReader isr = new InputStreamReader(fis);
             BufferedReader br = new BufferedReader(isr);
@@ -139,31 +134,48 @@ public class NotesEdit extends AppCompatActivity {
             }
             String strrd = sb.toString();
             br.close();
-            txt_etNE.setText(strrd);
-            originalTxtFile.delete();
+
+            txt_etNE.setText(strrd);// הצגת מחרוזת Txt
+
+            originalTxtFile.delete(); // מחיקת קובץ מהמכשיר
         }
         catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
+    private void deleteNoteContext() {
+        String originalNote_thumbtack = getThumbtackStatus(note.getThumbtack());
+        FBST.getReference(note.getTxt()).delete();// מחיקת קובץ Note של txt מStorage
+        notesRef.child(currentUser.getUid()).child(originalNote_thumbtack).child(note.getDateTime_created()).removeValue(); //מחיקת ערך Note מהDB
+
+    }
+
     public void saveNote(View view) {
+        if (!(originalTitle.matches("Null"))) {
+            deleteNoteContext();// מחיקת עצם Note קודם מDB ומחיקת קובץ txt מStorage
+        }
+
         //קליטת נתונים בסיסיים
         String title = title_etNE.getText().toString();
         String note_txt = txt_etNE.getText().toString();
-        thumbtack = thumbtack_cbNE.isChecked();
+        Boolean thumbtack = thumbtack_cbNE.isChecked();
 
         // אם הנתונים תקניים שמירה והעלאה של הקובץ
         if (dataVerification(title,note_txt)){
             note.setTitle(title);//השמה של כותרת בDB
-            dateTime_created = getDateAndTime();//יצירת תבנית של תאריך וזמן
+
+            String dateTime_created = getDateAndTime();//יצירת תבנית של תאריך וזמן
             note.setDateTime_created(dateTime_created);//השמה של מחרזות תאריך וזמן בDB
-            getThumbtackStatus(); // יצירת מחרוזת נעץ בהתאם לערכו הבוליאני
-            String txt = "Notes/" + currentUser.getUid() + "/" + thumbtack_str +"/" + dateTime_created + ".txt"; //יצירת כתובת להשמה בSTORAGE
+
+            note.setThumbtack(thumbtack);//השמת ערך בוליאני של נעץ
+            String noteThumbtack = getThumbtackStatus(thumbtack); // יצירת מחרוזת נעץ בהתאם לערכו הבוליאני
+
+            String txt = "Notes/" + currentUser.getUid() + "/" + noteThumbtack +"/" + dateTime_created + ".txt"; //יצירת כתובת להשמה בSTORAGE
             createTxtFile(note_txt, txt); //יצירת קובץ TXT
             note.setTxt(txt); // השמה של כתובת TXT בDB
-            note.setThumbtack(thumbtack);//השמת ערך בוליאני של נעץ
-            notesRef.child(currentUser.getUid()).child(thumbtack_str).child(dateTime_created).setValue(note);// השמת ערך Note בDB
+
+            notesRef.child(currentUser.getUid()).child(noteThumbtack).child(dateTime_created).setValue(note);// השמת ערך Note בDB
 
             //סיום ויצאה מהActivity
             Intent newActivity;
@@ -191,19 +203,17 @@ public class NotesEdit extends AppCompatActivity {
 
     //המרת תאריך ושעה לפורמט רצוי
     private String getDateAndTime() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-        Date date = Calendar.getInstance().getTime();
-        return dateFormat.format(date);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss"); // יצירת פורמט של זמן ותאריך
+        Date date = Calendar.getInstance().getTime(); //קבלת זמן ותאריך מהלוח שנה
+        return dateFormat.format(date); //שליחה חזרה של תאריך
     }
 
     //יצירת String לנעץ בהתאם לערכו הבוליאני
-    private void getThumbtackStatus() {
+    private String getThumbtackStatus(Boolean thumbtack) {
         if (thumbtack){
-            thumbtack_str = "Thumbtack";
+            return "Thumbtack";
         }
-        else {
-            thumbtack_str = "NoThumbtack";
-        }
+        return "NoThumbtack";
     }
 
     //יצירה וההעלאה של קובץ Txt לFBST
