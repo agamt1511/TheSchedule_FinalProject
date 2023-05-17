@@ -87,6 +87,7 @@ public class NotesEdit extends AppCompatActivity {
             note.setTxt(originalTxt);
             note.setDateTime_created(noteContent.getStringExtra("originalNote_dateTime"));
             Boolean originalThumbtack = noteContent.getBooleanExtra("originalNote_thumbtack", false);
+            note.setThumbtack(originalThumbtack);
             if (originalThumbtack) {
                 thumbtack_cbNE.setChecked(true);
             }
@@ -102,6 +103,7 @@ public class NotesEdit extends AppCompatActivity {
                     public void onComplete(@NonNull Task<FileDownloadTask.TaskSnapshot> task) {
                         if (task.isSuccessful()) {
                             readFile();
+                            deleteNoteContext();
                         }
                     }
                 });
@@ -109,6 +111,18 @@ public class NotesEdit extends AppCompatActivity {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    private void deleteNoteContext() {
+        if (note.getThumbtack()){
+            thumbtack_str = "Thumbtack";
+        }
+        else {
+            thumbtack_str = "NoThumbtack";
+        }
+        FBST.getReference(note.getTxt()).delete();
+        notesRef.child(currentUser.getUid()).child(thumbtack_str).child(note.getDateTime_created()).removeValue();
+
     }
 
     private void readFile() {
