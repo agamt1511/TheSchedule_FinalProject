@@ -126,6 +126,7 @@ public class NotesEdit extends AppCompatActivity {
             String strrd = sb.toString();
             br.close();
             txt_etNE.setText(strrd);
+            originalTxtFile.delete();
         }
         catch (IOException e) {
             throw new RuntimeException(e);
