@@ -1,13 +1,17 @@
 package com.example.theschedule_finalproject;
 
+import static com.example.theschedule_finalproject.FBref.FBST;
 import static com.example.theschedule_finalproject.FBref.authRef;
 import static com.example.theschedule_finalproject.FBref.currentUser;
 import static com.example.theschedule_finalproject.FBref.eventsRef;
 import static com.example.theschedule_finalproject.FBref.storageRef;
 
+import static java.util.Calendar.DAY_OF_MONTH;
 import static java.util.Calendar.HOUR;
 import static java.util.Calendar.HOUR_OF_DAY;
 import static java.util.Calendar.MINUTE;
+import static java.util.Calendar.MONTH;
+import static java.util.Calendar.YEAR;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -39,11 +43,20 @@ import android.widget.Toast;
 import com.example.theschedule_finalproject.Models.Event;
 import com.example.theschedule_finalproject.Models.Note;
 import com.example.theschedule_finalproject.databinding.ActivityDailyScheduleEditBinding;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.StorageReference;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collections;
@@ -65,6 +78,9 @@ public class DailyScheduleEdit extends AppCompatActivity {
     private PendingIntent pendingIntent;
     Query query;
     String time_str, date_str;
+    Intent eventContent;
+    String originalTitle;
+    File originalTxtFile;
 
 
 
@@ -91,8 +107,111 @@ public class DailyScheduleEdit extends AppCompatActivity {
         time_str = "null";
         date_str = "null";
         event = new Event();
+
+        eventContent = getIntent();//קבלת Intent מפעילות קודמת
+        checkGetEvent();//קבלת נתונים מIntent פעילות קודמת
+
+
         setListeners();
 
+    }
+
+    private void checkGetEvent() {
+        originalTitle = eventContent.getStringExtra("originalEvent_title");
+        if (!(originalTitle.matches("Null"))){
+            event.setTitle(originalTitle);
+            event.setTxt(eventContent.getStringExtra("originalEvent_txt"));
+            event.setEvent_date(eventContent.getStringExtra("originalEvent_date"));
+            event.setEvent_time(eventContent.getStringExtra("originalEvent_time"));
+            event.setCount(eventContent.getIntExtra("originalEvent_count",0));
+            event.setAlarm(eventContent.getIntExtra("originalEvent_alarm",0));
+
+
+            getTitleAndTxt();
+            getDateAndTime();
+        }
+    }
+
+    private void getDateAndTime() {
+        //הגדרת תאריך
+        calendar.set(Calendar.YEAR, Integer.parseInt(event.getEvent_date().substring(0,4)));
+        calendar.set(Calendar.MONTH,Integer.parseInt(event.getEvent_date().substring(4,6))-1);
+        calendar.set(Calendar.DAY_OF_MONTH,Integer.parseInt(event.getEvent_date().substring(6,8)));
+
+        date_str = calendar.get(YEAR) + "/" + ((Integer) calendar.get(MONTH)+1) + "/" + calendar.get(DAY_OF_MONTH);
+
+        date_tvDSE.setText(date_str);
+
+        //הגדרת זמן
+        String hour_str, minute_str;
+        Toast.makeText(this, event.getEvent_time().substring(0,2), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, event.getEvent_time().substring(2,4), Toast.LENGTH_SHORT).show();
+
+
+        calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(event.getEvent_time().substring(0,2)));
+        calendar.set(Calendar.MINUTE,Integer.parseInt(event.getEvent_time().substring(2,4)));
+        calendar.set(Calendar.SECOND,0);
+        if(Calendar.HOUR_OF_DAY<10){
+            hour_str = "0" + Calendar.HOUR_OF_DAY;
+        }
+        else {
+            hour_str = Integer.toString(Calendar.HOUR_OF_DAY);
+        }
+
+        if(Calendar.MINUTE<10){
+            minute_str = "0" + Calendar.MINUTE;
+        }
+        else {
+            minute_str = Integer.toString(Calendar.MINUTE);
+        }
+
+        hour_str = String.valueOf(Calendar.HOUR_OF_DAY);
+        minute_str = String.valueOf(Calendar.MINUTE);
+        time_str = hour_str + minute_str;
+        time_tvDSE.setText(hour_str + ":" + minute_str);
+    }
+
+    private void getTitleAndTxt() {
+        title_etDSE.setText(event.getTitle());
+        originalTxtFile = null;
+        try {
+            originalTxtFile = File.createTempFile("event", ".txt"); //יצירת קובץ לקבלת נתונים
+            StorageReference originalTxtFile_ref = FBST.getReference(event.getTxt());//יצירת הפנייה למיקום של קובץ txt
+            originalTxtFile_ref.getFile(originalTxtFile).addOnCompleteListener(new OnCompleteListener<FileDownloadTask.TaskSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<FileDownloadTask.TaskSnapshot> task) {
+                    if (task.isSuccessful()) { //כאשר ההורדה הסתיימה בהצלחה
+                        readFile(); //קריאה והצגה של קובץ txt
+                    }
+                }
+            });
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void readFile() {
+        try {
+            //קריאת קובץ מקומי
+            FileInputStream fis= new FileInputStream (new File(originalTxtFile.getPath()));
+            InputStreamReader isr = new InputStreamReader(fis);
+            BufferedReader br = new BufferedReader(isr);
+            StringBuffer sb = new StringBuffer();
+            String line = br.readLine();
+            while (line != null) {
+                sb.append(line+'\n');
+                line = br.readLine();
+            }
+            String strrd = sb.toString();
+            br.close();
+
+            txt_etDSE.setText(strrd);// הצגת מחרוזת Txt
+
+            originalTxtFile.delete(); // מחיקת קובץ מהמכשיר
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void setCount() {
@@ -107,7 +226,7 @@ public class DailyScheduleEdit extends AppCompatActivity {
                 calendar.set(Calendar.MONTH,month);
                 calendar.set(Calendar.DAY_OF_MONTH,day);
 
-                date_str = Integer.toString(year) + "/" + Integer.toString(month+1)  + "/" + Integer.toString(day);
+                date_str =  Integer.toString(day) + "/" + Integer.toString(month+1)  + "/" + Integer.toString(year) ;
 
                 date_tvDSE.setText(date_str);
             }

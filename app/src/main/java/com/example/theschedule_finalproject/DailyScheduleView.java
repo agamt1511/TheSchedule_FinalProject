@@ -130,20 +130,20 @@ public class DailyScheduleView extends AppCompatActivity {
             }
         });
 
-//        events_lvDSV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-//                Event event = (Event) (events_lvDSV.getItemAtPosition(position)); //קבלת ערך Note נבחר
-//                newActivity = new Intent(DailyScheduleView.this, DailyScheduleView.class);
-//                newActivity.putExtra("originalNote_title",event.getTitle());
-//                newActivity.putExtra("originalNote_txt",event.getTxt());
-//                newActivity.putExtra("originalNote_date",event.getEvent_date());
-//                newActivity.putExtra("originalNote_time",event.getEvent_time());
-//                newActivity.putExtra("originalNote_count",event.getCount());
-//                newActivity.putExtra("originalNote_alarm",event.getAlarm());
-//                startActivity(newActivity);
-//            }
-//        });
+        events_lvDSV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                Event event = (Event) (events_lvDSV.getItemAtPosition(position)); //קבלת ערך Note נבחר
+                newActivity = new Intent(DailyScheduleView.this, DailyScheduleEdit.class);
+                newActivity.putExtra("originalEvent_title",event.getTitle());
+                newActivity.putExtra("originalEvent_txt",event.getTxt());
+                newActivity.putExtra("originalEvent_date",event.getEvent_date());
+                newActivity.putExtra("originalEvent_time",event.getEvent_time());
+                newActivity.putExtra("originalEvent_count",event.getCount());
+                newActivity.putExtra("originalEvent_alarm",event.getAlarm());
+                startActivity(newActivity);
+            }
+        });
 
     }
 
@@ -222,6 +222,7 @@ public class DailyScheduleView extends AppCompatActivity {
     public void addEvent(View view) {
         Intent newActivity;
         newActivity = new Intent(DailyScheduleView.this, DailyScheduleEdit.class);
+        newActivity.putExtra("originalEvent_title", "Null"); //השמת ערך כדי לא להפעיל ייבוא פתק
         startActivity(newActivity);
     }
 
