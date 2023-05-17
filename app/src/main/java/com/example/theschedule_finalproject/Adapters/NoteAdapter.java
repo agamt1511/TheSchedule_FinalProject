@@ -55,6 +55,7 @@ public class NoteAdapter extends BaseAdapter {
 
         TextView title_tvNC = (TextView) view.findViewById(R.id.title_tvNC);
         TextView dateTime_tvNC = (TextView) view.findViewById(R.id.dateTime_tvNC);
+
         title_tvNC.setText(note.getTitle());
         dateTime_tvNC.setText(convertToDate(note.getDateTime_created()));
 

@@ -96,7 +96,7 @@ public class DailyScheduleEdit extends AppCompatActivity {
     }
 
     private void setCount() {
-        event.setCount((int) (Math.random()*1000+1));
+        event.setCount(((int) (Math.random()*898)+101));
     }
 
     private void setListeners() {

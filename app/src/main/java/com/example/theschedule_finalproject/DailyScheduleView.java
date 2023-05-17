@@ -1,5 +1,10 @@
 package com.example.theschedule_finalproject;
 
+import static com.example.theschedule_finalproject.FBref.authRef;
+import static com.example.theschedule_finalproject.FBref.currentUser;
+import static com.example.theschedule_finalproject.FBref.eventsRef;
+import static com.example.theschedule_finalproject.FBref.notesRef;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
@@ -13,8 +18,18 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CalendarView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.theschedule_finalproject.Adapters.EventAdapter;
+import com.example.theschedule_finalproject.Models.Event;
+import com.example.theschedule_finalproject.Models.Note;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -27,7 +42,12 @@ import java.util.GregorianCalendar;
 public class DailyScheduleView extends AppCompatActivity {
     BroadcastReceiver broadcastReceiver;
     CalendarView calender_cvDSV;
+    ListView events_lvDSV;
+    ArrayList<Event> eventArrayList;
     String selectedDayNum;
+    DatabaseReference eventsDBR;
+    Query eventQuery;
+    EventAdapter eventAdapter;
 
     String selectedDay;
 
@@ -35,12 +55,14 @@ public class DailyScheduleView extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_daily_schedule_view);
+        currentUser = authRef.getCurrentUser(); //קבלת UID של משתמש מחובר
 
         //בדיקת חיבור לאינטרנט באמצעות BrodcastReciever
         broadcastReceiver = new NetworkConnectionReceiver();
         registerReceiver(broadcastReceiver,new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
         calender_cvDSV = (CalendarView) findViewById(R.id.calender_cvDSV);
+        events_lvDSV = (ListView) findViewById(R.id.events_lvDSV);
 
         calender_cvDSV.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
@@ -48,10 +70,10 @@ public class DailyScheduleView extends AppCompatActivity {
                 String year_str, month_str, day_str;
                 year_str = Integer.toString(year);
                 if (month<10){
-                    month_str = "0" + Integer.toString(month);
+                    month_str = "0" + Integer.toString(month+1);
                 }
                 else{
-                    month_str = Integer.toString(month);
+                    month_str = Integer.toString(month+1);
                 }
                 if (day<10){
                     day_str = "0" + Integer.toString(day);
@@ -64,9 +86,49 @@ public class DailyScheduleView extends AppCompatActivity {
             }
         });
 
+        startCalender();
+    }
+
+    private void startCalender() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        selectedDay = dateFormat.format(calender_cvDSV.getDate());
+        selectedDayData();
     }
 
     private void selectedDayData() {
+        Toast.makeText(this, selectedDay, Toast.LENGTH_SHORT).show();
+        eventsDBR = eventsRef.child(currentUser.getUid()).child(selectedDay);
+        eventArrayList = new ArrayList<>();
+        eventQuery = eventsDBR.orderByChild("event_time");
+
+        eventQuery.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()){
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                        Event event = dataSnapshot.getValue(Event.class);
+                        eventArrayList.add(event);
+                    }
+                    eventAdapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        eventAdapter = new EventAdapter(this,eventArrayList);
+        events_lvDSV.setAdapter(eventAdapter);
+        eventAdapter.notifyDataSetChanged();
+    }
+
+    private void updateEventAdapter() {
+        eventAdapter.notifyDataSetChanged();
+    }
+
+    private void updateEventArray() {
     }
 
 

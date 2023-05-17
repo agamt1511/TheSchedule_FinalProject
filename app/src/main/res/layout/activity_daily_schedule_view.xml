@@ -23,12 +23,12 @@
         android:id="@+id/calender_cvDSV"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="40" />
+        android:layout_weight="50" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="50"
+        android:layout_weight="40"
         android:orientation="horizontal">
 
         <Space
@@ -61,10 +61,17 @@
                 android:layout_height="0dp"
                 android:layout_weight="5" />
 
-            <androidx.recyclerview.widget.RecyclerView
+            <ListView
+                android:id="@+id/events_lvDSV"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="80" />
+                android:layout_weight="70" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="5" />
+
         </LinearLayout>
 
         <Space
