@@ -144,10 +144,10 @@ public class DailyScheduleEdit extends AppCompatActivity {
         if (dataVerification()){
             setTime();
             setDate();
+            setCount();
             setTitleAndTxt();
             event.setAlarm(0);
             setAlarm();
-            setCount();
 
             eventsRef.child(currentUser.getUid()).child(event.getEvent_date()).child(event.getEvent_time()+ String.valueOf(event.getCount())).setValue(event);
 
@@ -214,7 +214,7 @@ public class DailyScheduleEdit extends AppCompatActivity {
     private void setTitleAndTxt() {
         event.setTitle(title_etDSE.getText().toString());
         byte[] txt_context = txt_etDSE.getText().toString().getBytes();
-        String txt_path = "Events/" + currentUser.getUid() + "/" + event.getEvent_date() + "/" + event.getEvent_time() +"/" + event.getCount() + ".txt";
+        String txt_path = "Events/" + currentUser.getUid() + "/" + event.getEvent_date() + "/" + event.getEvent_time() + event.getCount() + ".txt";
         storageRef.child(txt_path).putBytes(txt_context);
         event.setTxt(txt_path);
     }
