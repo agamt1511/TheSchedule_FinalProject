@@ -7,7 +7,6 @@ import static com.example.theschedule_finalproject.FBref.eventsRef;
 import static com.example.theschedule_finalproject.FBref.storageRef;
 
 import static java.util.Calendar.DAY_OF_MONTH;
-import static java.util.Calendar.HOUR;
 import static java.util.Calendar.HOUR_OF_DAY;
 import static java.util.Calendar.MILLISECOND;
 import static java.util.Calendar.MINUTE;
@@ -16,12 +15,9 @@ import static java.util.Calendar.YEAR;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.RecyclerView;
 
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.DatePickerDialog;
-import android.app.DownloadManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -42,14 +38,11 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.theschedule_finalproject.Models.Event;
-import com.example.theschedule_finalproject.Models.Note;
 import com.example.theschedule_finalproject.databinding.ActivityDailyScheduleEditBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.StorageReference;
 
@@ -60,9 +53,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
-import java.util.Random;
 
 public class DailyScheduleEdit extends AppCompatActivity {
     BroadcastReceiver broadcastReceiver;
@@ -81,10 +72,9 @@ public class DailyScheduleEdit extends AppCompatActivity {
     String time_str, date_str;
     Intent eventContent;
     String originalTitle;
-    Integer originalAlarm;
     File originalTxtFile;
 
-
+    DatabaseReference eventsDBR_delete;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,7 +100,6 @@ public class DailyScheduleEdit extends AppCompatActivity {
         date_str = "null";
         event = new Event();
 
-        originalAlarm = 0;
         eventContent = getIntent();//קבלת Intent מפעילות קודמת
         checkGetEvent();//קבלת נתונים מIntent פעילות קודמת
         setListeners();
@@ -125,8 +114,7 @@ public class DailyScheduleEdit extends AppCompatActivity {
             event.setEvent_date(eventContent.getStringExtra("originalEvent_date"));
             event.setEvent_time(eventContent.getStringExtra("originalEvent_time"));
             event.setCount(eventContent.getIntExtra("originalEvent_count",0));
-            originalAlarm = eventContent.getIntExtra("originalEvent_alarm",0);
-            event.setAlarm(originalAlarm);
+            event.setAlarm(eventContent.getIntExtra("originalEvent_alarm",0));
 
 
             getTitleAndTxt();
@@ -265,6 +253,11 @@ public class DailyScheduleEdit extends AppCompatActivity {
 
     public void saveEvent(View view) {
         if (dataVerification()){
+            if (!(originalTitle.matches("Null"))) {
+                deleteFormerEvent();
+            }
+
+
             setTime();
             setDate();
             setCount();
@@ -277,6 +270,17 @@ public class DailyScheduleEdit extends AppCompatActivity {
             newActivity = new Intent(DailyScheduleEdit.this, DailyScheduleView.class);
             startActivity(newActivity);
         }
+    }
+
+    private void deleteFormerEvent() {
+        if(event.getAlarm()!=0){
+            deleteAlert(event.getAlarm());
+        }
+
+        FBST.getReference(event.getTxt()).delete();
+
+        eventsDBR_delete = eventsRef.child(currentUser.getUid()).child(event.getEvent_date()).child(event.getEvent_time()+event.getCount());
+        eventsDBR_delete.removeValue();
     }
 
     private boolean dataVerification() {
@@ -305,9 +309,6 @@ public class DailyScheduleEdit extends AppCompatActivity {
 
 
     private void setAlarm() {
-        if(originalAlarm != 0){
-            deleteAlert(originalAlarm);
-        }
         if(alert_cbDSE.isChecked()){
             event.setAlarm(((int) (Math.random()*898)+101));
             createAlert(event.getAlarm());
@@ -331,7 +332,7 @@ public class DailyScheduleEdit extends AppCompatActivity {
         alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(DailyScheduleEdit.this, AlarmReceiver.class);
         pendingIntent = PendingIntent.getBroadcast(DailyScheduleEdit.this, requestCode, intent, 0);
-        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis()- 60, AlarmManager.INTERVAL_DAY, pendingIntent);
         Toast.makeText(this, "Alarm Set", Toast.LENGTH_SHORT).show();
     }
 

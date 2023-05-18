@@ -93,6 +93,7 @@ public class DailyScheduleView extends AppCompatActivity {
                     day_str = Integer.toString(day);
                 }
                 selectedDay = year_str + month_str + day_str;
+                eventArrayList.clear();;
                 selectedDayData();
             }
         });
