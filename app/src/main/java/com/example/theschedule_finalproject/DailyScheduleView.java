@@ -11,7 +11,10 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -53,8 +56,10 @@ public class DailyScheduleView extends AppCompatActivity {
     Query eventQuery;
     EventAdapter eventAdapter;
     Intent newActivity;
-
+    private AlarmManager alarmManager;
+    private PendingIntent pendingIntent;
     String selectedDay;
+    private Boolean message;
     AlertDialog.Builder adb;
 
     @Override
@@ -91,6 +96,10 @@ public class DailyScheduleView extends AppCompatActivity {
                 selectedDayData();
             }
         });
+        message = true;// איפשור שינוי ListView
+        eventArrayList = new ArrayList<>();
+        eventAdapter = new EventAdapter(this, eventArrayList);
+        events_lvDSV.setAdapter(eventAdapter);
 
         startCalender();
         setListeners();// יצירת מאזינים
@@ -124,7 +133,21 @@ public class DailyScheduleView extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         Event event = (Event) (events_lvDSV.getItemAtPosition(position)); //קבלת ערך Note נבחר
+                        eventAdapter.notifyDataSetChanged(); //התראה בAdapter על שינוי ערך
 
+                        message = false;//הגדרת משתנה כדי שלא יופעלו מאזיני הquery כי כבר ביצענו את המחיקה מהתצוגה
+
+                        if(event.getAlarm()!=0){
+                            Intent intent = new Intent(DailyScheduleView.this, AlarmReceiver.class);
+                            pendingIntent = PendingIntent.getBroadcast(DailyScheduleView.this, event.getAlarm(), intent, 0);
+                            if (alarmManager == null){
+                                alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+                            }
+                            alarmManager.cancel(pendingIntent);
+                            Toast.makeText(DailyScheduleView.this, "Alarm Canceled", Toast.LENGTH_SHORT).show();
+                        }
+
+                        eventArrayList.remove(event);
                         FBST.getReference(event.getTxt()).delete();
 
                         eventsDBR_delete = eventsRef.child(currentUser.getUid()).child(event.getEvent_date()).child(event.getEvent_time()+event.getCount());
@@ -144,6 +167,7 @@ public class DailyScheduleView extends AppCompatActivity {
                 return false;
             }
         });
+        message = true;
     }
 
     private void startCalender() {
@@ -153,32 +177,31 @@ public class DailyScheduleView extends AppCompatActivity {
     }
 
     private void selectedDayData() {
-        Toast.makeText(this, selectedDay, Toast.LENGTH_SHORT).show();
-        eventsDBR = eventsRef.child(currentUser.getUid()).child(selectedDay);
-        eventArrayList = new ArrayList<>();
-        eventQuery = eventsDBR.orderByChild("event_time");
+            eventsDBR = eventsRef.child(currentUser.getUid()).child(selectedDay);
+            eventQuery = eventsDBR.orderByChild("event_time");
 
-        eventQuery.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()){
-                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                        Event event = dataSnapshot.getValue(Event.class);
-                        eventArrayList.add(event);
+            eventQuery.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (message) {
+                        if (snapshot.exists()) {
+                            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                Event event = dataSnapshot.getValue(Event.class);
+                                eventArrayList.add(event);
+                            }
+                            eventAdapter.notifyDataSetChanged();
+                        }
                     }
-                    eventAdapter.notifyDataSetChanged();
                 }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
 
-            }
-        });
+                }
+            });
 
-        eventAdapter = new EventAdapter(this,eventArrayList);
-        events_lvDSV.setAdapter(eventAdapter);
-        eventAdapter.notifyDataSetChanged();
+            eventAdapter.notifyDataSetChanged();
+
     }
 
     private void updateEventAdapter() {
