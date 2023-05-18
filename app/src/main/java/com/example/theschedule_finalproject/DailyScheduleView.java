@@ -97,6 +97,21 @@ public class DailyScheduleView extends AppCompatActivity {
     }
 
     private void setListeners() {
+        events_lvDSV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                Event event = (Event) (events_lvDSV.getItemAtPosition(position)); //קבלת ערך Note נבחר
+                newActivity = new Intent(DailyScheduleView.this, DailyScheduleEdit.class);
+                newActivity.putExtra("originalEvent_title",event.getTitle());
+                newActivity.putExtra("originalEvent_txt",event.getTxt());
+                newActivity.putExtra("originalEvent_date",event.getEvent_date());
+                newActivity.putExtra("originalEvent_time",event.getEvent_time());
+                newActivity.putExtra("originalEvent_count",event.getCount());
+                newActivity.putExtra("originalEvent_alarm",event.getAlarm());
+                startActivity(newActivity);
+            }
+        });
+
         events_lvDSV.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long l) {
@@ -129,22 +144,6 @@ public class DailyScheduleView extends AppCompatActivity {
                 return false;
             }
         });
-
-        events_lvDSV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                Event event = (Event) (events_lvDSV.getItemAtPosition(position)); //קבלת ערך Note נבחר
-                newActivity = new Intent(DailyScheduleView.this, DailyScheduleEdit.class);
-                newActivity.putExtra("originalEvent_title",event.getTitle());
-                newActivity.putExtra("originalEvent_txt",event.getTxt());
-                newActivity.putExtra("originalEvent_date",event.getEvent_date());
-                newActivity.putExtra("originalEvent_time",event.getEvent_time());
-                newActivity.putExtra("originalEvent_count",event.getCount());
-                newActivity.putExtra("originalEvent_alarm",event.getAlarm());
-                startActivity(newActivity);
-            }
-        });
-
     }
 
     private void startCalender() {
