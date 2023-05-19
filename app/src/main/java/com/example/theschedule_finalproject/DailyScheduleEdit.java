@@ -37,7 +37,6 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.example.theschedule_finalproject.Models.Event;
-import com.example.theschedule_finalproject.databinding.ActivityDailyScheduleEditBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
