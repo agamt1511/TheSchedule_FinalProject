@@ -1,7 +1,9 @@
 package com.example.theschedule_finalproject;
 
+import static com.example.theschedule_finalproject.FBref.assignmentsRef;
 import static com.example.theschedule_finalproject.FBref.authRef;
 import static com.example.theschedule_finalproject.FBref.currentUser;
+import static com.example.theschedule_finalproject.FBref.eventsRef;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,7 +22,15 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 
+import com.example.theschedule_finalproject.Adapters.AssignmentAdapter;
 import com.example.theschedule_finalproject.Models.Assignment;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
 
 public class AssignmentsView extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
     BroadcastReceiver broadcastReceiver;
@@ -30,6 +40,11 @@ public class AssignmentsView extends AppCompatActivity implements AdapterView.On
 
     String[] priorities;
     Assignment assignment;
+    ArrayList<Assignment> assignmentArrayList;
+    DatabaseReference assignmentsDBR;
+    Query assignmentQuery;
+    AssignmentAdapter assignmentAdapter;
+    String importance;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +61,10 @@ public class AssignmentsView extends AppCompatActivity implements AdapterView.On
         assignment = new Assignment();
 
         currentUser = authRef.getCurrentUser(); //קבלת UID של משתמש מחובר
+
+        assignmentArrayList = new ArrayList<>();
+        assignmentAdapter = new AssignmentAdapter(this,assignmentArrayList);
+        assignments_lvAV.setAdapter(assignmentAdapter);
 
         Resources resources = getResources();
         priorities = resources.getStringArray(R.array.priorities);
@@ -96,8 +115,35 @@ public class AssignmentsView extends AppCompatActivity implements AdapterView.On
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-        String importance = priorities[i];
+        assignmentArrayList.clear();
+        importance = priorities[i];
+        showSelectedPriorityData(importance);
     }
+
+    private void showSelectedPriorityData(String importance) {
+        assignmentsDBR = assignmentsRef.child(currentUser.getUid()).child(importance);
+        assignmentQuery = assignmentsDBR.orderByChild("dateTime_goal");
+
+        assignmentQuery.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()){
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()){
+                        Assignment assignmentDataSnapshot = dataSnapshot.getValue(Assignment.class);
+                        assignmentArrayList.add(assignmentDataSnapshot);
+                    }
+                    assignmentAdapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        assignmentAdapter.notifyDataSetChanged();
+    }
+
 
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
