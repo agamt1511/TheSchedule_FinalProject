@@ -102,7 +102,7 @@ public class DailyScheduleView extends AppCompatActivity {
                 }
 
                 selectedDay = year_str + month_str + day_str; //קבלת תאריך של יום לחוץ
-
+                eventArrayList.clear(); //ניקוי רשימת ערכי Event
                 selectedDayData();// הצגת אירועי יום נבחר בList View
             }
         });
@@ -125,7 +125,6 @@ public class DailyScheduleView extends AppCompatActivity {
 
     // הצגת אירועי יום נבחר בList View
     private void selectedDayData() {
-        eventArrayList.clear(); //ניקוי רשימת ערכי Event
         eventsDBR = eventsRef.child(currentUser.getUid()).child(selectedDay);
         eventQuery = eventsDBR.orderByChild("event_time");
 
