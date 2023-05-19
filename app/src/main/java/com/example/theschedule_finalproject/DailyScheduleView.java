@@ -27,7 +27,6 @@ import android.widget.AdapterView;
 import android.widget.CalendarView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.theschedule_finalproject.Adapters.EventAdapter;
 import com.example.theschedule_finalproject.Models.Event;
@@ -133,11 +132,9 @@ public class DailyScheduleView extends AppCompatActivity {
         eventQuery.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Toast.makeText(DailyScheduleView.this, message.toString(), Toast.LENGTH_SHORT).show();
                 if (message) { //אם לא שונה כבר בפונקציית מחיקה
                     if (snapshot.exists()) {
                         for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                            Toast.makeText(DailyScheduleView.this, "dffdf", Toast.LENGTH_SHORT).show();
                             Event event = dataSnapshot.getValue(Event.class);//צור ערך Event חדש והשמה בו ערך שהתקבל בפונקציה
                             eventArrayList.add(event); //השמת ערך Event חדש ברשימה
                         }
