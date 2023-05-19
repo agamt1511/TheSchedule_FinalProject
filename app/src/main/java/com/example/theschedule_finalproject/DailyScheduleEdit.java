@@ -105,6 +105,9 @@ public class DailyScheduleEdit extends AppCompatActivity {
         event = new Event();
 
         eventContent = getIntent();//קבלת Intent מפעילות קודמת
+
+        
+
         checkGetEvent();//קבלת נתונים מIntent פעילות קודמת
         setListeners();//הגדרת מאזינים
 
