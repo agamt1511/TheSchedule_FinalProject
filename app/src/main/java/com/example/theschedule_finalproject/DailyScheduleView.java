@@ -48,33 +48,42 @@ import java.util.GregorianCalendar;
 
 public class DailyScheduleView extends AppCompatActivity {
     BroadcastReceiver broadcastReceiver;
+
     CalendarView calender_cvDSV;
     ListView events_lvDSV;
+
     ArrayList<Event> eventArrayList;
-    String selectedDayNum;
+    EventAdapter eventAdapter;
+
     DatabaseReference eventsDBR, eventsDBR_delete;
     Query eventQuery;
-    EventAdapter eventAdapter;
+
+    PendingIntent pendingIntent;
     Intent newActivity;
-    private AlarmManager alarmManager;
-    private PendingIntent pendingIntent;
-    String selectedDay;
-    private Boolean message;
+
+    AlarmManager alarmManager;
     AlertDialog.Builder adb;
+
+    String selectedDay;
+    Boolean message;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_daily_schedule_view);
-        currentUser = authRef.getCurrentUser(); //קבלת UID של משתמש מחובר
 
         //בדיקת חיבור לאינטרנט באמצעות BrodcastReciever
         broadcastReceiver = new NetworkConnectionReceiver();
         registerReceiver(broadcastReceiver,new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
+        //התאמה בין רכיב תצוגה למשתנה
         calender_cvDSV = (CalendarView) findViewById(R.id.calender_cvDSV);
         events_lvDSV = (ListView) findViewById(R.id.events_lvDSV);
 
+        currentUser = authRef.getCurrentUser(); //קבלת UID של משתמש מחובר
+
+        //מאזין - לשינוי תאריך לחוץ בלוח חודש
         calender_cvDSV.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView calendarView, int year, int month, int day) {
@@ -92,21 +101,64 @@ public class DailyScheduleView extends AppCompatActivity {
                 else{
                     day_str = Integer.toString(day);
                 }
-                selectedDay = year_str + month_str + day_str;
-                eventArrayList.clear();;
-                selectedDayData();
+
+                selectedDay = year_str + month_str + day_str; //קבלת תאריך של יום לחוץ
+
+                selectedDayData();// הצגת אירועי יום נבחר בList View
             }
         });
-        message = true;// איפשור שינוי ListView
-        eventArrayList = new ArrayList<>();
-        eventAdapter = new EventAdapter(this, eventArrayList);
-        events_lvDSV.setAdapter(eventAdapter);
 
-        startCalender();
+        message = true;// איפשור שינוי ListView
+        eventArrayList = new ArrayList<>(); // יצירת רשימה חדשה
+        eventAdapter = new EventAdapter(this, eventArrayList); //קישור בין רשימה לAdapter
+        events_lvDSV.setAdapter(eventAdapter); //קישור בין Adapter לListView
+
+        startCalender(); //קבלת יום נבחר והצגה בהתאם
         setListeners();// יצירת מאזינים
     }
 
+    //שינוי תאריך שהתקבל לפורמט תאריך נבחר
+    private void startCalender() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        selectedDay = dateFormat.format(calender_cvDSV.getDate());
+        selectedDayData();
+    }
+
+    // הצגת אירועי יום נבחר בList View
+    private void selectedDayData() {
+        eventArrayList.clear(); //ניקוי רשימת ערכי Event
+        eventsDBR = eventsRef.child(currentUser.getUid()).child(selectedDay);
+        eventQuery = eventsDBR.orderByChild("event_time");
+
+        eventQuery.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Toast.makeText(DailyScheduleView.this, message.toString(), Toast.LENGTH_SHORT).show();
+                if (message) { //אם לא שונה כבר בפונקציית מחיקה
+                    if (snapshot.exists()) {
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            Toast.makeText(DailyScheduleView.this, "dffdf", Toast.LENGTH_SHORT).show();
+                            Event event = dataSnapshot.getValue(Event.class);//צור ערך Event חדש והשמה בו ערך שהתקבל בפונקציה
+                            eventArrayList.add(event); //השמת ערך Event חדש ברשימה
+                        }
+                        eventAdapter.notifyDataSetChanged(); //עדכו Adapter
+                    }
+                }
+                message = true;
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        eventAdapter.notifyDataSetChanged(); //עדכון Adapter
+    }
+
+    // יצירת מאזיני לחיצה
     private void setListeners() {
+        //מאזין ללחיצה רגילה - פתיחה ועריכה של Event
         events_lvDSV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
@@ -122,6 +174,7 @@ public class DailyScheduleView extends AppCompatActivity {
             }
         });
 
+        //מאזין ללחיצה ארוכה - מחיקת ערך Event
         events_lvDSV.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long l) {
@@ -134,25 +187,25 @@ public class DailyScheduleView extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         Event event = (Event) (events_lvDSV.getItemAtPosition(position)); //קבלת ערך Note נבחר
-                        eventAdapter.notifyDataSetChanged(); //התראה בAdapter על שינוי ערך
-
+                        eventAdapter.notifyDataSetChanged(); //התראה בAdapter
                         message = false;//הגדרת משתנה כדי שלא יופעלו מאזיני הquery כי כבר ביצענו את המחיקה מהתצוגה
 
-                        if(event.getAlarm()!=0){
+                        if(event.getAlarm()!=0){ //מחיקת התראה אם קיימת
                             Intent intent = new Intent(DailyScheduleView.this, AlarmReceiver.class);
                             pendingIntent = PendingIntent.getBroadcast(DailyScheduleView.this, event.getAlarm(), intent, 0);
                             if (alarmManager == null){
                                 alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
                             }
                             alarmManager.cancel(pendingIntent);
-                            Toast.makeText(DailyScheduleView.this, "Alarm Canceled", Toast.LENGTH_SHORT).show();
                         }
 
-                        eventArrayList.remove(event);
-                        FBST.getReference(event.getTxt()).delete();
+                        eventArrayList.remove(event); //מחיקת ערך Event מרשימה
+                        FBST.getReference(event.getTxt()).delete();// מחיקת ערך Txt של Eהקמא מStorage
 
                         eventsDBR_delete = eventsRef.child(currentUser.getUid()).child(event.getEvent_date()).child(event.getEvent_time()+event.getCount());
-                        eventsDBR_delete.removeValue();
+                        eventsDBR_delete.removeValue(); //מחיקת ערך Event מDB
+
+
                     }
                 });
 
@@ -164,55 +217,20 @@ public class DailyScheduleView extends AppCompatActivity {
                 //יצירת והצגת דיאלוג
                 AlertDialog ad = adb.create();
                 ad.show();
-
                 return false;
             }
         });
-        message = true;
     }
 
-    private void startCalender() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-        selectedDay = dateFormat.format(calender_cvDSV.getDate());
-        selectedDayData();
+    //מעבר לActivity יצירת אירוע חדש
+    public void addEvent(View view) {
+        Intent newActivity;
+        newActivity = new Intent(DailyScheduleView.this, DailyScheduleEdit.class);
+        newActivity.putExtra("originalEvent_title", "Null"); //השמת ערך כדי לא להפעיל ייבוא פתק
+        startActivity(newActivity);
     }
 
-    private void selectedDayData() {
-            eventsDBR = eventsRef.child(currentUser.getUid()).child(selectedDay);
-            eventQuery = eventsDBR.orderByChild("event_time");
-
-            eventQuery.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if (message) {
-                        if (snapshot.exists()) {
-                            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                                Event event = dataSnapshot.getValue(Event.class);
-                                eventArrayList.add(event);
-                            }
-                            eventAdapter.notifyDataSetChanged();
-                        }
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            });
-
-            eventAdapter.notifyDataSetChanged();
-
-    }
-
-    private void updateEventAdapter() {
-        eventAdapter.notifyDataSetChanged();
-    }
-
-    private void updateEventArray() {
-    }
-
-
+    //תפריט מסכים
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
@@ -240,13 +258,6 @@ public class DailyScheduleView extends AppCompatActivity {
             startActivity(newActivity);
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    public void addEvent(View view) {
-        Intent newActivity;
-        newActivity = new Intent(DailyScheduleView.this, DailyScheduleEdit.class);
-        newActivity.putExtra("originalEvent_title", "Null"); //השמת ערך כדי לא להפעיל ייבוא פתק
-        startActivity(newActivity);
     }
 
 }

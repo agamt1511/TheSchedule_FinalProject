@@ -35,7 +35,6 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
 import com.example.theschedule_finalproject.Models.Event;
 import com.example.theschedule_finalproject.databinding.ActivityDailyScheduleEditBinding;
@@ -56,25 +55,29 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class DailyScheduleEdit extends AppCompatActivity {
+    //הצהרה על רכיבי תצוגה, משתנים וכדומה
     BroadcastReceiver broadcastReceiver;
+
     EditText title_etDSE, txt_etDSE;
     TextView date_tvDSE, time_tvDSE;
     CheckBox alert_cbDSE;
+
     Event event;
     Calendar calendar;
+    AlarmManager alarmManager;
+
     DatePickerDialog.OnDateSetListener dateSetListener;
     TimePickerDialog.OnTimeSetListener timeSetListener;
 
-    private ActivityDailyScheduleEditBinding dailyScheduleEditBinding;
-    private AlarmManager alarmManager;
-    private PendingIntent pendingIntent;
-    Query query;
-    String time_str, date_str;
-    Intent eventContent;
-    String originalTitle;
+    DatabaseReference eventsDBR_delete;
+
     File originalTxtFile;
 
-    DatabaseReference eventsDBR_delete;
+    PendingIntent pendingIntent;
+    Intent eventContent;
+
+    String originalTitle, time_str, date_str;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,27 +88,30 @@ public class DailyScheduleEdit extends AppCompatActivity {
         broadcastReceiver = new NetworkConnectionReceiver();
         registerReceiver(broadcastReceiver,new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
+        //התאמה בין רכיב תצוגה למשתנה
         title_etDSE = (EditText) findViewById(R.id.title_etDSE);
         txt_etDSE = (EditText) findViewById(R.id.txt_etDSE);
         date_tvDSE = (TextView) findViewById(R.id.date_tvDSE);
         time_tvDSE = (TextView) findViewById(R.id.time_tvDSE);
         alert_cbDSE = (CheckBox) findViewById(R.id.alert_cbDSE);
 
-        createNotificationChannel();
+        createNotificationChannel();// יצירת ערוץ להתראה
 
-        currentUser = authRef.getCurrentUser();
-        calendar = Calendar.getInstance();
+        currentUser = authRef.getCurrentUser(); //קבלת UID של משתמש מחובר
+        calendar = Calendar.getInstance(); //יישום לוח שנה
 
+        //אתחול תוכן משתמים ועצמי בסיס
         time_str = "null";
         date_str = "null";
         event = new Event();
 
         eventContent = getIntent();//קבלת Intent מפעילות קודמת
         checkGetEvent();//קבלת נתונים מIntent פעילות קודמת
-        setListeners();
+        setListeners();//הגדרת מאזינים
 
     }
 
+    //בדיקת נתונים שהתקבלו מActivity קודם
     private void checkGetEvent() {
         originalTitle = eventContent.getStringExtra("originalEvent_title");
         if (!(originalTitle.matches("Null"))){
@@ -116,19 +122,58 @@ public class DailyScheduleEdit extends AppCompatActivity {
             event.setCount(eventContent.getIntExtra("originalEvent_count",0));
             event.setAlarm(eventContent.getIntExtra("originalEvent_alarm",0));
 
-
             getTitleAndTxt();
             getDateAndTime();
             getAlarm();
         }
     }
 
-    private void getAlarm() {
-        if(event.getAlarm()!=0){
-            alert_cbDSE.setChecked(true);
+    // כותרת +טקסט - קבלה והשמה במשתנים מתאימים
+    private void getTitleAndTxt() {
+        title_etDSE.setText(event.getTitle());
+
+        originalTxtFile = null;
+        try {
+            originalTxtFile = File.createTempFile("event", ".txt"); //יצירת קובץ לקבלת נתונים
+            StorageReference originalTxtFile_ref = FBST.getReference(event.getTxt());//יצירת הפנייה למיקום של קובץ txt
+            originalTxtFile_ref.getFile(originalTxtFile).addOnCompleteListener(new OnCompleteListener<FileDownloadTask.TaskSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<FileDownloadTask.TaskSnapshot> task) {
+                    if (task.isSuccessful()) { //כאשר ההורדה הסתיימה בהצלחה
+                        readFile(); //קריאה והצגה של קובץ txt
+                    }
+                }
+            });
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
+    //קריאת קובץ מקומי
+    private void readFile() {
+        try {
+            FileInputStream fis= new FileInputStream (new File(originalTxtFile.getPath()));
+            InputStreamReader isr = new InputStreamReader(fis);
+            BufferedReader br = new BufferedReader(isr);
+            StringBuffer sb = new StringBuffer();
+            String line = br.readLine();
+            while (line != null) {
+                sb.append(line+'\n');
+                line = br.readLine();
+            }
+            String strrd = sb.toString();
+            br.close();
+
+            txt_etDSE.setText(strrd);// הצגת מחרוזת Txt
+
+            originalTxtFile.delete(); // מחיקת קובץ מהמכשיר
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    // תאריך + שעה - קבלה והשמה במשתנים מתאימים
     private void getDateAndTime() {
         //הגדרת תאריך
         calendar.set(Calendar.YEAR, Integer.parseInt(event.getEvent_date().substring(0,4)));
@@ -162,54 +207,27 @@ public class DailyScheduleEdit extends AppCompatActivity {
         time_tvDSE.setText(hour_str + ":" + minute_str);
     }
 
-    private void getTitleAndTxt() {
-        title_etDSE.setText(event.getTitle());
-        originalTxtFile = null;
-        try {
-            originalTxtFile = File.createTempFile("event", ".txt"); //יצירת קובץ לקבלת נתונים
-            StorageReference originalTxtFile_ref = FBST.getReference(event.getTxt());//יצירת הפנייה למיקום של קובץ txt
-            originalTxtFile_ref.getFile(originalTxtFile).addOnCompleteListener(new OnCompleteListener<FileDownloadTask.TaskSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<FileDownloadTask.TaskSnapshot> task) {
-                    if (task.isSuccessful()) { //כאשר ההורדה הסתיימה בהצלחה
-                        readFile(); //קריאה והצגה של קובץ txt
-                    }
-                }
-            });
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    // התראה - קבלה והשמה במשתנים מתאימים
+    private void getAlarm() {
+        if(event.getAlarm()!=0){
+            alert_cbDSE.setChecked(true);
         }
     }
 
-    private void readFile() {
-        try {
-            //קריאת קובץ מקומי
-            FileInputStream fis= new FileInputStream (new File(originalTxtFile.getPath()));
-            InputStreamReader isr = new InputStreamReader(fis);
-            BufferedReader br = new BufferedReader(isr);
-            StringBuffer sb = new StringBuffer();
-            String line = br.readLine();
-            while (line != null) {
-                sb.append(line+'\n');
-                line = br.readLine();
-            }
-            String strrd = sb.toString();
-            br.close();
-
-            txt_etDSE.setText(strrd);// הצגת מחרוזת Txt
-
-            originalTxtFile.delete(); // מחיקת קובץ מהמכשיר
-        }
-        catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    //TimePicker - יצירה ואתחול
+    public void openTimePicker(View view) {
+        new TimePickerDialog(DailyScheduleEdit.this,timeSetListener,calendar.get(HOUR_OF_DAY),calendar.get(MINUTE),true).show();
     }
 
-    private void setCount() {
-        event.setCount(((int) (Math.random()*898)+101));
+    //DatePicker - יצירה ואתחול
+    public void openDatePicker(View view) {
+        new DatePickerDialog(DailyScheduleEdit.this, dateSetListener ,calendar.get(Calendar.YEAR),calendar.get(Calendar.MONTH),calendar.get(Calendar.DAY_OF_MONTH)).show();
     }
 
+    // יצירת מאזיני Picker ותוכנם
     private void setListeners() {
+
+        //מאזין לבחירת תאריך
         dateSetListener = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker datePicker, int year, int month, int day) {
@@ -223,6 +241,7 @@ public class DailyScheduleEdit extends AppCompatActivity {
             }
         };
 
+        //מאזין לבחירת זמן
         timeSetListener = new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker timePicker, int hour, int minute) {
@@ -251,12 +270,12 @@ public class DailyScheduleEdit extends AppCompatActivity {
 
     }
 
+    //שמירה/ עדכון של אירוע חדש
     public void saveEvent(View view) {
-        if (dataVerification()){
-            if (!(originalTitle.matches("Null"))) {
+        if (dataVerification()){ //אימות נתונים
+            if (!(originalTitle.matches("Null"))) { //אתחול התראה קיימת (אם יש)
                 deleteFormerEvent();
             }
-
 
             setTime();
             setDate();
@@ -264,6 +283,7 @@ public class DailyScheduleEdit extends AppCompatActivity {
             setTitleAndTxt();
             setAlarm();
 
+            //השמת עצם Event בDB
             eventsRef.child(currentUser.getUid()).child(event.getEvent_date()).child(event.getEvent_time()+ String.valueOf(event.getCount())).setValue(event);
 
             Intent newActivity;
@@ -272,17 +292,7 @@ public class DailyScheduleEdit extends AppCompatActivity {
         }
     }
 
-    private void deleteFormerEvent() {
-        if(event.getAlarm()!=0){
-            deleteAlert(event.getAlarm());
-        }
-
-        FBST.getReference(event.getTxt()).delete();
-
-        eventsDBR_delete = eventsRef.child(currentUser.getUid()).child(event.getEvent_date()).child(event.getEvent_time()+event.getCount());
-        eventsDBR_delete.removeValue();
-    }
-
+    //בדיקה האם הפרטים שהוכנסו נכונים
     private boolean dataVerification() {
         int errorExist = 0;
         if (title_etDSE.getText().toString().length()<1){
@@ -307,7 +317,21 @@ public class DailyScheduleEdit extends AppCompatActivity {
         return true;
     }
 
+    // מחיקת אירוע קודם שעליו לחצנו לפני שנכנסו לActivity זה
+    private void deleteFormerEvent() {
+        //מחיקת התראה מקורית
+        if(event.getAlarm()!=0){
+            deleteAlert(event.getAlarm());
+        }
 
+        FBST.getReference(event.getTxt()).delete(); //מחיקת תוכן txt של עצם Note מStorage
+
+        //מחיקת עצם Note מDB
+        eventsDBR_delete = eventsRef.child(currentUser.getUid()).child(event.getEvent_date()).child(event.getEvent_time()+event.getCount());
+        eventsDBR_delete.removeValue();
+    }
+
+    //יצירת התראה חדשה/ הגדרת ערך ברירת מחדל להתראה
     private void setAlarm() {
         if(alert_cbDSE.isChecked()){
             event.setAlarm(((int) (Math.random()*898)+101));
@@ -318,6 +342,7 @@ public class DailyScheduleEdit extends AppCompatActivity {
         }
     }
 
+    //מחיקת התראה קיימת בהתאם לrequestCode הספציפי לה
     private void deleteAlert(Integer requestCode) {
         Intent intent = new Intent(DailyScheduleEdit.this, AlarmReceiver.class);
         pendingIntent = PendingIntent.getBroadcast(DailyScheduleEdit.this, requestCode, intent, 0);
@@ -325,27 +350,34 @@ public class DailyScheduleEdit extends AppCompatActivity {
             alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         }
         alarmManager.cancel(pendingIntent);
-        Toast.makeText(DailyScheduleEdit.this, "Alarm Canceled", Toast.LENGTH_SHORT).show();
     }
 
+    //יצירת התראה עם לrequestCode ספציפי עבורה
     private void createAlert(Integer requestCode) {
         alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(DailyScheduleEdit.this, AlarmReceiver.class);
         pendingIntent = PendingIntent.getBroadcast(DailyScheduleEdit.this, requestCode, intent, 0);
         alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis()- 60, AlarmManager.INTERVAL_DAY, pendingIntent);
-        Toast.makeText(this, "Alarm Set", Toast.LENGTH_SHORT).show();
     }
 
 
+    //הגדרת זמן לevent
     private void setTime() {
         event.setEvent_time(time_str);
     }
 
+    //הגדרת תאריך לevent
     private void setDate() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
         event.setEvent_date(dateFormat.format(calendar.getTime()));
     }
 
+    //קבוע count לכל תאריך ושעה ספציפים כדי שיהיה אפשר לשים כמה events על אותו תאריך ושעה
+    private void setCount() {
+        event.setCount(((int) (Math.random()*898)+101));
+    }
+
+    //הגדרת כתרת ותוכן לevent
     private void setTitleAndTxt() {
         event.setTitle(title_etDSE.getText().toString());
         byte[] txt_context = txt_etDSE.getText().toString().getBytes();
@@ -354,14 +386,7 @@ public class DailyScheduleEdit extends AppCompatActivity {
         event.setTxt(txt_path);
     }
 
-    public void openDatePicker(View view) {
-        new DatePickerDialog(DailyScheduleEdit.this, dateSetListener ,calendar.get(Calendar.YEAR),calendar.get(Calendar.MONTH),calendar.get(Calendar.DAY_OF_MONTH)).show();
-    }
-
-    public void openTimePicker(View view) {
-        new TimePickerDialog(DailyScheduleEdit.this,timeSetListener,calendar.get(HOUR_OF_DAY),calendar.get(MINUTE),true).show();
-    }
-
+    //יצירת ערוץ התראות
     private void createNotificationChannel(){
         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.O){
             CharSequence channelName = "SpringTimeChannel";
