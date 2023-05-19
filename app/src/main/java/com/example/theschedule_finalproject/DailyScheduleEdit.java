@@ -100,8 +100,8 @@ public class DailyScheduleEdit extends AppCompatActivity {
         calendar = Calendar.getInstance(); //יישום לוח שנה
 
         //אתחול תוכן משתמים ועצמי בסיס
-        time_str = "null";
-        date_str = "null";
+        time_str = "Null";
+        date_str = "Null";
         event = new Event();
 
         eventContent = getIntent();//קבלת Intent מפעילות קודמת
@@ -305,11 +305,11 @@ public class DailyScheduleEdit extends AppCompatActivity {
             txt_etDSE.setError("ERROR! The filed can't be blank.");
             errorExist++;
         }
-        if (time_str.matches("null")){
+        if (time_str.matches("Null")){
             time_tvDSE.setText("The filed can't be blank.");
             errorExist++;
         }
-        if (date_str.matches("null")){
+        if (date_str.matches("Null")){
             date_tvDSE.setText("The filed can't be blank.");
             errorExist++;
         }

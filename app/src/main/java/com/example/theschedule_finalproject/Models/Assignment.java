@@ -6,16 +6,20 @@ public class Assignment {
     private String txt;// הפנייה לstorage
     private String dateTime_goal;
     private int count;
+    private String priority;
+    private boolean completed;
 
 
     public Assignment() {
     }
 
-    public Assignment(String title, String txt, String dateTime_goal, int count) {
+    public Assignment(String title, String txt, String dateTime_goal, int count, String priority, boolean completed) {
         this.title = title;
         this.txt = txt;
         this.dateTime_goal = dateTime_goal;
         this.count = count;
+        this.priority = priority;
+        this.completed = completed;
     }
 
     public String getTitle() {
@@ -51,5 +55,21 @@ public class Assignment {
 
     public void setCount(int count) {
         this.count = count;
+    }
+
+    public String getPriority() {
+        return priority;
+    }
+
+    public void setPriority(String priority) {
+        this.priority = priority;
+    }
+
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
     }
 }

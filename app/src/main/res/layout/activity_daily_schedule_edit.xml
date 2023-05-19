@@ -101,9 +101,8 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="85"
-                    android:text="Enter DueTime"
+                    android:text="Enter Event Time"
                     android:textSize="20dp"
-                    android:inputType="time"
                     android:gravity="center"
                     android:onClick="openTimePicker"/>
 
@@ -132,9 +131,8 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="85"
-                    android:text="Enter DueDate"
+                    android:text="Enter Event Date"
                     android:textSize="20dp"
-                    android:inputType="date"
                     android:onClick="openDatePicker"
                     android:gravity="center"/>
 

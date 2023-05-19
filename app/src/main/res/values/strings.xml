@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Spring Time</string>
+    <string-array name="priorities">
+        <item>Important And Urgent</item>
+        <item>Important And Not Urgent</item>
+        <item>Unimportant And Urgent</item>
+        <item>Unimportant And Not Urgent</item>
+    </string-array>
 </resources>
