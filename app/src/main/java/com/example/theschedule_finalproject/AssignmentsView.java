@@ -40,11 +40,12 @@ public class AssignmentsView extends AppCompatActivity implements AdapterView.On
 
     String[] priorities;
     Assignment assignment;
-    ArrayList<Assignment> assignmentArrayList;
+    public static ArrayList<Assignment> assignmentArrayList;
     DatabaseReference assignmentsDBR;
     Query assignmentQuery;
     AssignmentAdapter assignmentAdapter;
     String importance;
+    public static Boolean messageAssignment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +60,7 @@ public class AssignmentsView extends AppCompatActivity implements AdapterView.On
         assignments_lvAV = (ListView) findViewById(R.id.assignments_lvAV);
 
         assignment = new Assignment();
+        messageAssignment = true;
 
         currentUser = authRef.getCurrentUser(); //קבלת UID של משתמש מחובר
 
@@ -127,13 +129,16 @@ public class AssignmentsView extends AppCompatActivity implements AdapterView.On
         assignmentQuery.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()){
-                    for (DataSnapshot dataSnapshot : snapshot.getChildren()){
-                        Assignment assignmentDataSnapshot = dataSnapshot.getValue(Assignment.class);
-                        assignmentArrayList.add(assignmentDataSnapshot);
+                if (messageAssignment) {
+                    if (snapshot.exists()) {
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            Assignment assignmentDataSnapshot = dataSnapshot.getValue(Assignment.class);
+                            assignmentArrayList.add(assignmentDataSnapshot);
+                        }
+                        assignmentAdapter.notifyDataSetChanged();
                     }
-                    assignmentAdapter.notifyDataSetChanged();
                 }
+                messageAssignment = true;
             }
 
             @Override
@@ -141,7 +146,6 @@ public class AssignmentsView extends AppCompatActivity implements AdapterView.On
 
             }
         });
-        assignmentAdapter.notifyDataSetChanged();
     }
 
 
