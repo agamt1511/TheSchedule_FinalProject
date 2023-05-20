@@ -43,7 +43,7 @@ public class AssignmentsView extends AppCompatActivity implements AdapterView.On
     public static ArrayList<Assignment> assignmentArrayList;
     DatabaseReference assignmentsDBR;
     Query assignmentQuery;
-    AssignmentAdapter assignmentAdapter;
+    public static AssignmentAdapter assignmentAdapter;
     String importance;
     public static Boolean messageAssignment;
 

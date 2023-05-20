@@ -76,9 +76,9 @@ public class AssignmentAdapter extends BaseAdapter {
                     assignment.setCompleted(false);
 
                 }
+                AssignmentsView.assignmentArrayList.clear();
                 AssignmentsView.messageAssignment = false;
                 assignmentsRef.child(currentUser.getUid()).child(assignment.getPriority()).child(assignment.getDateTime_goal() + String.valueOf(assignment.getCount())).setValue(assignment);
-                AssignmentsView.assignmentArrayList.clear();
             }
         });
 
