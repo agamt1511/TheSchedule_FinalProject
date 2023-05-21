@@ -14,6 +14,7 @@ import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,6 +22,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.example.theschedule_finalproject.Adapters.AssignmentAdapter;
 import com.example.theschedule_finalproject.Models.Assignment;
@@ -68,6 +70,29 @@ public class AssignmentsView extends AppCompatActivity implements AdapterView.On
         assignmentAdapter = new AssignmentAdapter(this,assignmentArrayList);
         assignments_lvAV.setAdapter(assignmentAdapter);
 
+        assignments_lvAV.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
+            @Override
+            public void onCreateContextMenu(ContextMenu contextMenu, View view, ContextMenu.ContextMenuInfo contextMenuInfo) {
+
+            }
+        });
+        assignments_lvAV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                Toast.makeText(AssignmentsView.this, "aa", Toast.LENGTH_SHORT).show();
+                Assignment assignment_newActivity = (Assignment) (assignments_lvAV.getItemAtPosition(position));
+                Intent newActivity;
+                newActivity = new Intent(AssignmentsView.this, AssignmentsEdit.class);
+                newActivity.putExtra("originalAssignment_title", assignment_newActivity.getTitle());
+                newActivity.putExtra("originalAssignment_txt", assignment_newActivity.getTxt());
+                newActivity.putExtra("originalAssignment_dateAndTime", assignment_newActivity.getDateTime_goal());
+                newActivity.putExtra("originalAssignment_count", assignment_newActivity.getCount());
+                newActivity.putExtra("originalAssignment_priority", assignment_newActivity.getPriority());
+                newActivity.putExtra("originalAssignment_isCompleted", assignment_newActivity.isCompleted());
+                startActivity(newActivity);
+            }
+        });
+
         Resources resources = getResources();
         priorities = resources.getStringArray(R.array.priorities);
         setArrayPriorities();
@@ -112,6 +137,7 @@ public class AssignmentsView extends AppCompatActivity implements AdapterView.On
     public void addAssignment(View view) {
         Intent newActivity;
         newActivity = new Intent(AssignmentsView.this, AssignmentsEdit.class);
+        newActivity.putExtra("originalAssignment_title", "Null"); //השמת ערך כדי לא להפעיל ייבוא מטלה
         startActivity(newActivity);
     }
 
