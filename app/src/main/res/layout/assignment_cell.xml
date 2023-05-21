@@ -11,23 +11,44 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center"
-        android:orientation="vertical">
+        android:orientation="horizontal">
 
-        <CheckBox
-            android:id="@+id/title_cbAC"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="60"
-            android:text="Assignment"
-            android:textSize="20dp"/>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="65"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/title_tvAC"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="60"
+                android:gravity="left"
+                android:text="Assignment"
+                android:textColor="@color/black"
+                android:textSize="25dp" />
+
+            <TextView
+                android:id="@+id/dateAndTime_tvAC"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="40"
+                android:gravity="left"
+                android:text="Time And Date" />
+
+
+        </LinearLayout>
 
         <TextView
-            android:id="@+id/dateAndTime_tvAC"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="40"
-            android:gravity="left"
-            android:text="Time And Date" />
+            android:id="@+id/isCompleted_tvAC"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="35"
+            android:gravity="center"
+            android:text="isCompleted" />
+
     </LinearLayout>
+
 </androidx.cardview.widget.CardView>

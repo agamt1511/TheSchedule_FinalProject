@@ -59,7 +59,7 @@ public class AssignmentsEdit extends AppCompatActivity implements AdapterView.On
     EditText title_etAE, txt_etAE;
     TextView time_tvAE ,date_tvAE;
     Spinner importance_spAE;
-    Assignment assignment;
+    Assignment assignment, assignment_former;
     String time_str, date_str;
     DatePickerDialog.OnDateSetListener dateSetListener;
     TimePickerDialog.OnTimeSetListener timeSetListener;
@@ -91,6 +91,7 @@ public class AssignmentsEdit extends AppCompatActivity implements AdapterView.On
         importance_spAE = (Spinner) findViewById(R.id.importance_spAE);
 
         assignment = new Assignment();
+        assignment_former =new Assignment();
 
         currentUser = authRef.getCurrentUser(); //קבלת UID של משתמש מחובר
         calendar = Calendar.getInstance(); //יישום לוח שנה
@@ -113,12 +114,12 @@ public class AssignmentsEdit extends AppCompatActivity implements AdapterView.On
     private void checkGetAssignment() {
         originalTitle = assignmentContent.getStringExtra("originalAssignment_title");
         if (!(originalTitle.matches("Null"))){
-            assignment.setTitle(originalTitle);
-            assignment.setTxt(assignmentContent.getStringExtra("originalAssignment_txt"));
-            assignment.setDateTime_goal(assignmentContent.getStringExtra("originalAssignment_dateAndTime"));
-            assignment.setCount(assignmentContent.getIntExtra("originalAssignment_count",0));
-            assignment.setPriority(assignmentContent.getStringExtra("originalAssignment_priority"));
-            assignment.setCompleted(assignmentContent.getBooleanExtra("originalAssignment_isCompleted", false));
+            assignment_former.setTitle(originalTitle);
+            assignment_former.setTxt(assignmentContent.getStringExtra("originalAssignment_txt"));
+            assignment_former.setDateTime_goal(assignmentContent.getStringExtra("originalAssignment_dateAndTime"));
+            assignment_former.setCount(assignmentContent.getIntExtra("originalAssignment_count",0));
+            assignment_former.setPriority(assignmentContent.getStringExtra("originalAssignment_priority"));
+            assignment_former.setCompleted(assignmentContent.getBooleanExtra("originalAssignment_isCompleted", false));
 
             getTitleAndTxt();
             getDateAndTime();
@@ -127,15 +128,15 @@ public class AssignmentsEdit extends AppCompatActivity implements AdapterView.On
     }
 
     private void getPriority() {
-        int position = arrayAdapter.getPosition(assignment.getPriority());
+        int position = arrayAdapter.getPosition(assignment_former.getPriority());
         importance_spAE.setSelection(position);
     }
 
     private void getDateAndTime() {
         //הגדרת תאריך
-        calendar.set(Calendar.YEAR, Integer.parseInt(assignment.getDateTime_goal().substring(0,4)));
-        calendar.set(Calendar.MONTH,Integer.parseInt(assignment.getDateTime_goal().substring(4,6))-1);
-        calendar.set(Calendar.DAY_OF_MONTH,Integer.parseInt(assignment.getDateTime_goal().substring(6,8)));
+        calendar.set(Calendar.YEAR, Integer.parseInt(assignment_former.getDateTime_goal().substring(0,4)));
+        calendar.set(Calendar.MONTH,Integer.parseInt(assignment_former.getDateTime_goal().substring(4,6))-1);
+        calendar.set(Calendar.DAY_OF_MONTH,Integer.parseInt(assignment_former.getDateTime_goal().substring(6,8)));
 
         date_str = calendar.get(YEAR) + "/" + ((Integer) calendar.get(MONTH)+1) + "/" + calendar.get(DAY_OF_MONTH);
 
@@ -143,8 +144,8 @@ public class AssignmentsEdit extends AppCompatActivity implements AdapterView.On
 
         //הגדרת זמן
         String hour_str, minute_str;
-        calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(assignment.getDateTime_goal().substring(8,10)));
-        calendar.set(Calendar.MINUTE,Integer.parseInt(assignment.getDateTime_goal().substring(10,12)));
+        calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(assignment_former.getDateTime_goal().substring(8,10)));
+        calendar.set(Calendar.MINUTE,Integer.parseInt(assignment_former.getDateTime_goal().substring(10,12)));
         calendar.set(Calendar.SECOND,0);
 
         if(calendar.get(HOUR_OF_DAY)<10){
@@ -166,12 +167,12 @@ public class AssignmentsEdit extends AppCompatActivity implements AdapterView.On
     }
 
     private void getTitleAndTxt() {
-        title_etAE.setText(assignment.getTitle());
+        title_etAE.setText(assignment_former.getTitle());
 
         originalTxtFile = null;
         try {
             originalTxtFile = File.createTempFile("assignment", ".txt"); //יצירת קובץ לקבלת נתונים
-            StorageReference originalTxtFile_ref = FBST.getReference(assignment.getTxt());//יצירת הפנייה למיקום של קובץ txt
+            StorageReference originalTxtFile_ref = FBST.getReference(assignment_former.getTxt());//יצירת הפנייה למיקום של קובץ txt
             originalTxtFile_ref.getFile(originalTxtFile).addOnCompleteListener(new OnCompleteListener<FileDownloadTask.TaskSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<FileDownloadTask.TaskSnapshot> task) {
@@ -266,9 +267,10 @@ public class AssignmentsEdit extends AppCompatActivity implements AdapterView.On
     }
 
     public void saveAssignment(View view) {
-
+        AssignmentsView.messageAssignment = true;
         if (dataVerification()) {
             if (!(originalTitle.matches("Null"))) { //אתחול התראה קיימת (אם יש)
+                Toast.makeText(this, "ddfdfds", Toast.LENGTH_SHORT).show();
                 deleteFormerAssignment();
             }
 
@@ -305,10 +307,10 @@ public class AssignmentsEdit extends AppCompatActivity implements AdapterView.On
     }
 
     private void deleteFormerAssignment() {
-        FBST.getReference(assignment.getTxt()).delete(); //מחיקת תוכן txt של עצם Note מStorage
+        FBST.getReference(assignment_former.getTxt()).delete(); //מחיקת תוכן txt של עצם Note מStorage
 
         //מחיקת עצם Note מDB
-        assignmentsDBR_delete = assignmentsRef.child(currentUser.getUid()).child(assignment.getPriority()).child(assignment.getDateTime_goal() + String.valueOf(assignment.getCount()));
+        assignmentsDBR_delete = assignmentsRef.child(currentUser.getUid()).child(assignment_former.getPriority()).child(assignment_former.getDateTime_goal() + String.valueOf(assignment_former.getCount()));
         assignmentsDBR_delete.removeValue();
     }
 

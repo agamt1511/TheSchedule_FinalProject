@@ -76,22 +76,6 @@ public class AssignmentsView extends AppCompatActivity implements AdapterView.On
 
             }
         });
-        assignments_lvAV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                Toast.makeText(AssignmentsView.this, "aa", Toast.LENGTH_SHORT).show();
-                Assignment assignment_newActivity = (Assignment) (assignments_lvAV.getItemAtPosition(position));
-                Intent newActivity;
-                newActivity = new Intent(AssignmentsView.this, AssignmentsEdit.class);
-                newActivity.putExtra("originalAssignment_title", assignment_newActivity.getTitle());
-                newActivity.putExtra("originalAssignment_txt", assignment_newActivity.getTxt());
-                newActivity.putExtra("originalAssignment_dateAndTime", assignment_newActivity.getDateTime_goal());
-                newActivity.putExtra("originalAssignment_count", assignment_newActivity.getCount());
-                newActivity.putExtra("originalAssignment_priority", assignment_newActivity.getPriority());
-                newActivity.putExtra("originalAssignment_isCompleted", assignment_newActivity.isCompleted());
-                startActivity(newActivity);
-            }
-        });
 
         Resources resources = getResources();
         priorities = resources.getStringArray(R.array.priorities);
