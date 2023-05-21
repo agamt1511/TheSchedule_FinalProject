@@ -79,7 +79,6 @@ public class AssignmentAdapter extends BaseAdapter {
         isCompleted_tvAC.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AssignmentsView.assignmentArrayList.clear();
                 if (assignment.isCompleted()){
                     assignment.setCompleted(false);
                     isCompleted_tvAC.setText("Not Complete");
@@ -91,6 +90,7 @@ public class AssignmentAdapter extends BaseAdapter {
 
                 AssignmentsView.messageAssignment = false;
                 assignmentsRef.child(currentUser.getUid()).child(assignment.getPriority()).child(assignment.getDateTime_goal() + String.valueOf(assignment.getCount())).setValue(assignment);
+                AssignmentsView.assignmentArrayList.clear();
             }
         });
 
