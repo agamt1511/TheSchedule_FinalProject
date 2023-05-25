@@ -102,7 +102,7 @@ public class AssignmentsView extends AppCompatActivity implements AdapterView.On
         assignmentsDBR = assignmentsRef.child(currentUser.getUid()).child(importance);
         assignmentQuery = assignmentsDBR.orderByChild("dateTime_goal");
 
-        final ProgressDialog progressDialog = ProgressDialog.show(this,"downloads data", "downloading...",true);//יצירת תצוגת טעינה
+        final ProgressDialog progressDialog = ProgressDialog.show(this,"Imports data", "fetching data...",true);//יצירת תצוגת טעינה
         assignmentQuery.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {

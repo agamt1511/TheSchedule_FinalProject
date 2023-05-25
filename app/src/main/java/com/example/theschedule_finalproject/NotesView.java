@@ -1,10 +1,8 @@
 package com.example.theschedule_finalproject;
 
-import static com.example.theschedule_finalproject.FBref.FBST;
 import static com.example.theschedule_finalproject.FBref.authRef;
 import static com.example.theschedule_finalproject.FBref.currentUser;
 import static com.example.theschedule_finalproject.FBref.notesRef;
-import static com.example.theschedule_finalproject.FBref.usersRef;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -12,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
@@ -21,24 +18,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.example.theschedule_finalproject.Adapters.NoteAdapter;
 import com.example.theschedule_finalproject.Models.Note;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FileDownloadTask;
-import com.google.firebase.storage.StorageReference;
-
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -58,9 +46,6 @@ public class NotesView extends AppCompatActivity{
 
     AlertDialog.Builder adb;
 
-    String thumbtack_str;
-    Boolean message;// הגדרת משתנה למניעת שינוי כפול של LIST VIEW
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,8 +61,6 @@ public class NotesView extends AppCompatActivity{
 
         currentUser = authRef.getCurrentUser(); //קבלת UID של משתמש מחובר
 
-        message = true;// איפשור שינוי ListView
-
         //הגדרת הפנייה לפתקים נעוצים + יצירת רשימה עצמי Note נעוצים
         notesDBR_thumbtack = notesRef.child(currentUser.getUid()).child("Thumbtack");
         noteArrayList_thumbtack = new ArrayList<>();
@@ -90,26 +73,26 @@ public class NotesView extends AppCompatActivity{
 
 
         //טיפול בפתקים נעוצים
-        final ProgressDialog progressDialog = ProgressDialog.show(this,"downloads data", "downloading...",true);//יצירת תצוגת טעינה
+        final ProgressDialog progressDialog = ProgressDialog.show(this,"Imports data", "fetching data...",true);//יצירת תצוגת טעינה
         //סידור פתקים נעוצים לפי תאריך יצירה - מקטן לגדול
         queryThumbtack = notesDBR_thumbtack.orderByChild("dateTime_created");
         //יצירת מאזין לשינוי ערכים בNote נעוצים query
         queryThumbtack.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(message) {//אם לא שונה כבר בפונקציית מחיקה
-                    if (snapshot.exists()) {
-                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                            Note note = dataSnapshot.getValue(Note.class); //צור ערך Note חדש והשמה בו ערך שהתקבל בפונקציה
-                            noteArrayList_thumbtack.add(note); //השמת ערך Note חדש ברשימה
-                        }
-                        Collections.reverse(noteArrayList_thumbtack);// הפיכת רשימת Note נעוצים - מגדול לקטן
-                        updateNoteAdapter();// עדכון רשימה מחוברת של Note נעוצים ולא נעוצים ועדכון Adapter
+                if (snapshot.exists()) {
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                        Note note = dataSnapshot.getValue(Note.class); //צור ערך Note חדש והשמה בו ערך שהתקבל בפונקציה
+                        noteArrayList_thumbtack.add(note); //השמת ערך Note חדש ברשימה
                     }
+                    Collections.reverse(noteArrayList_thumbtack);// הפיכת רשימת Note נעוצים - מגדול לקטן
+                    updateNoteAdapter();// עדכון רשימה מחוברת של Note נעוצים ולא נעוצים ועדכון Adapter
                 }
+
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                progressDialog.dismiss();
                 adb = new AlertDialog.Builder(NotesView.this);
                 adb.setTitle("Error Occurred");
                 adb.setMessage("There is a problem importing the data. Please try again later.");
@@ -127,19 +110,19 @@ public class NotesView extends AppCompatActivity{
         queryNoThumbtack.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(message) { //אם לא שונה כבר בפונקציית מחיקה
-                    if (snapshot.exists()) {
-                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                            Note note = dataSnapshot.getValue(Note.class); //צור ערך Note חדש והשמה בו ערך שהתקבל בפונקציה
-                            noteArrayList_noThumbtack.add(note); //השמת ערך Note חדש ברשימה
-                        }
-                        Collections.reverse(noteArrayList_noThumbtack);// הפיכת רשימת Note נעוצים - מגדול לקטן
-                        updateNoteAdapter();// עדכון רשימה מחוברת של Note נעוצים ולא נעוצים ועדכון Adapter
+                if (snapshot.exists()) {
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                        Note note = dataSnapshot.getValue(Note.class); //צור ערך Note חדש והשמה בו ערך שהתקבל בפונקציה
+                        noteArrayList_noThumbtack.add(note); //השמת ערך Note חדש ברשימה
                     }
+                    Collections.reverse(noteArrayList_noThumbtack);// הפיכת רשימת Note נעוצים - מגדול לקטן
+                    updateNoteAdapter();// עדכון רשימה מחוברת של Note נעוצים ולא נעוצים ועדכון Adapter
                 }
+
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                progressDialog.dismiss();
                 adb = new AlertDialog.Builder(NotesView.this);
                 adb.setTitle("Error Occurred");
                 adb.setMessage("There is a problem importing the data. Please try again later.");
@@ -149,7 +132,6 @@ public class NotesView extends AppCompatActivity{
         });
         progressDialog.dismiss();
 
-
         updateNoteArray();
         noteAdapter = new NoteAdapter(this,noteArrayList_complete); //הגדרת Adapter חדש עם ערכי הרשימה המאוחדת
         notes_lvNV.setAdapter(noteAdapter); //קישור בין Adapter לרכיב תצוגה
@@ -157,6 +139,16 @@ public class NotesView extends AppCompatActivity{
         setListeners();// יצירת מאזינים
     }
 
+    //פעולת עדכון  רשימה
+    private void updateNoteArray() {
+        noteArrayList_complete.clear();
+        for (int i=0; i<noteArrayList_thumbtack.size(); i++){
+            noteArrayList_complete.add(noteArrayList_thumbtack.get(i));
+        }
+        noteArrayList_complete.addAll(noteArrayList_noThumbtack);
+    }
+
+    //הגדרת מאזינים
     private void setListeners() {
         //כאשר נלחץ על אחד מעצמי הNote נקבל את ערכיו ונשלח לActivity עריכה
         notes_lvNV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -173,29 +165,18 @@ public class NotesView extends AppCompatActivity{
         });
     }
 
-    //פעולת עדכון  רשימה
-    private void updateNoteArray() {
-        noteArrayList_complete.clear();
-        for (int i=0; i<noteArrayList_thumbtack.size(); i++){
-            noteArrayList_complete.add(noteArrayList_thumbtack.get(i));
-        }
-        noteArrayList_complete.addAll(noteArrayList_noThumbtack);
-    }
-
-
     //פעולת עדכון Adapter
     private void updateNoteAdapter() {
         updateNoteArray();// עדכון רשימת Note מאוחדת
         noteAdapter.notifyDataSetChanged(); //התראה לAdapter על שינוי שקרה
     }
 
-    //צעבר לACtivity יצירת פתק חדש
+    //מעבר לActivity יצירת פתק חדש
     public void addNote(View view) {
         newActivity = new Intent(NotesView.this, NotesEdit.class);
         newActivity.putExtra("originalNote_title", "Null"); //השמת ערך כדי לא להפעיל ייבוא פתק
         startActivity(newActivity);
     }
-
 
     //תפריט מסכים
     @Override

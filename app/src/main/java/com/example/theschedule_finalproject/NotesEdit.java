@@ -93,7 +93,7 @@ public class NotesEdit extends AppCompatActivity {
 
         //בדיקה: האם הIntent התקבל מלחמיצה על note או מלחציה על כפתור של new note
         if (!(originalTitle.matches("Null"))) {
-            delete_btnNE.setVisibility(View.VISIBLE);
+            delete_btnNE.setVisibility(View.VISIBLE);//הגדרת כפתור מחיקה - נראה
 
             note.setTitle(originalTitle); //השמת כותרת בעצם Note
             title_etNE.setText(originalTitle);// הצגה כותרת בActivity
@@ -114,7 +114,7 @@ public class NotesEdit extends AppCompatActivity {
                 originalTxtFile = File.createTempFile("note", ".txt"); //יצירת קובץ לקבלת נתונים
                 StorageReference originalTxtFile_ref = FBST.getReference(originalTxt);//יצירת הפנייה למיקום של קובץ txt
 
-                final ProgressDialog progressDialog = ProgressDialog.show(this,"downloads data", "downloading...",true);//יצירת תצוגת טעינה
+                final ProgressDialog progressDialog = ProgressDialog.show(this,"downloads data", "downloading...",true);
                 originalTxtFile_ref.getFile(originalTxtFile).addOnCompleteListener(new OnCompleteListener<FileDownloadTask.TaskSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<FileDownloadTask.TaskSnapshot> task) {
@@ -154,6 +154,7 @@ public class NotesEdit extends AppCompatActivity {
         }
     }
 
+    //מחיקת Note מקורי
     private void deleteNoteContext() {
         String originalNote_thumbtack = getThumbtackStatus(note.getThumbtack());
         FBST.getReference(note.getTxt()).delete();// מחיקת קובץ Note של txt מStorage
@@ -161,6 +162,7 @@ public class NotesEdit extends AppCompatActivity {
 
     }
 
+    //שמירה של Note חדש
     public void saveNote(View view) {
         if (!(originalTitle.matches("Null"))) {
             deleteNoteContext();// מחיקת עצם Note קודם מDB ומחיקת קובץ txt מStorage
@@ -235,6 +237,7 @@ public class NotesEdit extends AppCompatActivity {
     //מחיקת פתק נוכחי
     public void deleteNote(View view) {
         deleteNoteContext();
+
         //סיום ויצאה מהActivity
         Intent newActivity;
         newActivity = new Intent(NotesEdit.this, NotesView.class);
