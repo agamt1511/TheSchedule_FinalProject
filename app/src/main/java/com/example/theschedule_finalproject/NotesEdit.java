@@ -19,6 +19,7 @@ import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -48,6 +49,7 @@ public class NotesEdit extends AppCompatActivity {
     BroadcastReceiver broadcastReceiver;
 
     EditText title_etNE, txt_etNE;
+    Button delete_btnNE;
     CheckBox thumbtack_cbNE;
 
     File originalTxtFile;
@@ -72,6 +74,9 @@ public class NotesEdit extends AppCompatActivity {
         title_etNE = (EditText) findViewById(R.id.title_etNE);
         txt_etNE = (EditText) findViewById(R.id.txt_etNE);
         thumbtack_cbNE = (CheckBox) findViewById(R.id.thumbtack_cbNE);
+        delete_btnNE = (Button) findViewById(R.id.delete_btnNE);
+
+        delete_btnNE.setVisibility(View.INVISIBLE);//הגדרת כפתור מחיקה - בלתי נראה
 
         //אתחול והגדרת תוכן למשתנים ועצמים
         note = new Note();
@@ -87,6 +92,7 @@ public class NotesEdit extends AppCompatActivity {
 
         //בדיקה: האם הIntent התקבל מלחמיצה על note או מלחציה על כפתור של new note
         if (!(originalTitle.matches("Null"))) {
+            delete_btnNE.setVisibility(View.VISIBLE);
 
             note.setTitle(originalTitle); //השמת כותרת בעצם Note
             title_etNE.setText(originalTitle);// הצגה כותרת בActivity
@@ -222,4 +228,11 @@ public class NotesEdit extends AppCompatActivity {
         storageRef.child(txtPath).putBytes(note_byte);
     }
 
+    public void deleteNote(View view) {
+        deleteNoteContext();
+        //סיום ויצאה מהActivity
+        Intent newActivity;
+        newActivity = new Intent(NotesEdit.this, NotesView.class);
+        startActivity(newActivity);
+    }
 }

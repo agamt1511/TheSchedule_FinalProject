@@ -144,48 +144,6 @@ public class NotesView extends AppCompatActivity{
     }
 
     private void setListeners() {
-        //לחיצה ארוכה - מחיקת ערך Note
-        notes_lvNV.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long l) {
-                //תיבת דיאלוג לווידוא מחיקה
-                adb = new AlertDialog.Builder(NotesView.this);
-                adb.setTitle("Delete Note");
-                adb.setMessage("Are you sure you want to delete this note?");
-
-                adb.setPositiveButton("YES", new DialogInterface.OnClickListener() {//כפתור אישור
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        Note note = (Note) (notes_lvNV.getItemAtPosition(position)); //קבלת ערך Note נבחר
-                        getThumbtackStatus(note); // קבלת ערך String של נעץ/לא נעץ
-                        noteAdapter.notifyDataSetChanged(); //התראה בAdapter על שינוי ערך
-
-                        message = false;//הגדרת משתנה כדי שלא יופעלו מאזיני הquery כי כבר ביצענו את המחיקה מהתצוגה
-
-                        //מחיקת קובץ Note מהStorage
-                        FBST.getReference(note.getTxt()).delete();
-
-                        //מחיקת ערך Note בעץ
-                        notesDBR_delete = notesRef.child(currentUser.getUid()).child(thumbtack_str).child(note.getDateTime_created());
-                        notesDBR_delete.removeValue();
-                    }
-                });
-
-                adb.setNegativeButton("NO", new DialogInterface.OnClickListener() {// כפתור יציאה
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {}}
-                );
-
-                //יצירת והצגת דיאלוג
-                AlertDialog ad = adb.create();
-                ad.show();
-
-                return false;
-            }
-        });
-        message = true; //אפשור פעולת מאזינים מחדש
-
-
         //כאשר נלחץ על אחד מעצמי הNote נקבל את ערכיו ונשלח לActivity עריכה
         notes_lvNV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -210,19 +168,6 @@ public class NotesView extends AppCompatActivity{
         noteArrayList_complete.addAll(noteArrayList_noThumbtack);
     }
 
-    //יצירת String לנעץ בהתאם לערכו הבוליאני
-    private void getThumbtackStatus(Note note) {
-        Boolean thumbtack = note.getThumbtack();
-        if (thumbtack){
-            thumbtack_str = "Thumbtack";
-            noteArrayList_thumbtack.remove(note); //מחיקת ערך Note מרשימה
-        }
-        else {
-            thumbtack_str = "NoThumbtack";
-            noteArrayList_noThumbtack.remove(note); //מחיקת ערך Note מרשימה
-        }
-        updateNoteArray();
-    }
 
     //פעולת עדכון Adapter
     private void updateNoteAdapter() {

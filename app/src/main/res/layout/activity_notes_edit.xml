@@ -73,7 +73,7 @@
                 android:id="@+id/txt_etNE"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="45"
+                android:layout_weight="38"
                 android:ems="10"
                 android:gravity="start|top"
                 android:hint="Write Your Note Here ..."
@@ -82,7 +82,7 @@
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="5" />
+                android:layout_weight="2" />
 
             <CheckBox
                 android:id="@+id/thumbtack_cbNE"
@@ -94,7 +94,7 @@
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="5" />
+                android:layout_weight="3" />
 
             <Button
                 android:layout_width="match_parent"
@@ -103,6 +103,23 @@
                 android:backgroundTint="#FFC400"
                 android:onClick="saveNote"
                 android:text="SAVE"
+                android:textColor="@color/primary_lightBlue"
+                android:textSize="20dp"
+                android:textStyle="bold" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="2" />
+
+            <Button
+                android:id="@+id/delete_btnNE"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="10"
+                android:backgroundTint="#FFC400"
+                android:onClick="deleteNote"
+                android:text="Delete"
                 android:textColor="@color/primary_lightBlue"
                 android:textSize="20dp"
                 android:textStyle="bold" />
