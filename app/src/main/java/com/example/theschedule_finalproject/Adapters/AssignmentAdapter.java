@@ -88,9 +88,8 @@ public class AssignmentAdapter extends BaseAdapter {
                     isCompleted_tvAC.setText("Completed");
                 }
 
-                AssignmentsView.messageAssignment = false;
+                AssignmentsView.messageAssignment = true;
                 assignmentsRef.child(currentUser.getUid()).child(assignment.getPriority()).child(assignment.getDateTime_goal() + String.valueOf(assignment.getCount())).setValue(assignment);
-                AssignmentsView.assignmentArrayList.clear();
             }
         });
 

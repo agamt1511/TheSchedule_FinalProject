@@ -35,6 +35,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 
 public class AssignmentsView extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
+    //הכרזה על רכיבי תצוגה, משתנים וכדומה
     BroadcastReceiver broadcastReceiver;
 
     Spinner importance_spAV;
@@ -42,10 +43,10 @@ public class AssignmentsView extends AppCompatActivity implements AdapterView.On
 
     String[] priorities;
     Assignment assignment;
-    public static ArrayList<Assignment> assignmentArrayList;
+    ArrayList<Assignment> assignmentArrayList;
     DatabaseReference assignmentsDBR;
     Query assignmentQuery;
-    public static AssignmentAdapter assignmentAdapter;
+    AssignmentAdapter assignmentAdapter;
     String importance;
     public static Boolean messageAssignment;
 
@@ -132,16 +133,18 @@ public class AssignmentsView extends AppCompatActivity implements AdapterView.On
         assignmentQuery.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (messageAssignment) {
-                    if (snapshot.exists()) {
-                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                            Assignment assignmentDataSnapshot = dataSnapshot.getValue(Assignment.class);
-                            assignmentArrayList.add(assignmentDataSnapshot);
-                        }
-                        assignmentAdapter.notifyDataSetChanged();
-                    }
+                if(messageAssignment){
+                    assignmentArrayList.clear();
+                    assignmentAdapter.notifyDataSetChanged();
                 }
-                messageAssignment = true;
+                if (snapshot.exists()) {
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                        Assignment assignmentDataSnapshot = dataSnapshot.getValue(Assignment.class);
+                        assignmentArrayList.add(assignmentDataSnapshot);
+                    }
+                    //assignmentAdapter.notifyDataSetChanged();
+                }
+                messageAssignment = false;
             }
 
             @Override
