@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -89,7 +90,7 @@ public class NotesView extends AppCompatActivity{
 
 
         //טיפול בפתקים נעוצים
-
+        final ProgressDialog progressDialog = ProgressDialog.show(this,"downloads data", "downloading...",true);//יצירת תצוגת טעינה
         //סידור פתקים נעוצים לפי תאריך יצירה - מקטן לגדול
         queryThumbtack = notesDBR_thumbtack.orderByChild("dateTime_created");
         //יצירת מאזין לשינוי ערכים בNote נעוצים query
@@ -108,7 +109,13 @@ public class NotesView extends AppCompatActivity{
                 }
             }
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
+            public void onCancelled(@NonNull DatabaseError error) {
+                adb = new AlertDialog.Builder(NotesView.this);
+                adb.setTitle("Error Occurred");
+                adb.setMessage("There is a problem importing the data. Please try again later.");
+                AlertDialog ad = adb.create();
+                ad.show();
+            }
         });
 
 
@@ -132,8 +139,15 @@ public class NotesView extends AppCompatActivity{
                 }
             }
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
+            public void onCancelled(@NonNull DatabaseError error) {
+                adb = new AlertDialog.Builder(NotesView.this);
+                adb.setTitle("Error Occurred");
+                adb.setMessage("There is a problem importing the data. Please try again later.");
+                AlertDialog ad = adb.create();
+                ad.show();
+            }
         });
+        progressDialog.dismiss();
 
 
         updateNoteArray();

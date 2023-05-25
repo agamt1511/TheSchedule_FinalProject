@@ -10,6 +10,7 @@ import static com.example.theschedule_finalproject.FBref.storageRef;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -112,9 +113,12 @@ public class NotesEdit extends AppCompatActivity {
             try {
                 originalTxtFile = File.createTempFile("note", ".txt"); //יצירת קובץ לקבלת נתונים
                 StorageReference originalTxtFile_ref = FBST.getReference(originalTxt);//יצירת הפנייה למיקום של קובץ txt
+
+                final ProgressDialog progressDialog = ProgressDialog.show(this,"downloads data", "downloading...",true);//יצירת תצוגת טעינה
                 originalTxtFile_ref.getFile(originalTxtFile).addOnCompleteListener(new OnCompleteListener<FileDownloadTask.TaskSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<FileDownloadTask.TaskSnapshot> task) {
+                        progressDialog.dismiss();
                         if (task.isSuccessful()) { //כאשר ההורדה הסתיימה בהצלחה
                             readFile(); //קריאה והצגה של קובץ txt
                         }
@@ -228,6 +232,7 @@ public class NotesEdit extends AppCompatActivity {
         storageRef.child(txtPath).putBytes(note_byte);
     }
 
+    //מחיקת פתק נוכחי
     public void deleteNote(View view) {
         deleteNoteContext();
         //סיום ויצאה מהActivity
