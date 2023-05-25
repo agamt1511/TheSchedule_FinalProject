@@ -42,7 +42,7 @@ public class AssignmentAdapter extends BaseAdapter {
 
     //קבלת עצם במיקום i
     @Override
-    public Object getItem(int i) {
+    public Assignment getItem(int i) {
         return assignmentArrayList.get(i);
     }
 
@@ -58,7 +58,7 @@ public class AssignmentAdapter extends BaseAdapter {
         layoutInflater = ((AppCompatActivity)context).getLayoutInflater();
         view = layoutInflater.inflate(R.layout.assignment_cell,viewGroup,false);
 
-        Assignment assignment = this.assignmentArrayList.get(i); //קבלת ערך במיקום נבחר
+        Assignment assignment = getItem(i); //קבלת ערך במיקום נבחר
 
         //התאמה בין רכיב תצוגה למשתנה
         TextView title_tvAC = (TextView) view.findViewById(R.id.title_tvAC);
