@@ -21,6 +21,7 @@ import android.app.DatePickerDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -41,7 +42,6 @@ import com.example.theschedule_finalproject.Models.Event;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.Query;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.StorageReference;
 
@@ -52,7 +52,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 
 public class DailyScheduleEdit extends AppCompatActivity {
     //הצהרה על רכיבי תצוגה, משתנים וכדומה
@@ -97,7 +96,7 @@ public class DailyScheduleEdit extends AppCompatActivity {
         alert_cbDSE = (CheckBox) findViewById(R.id.alert_cbDSE);
         delete_btnDSE = (Button) findViewById(R.id.delete_btnDSE);
 
-        delete_btnDSE.setVisibility(View.INVISIBLE);
+        delete_btnDSE.setVisibility(View.INVISIBLE);//כםתור מחיקה בלתי נראה
 
         createNotificationChannel();// יצירת ערוץ להתראה
 
@@ -111,7 +110,6 @@ public class DailyScheduleEdit extends AppCompatActivity {
 
         eventContent = getIntent();//קבלת Intent מפעילות קודמת
 
-        
 
         checkGetEvent();//קבלת נתונים מIntent פעילות קודמת
         setListeners();//הגדרת מאזינים
@@ -144,9 +142,12 @@ public class DailyScheduleEdit extends AppCompatActivity {
         try {
             originalTxtFile = File.createTempFile("event", ".txt"); //יצירת קובץ לקבלת נתונים
             StorageReference originalTxtFile_ref = FBST.getReference(event.getTxt());//יצירת הפנייה למיקום של קובץ txt
+
+            final ProgressDialog progressDialog = ProgressDialog.show(this,"downloads data", "downloading...",true);
             originalTxtFile_ref.getFile(originalTxtFile).addOnCompleteListener(new OnCompleteListener<FileDownloadTask.TaskSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<FileDownloadTask.TaskSnapshot> task) {
+                    progressDialog.dismiss();
                     if (task.isSuccessful()) { //כאשר ההורדה הסתיימה בהצלחה
                         readFile(); //קריאה והצגה של קובץ txt
                     }
@@ -234,7 +235,6 @@ public class DailyScheduleEdit extends AppCompatActivity {
 
     // יצירת מאזיני Picker ותוכנם
     private void setListeners() {
-
         //מאזין לבחירת תאריך
         dateSetListener = new DatePickerDialog.OnDateSetListener() {
             @Override
@@ -368,7 +368,6 @@ public class DailyScheduleEdit extends AppCompatActivity {
         alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis()- 60, AlarmManager.INTERVAL_DAY, pendingIntent);
     }
 
-
     //הגדרת זמן לevent
     private void setTime() {
         event.setEvent_time(time_str);
@@ -408,6 +407,7 @@ public class DailyScheduleEdit extends AppCompatActivity {
         }
     }
 
+    //מחיקת Event נוכחי
     public void deleteEvent(View view) {
         deleteFormerEvent();
 

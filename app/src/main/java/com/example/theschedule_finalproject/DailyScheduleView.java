@@ -1,21 +1,15 @@
 package com.example.theschedule_finalproject;
 
-import static com.example.theschedule_finalproject.FBref.FBST;
 import static com.example.theschedule_finalproject.FBref.authRef;
 import static com.example.theschedule_finalproject.FBref.currentUser;
 import static com.example.theschedule_finalproject.FBref.eventsRef;
-import static com.example.theschedule_finalproject.FBref.notesRef;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.RecyclerView;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
@@ -26,24 +20,17 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CalendarView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.example.theschedule_finalproject.Adapters.EventAdapter;
 import com.example.theschedule_finalproject.Models.Event;
-import com.example.theschedule_finalproject.Models.Note;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 
 public class DailyScheduleView extends AppCompatActivity {
     BroadcastReceiver broadcastReceiver;
@@ -52,12 +39,12 @@ public class DailyScheduleView extends AppCompatActivity {
     ListView events_lvDSV;
 
     ArrayList<Event> eventArrayList;
+
     EventAdapter eventAdapter;
 
-    DatabaseReference eventsDBR, eventsDBR_delete;
+    DatabaseReference eventsDBR;
     Query eventQuery;
 
-    PendingIntent pendingIntent;
     Intent newActivity;
 
     AlertDialog.Builder adb;
@@ -125,6 +112,7 @@ public class DailyScheduleView extends AppCompatActivity {
         eventsDBR = eventsRef.child(currentUser.getUid()).child(selectedDay);
         eventQuery = eventsDBR.orderByChild("event_time");
 
+        final ProgressDialog progressDialog = ProgressDialog.show(this,"Imports data", "fetching data...",true);
         eventQuery.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -133,18 +121,23 @@ public class DailyScheduleView extends AppCompatActivity {
                         Event event = dataSnapshot.getValue(Event.class);//צור ערך Event חדש והשמה בו ערך שהתקבל בפונקציה
                         eventArrayList.add(event); //השמת ערך Event חדש ברשימה
                     }
-                    eventAdapter.notifyDataSetChanged(); //עדכו Adapter
+                    eventAdapter.notifyDataSetChanged(); //עדכון Adapter
                 }
 
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                progressDialog.dismiss();
+                adb = new AlertDialog.Builder(DailyScheduleView.this);
+                adb.setTitle("Error Occurred");
+                adb.setMessage("There is a problem importing the data. Please try again later.");
+                AlertDialog ad = adb.create();
+                ad.show();
             }
         });
-
         eventAdapter.notifyDataSetChanged(); //עדכון Adapter
+        progressDialog.dismiss();
     }
 
     // יצירת מאזיני לחיצה
