@@ -3,18 +3,18 @@ package com.example.theschedule_finalproject;
 import static com.example.theschedule_finalproject.FBref.assignmentsRef;
 import static com.example.theschedule_finalproject.FBref.authRef;
 import static com.example.theschedule_finalproject.FBref.currentUser;
-import static com.example.theschedule_finalproject.FBref.eventsRef;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
-import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,7 +22,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import com.example.theschedule_finalproject.Adapters.AssignmentAdapter;
 import com.example.theschedule_finalproject.Models.Assignment;
@@ -41,13 +40,18 @@ public class AssignmentsView extends AppCompatActivity implements AdapterView.On
     Spinner importance_spAV;
     ListView assignments_lvAV;
 
-    String[] priorities;
-    Assignment assignment;
+    AlertDialog.Builder adb;
     ArrayList<Assignment> assignmentArrayList;
+
+    String[] priorities;
+
+    AssignmentAdapter assignmentAdapter;
+
     DatabaseReference assignmentsDBR;
     Query assignmentQuery;
-    AssignmentAdapter assignmentAdapter;
+
     String importance;
+
     public static Boolean messageAssignment;
 
     @Override
@@ -59,30 +63,83 @@ public class AssignmentsView extends AppCompatActivity implements AdapterView.On
         broadcastReceiver = new NetworkConnectionReceiver();
         registerReceiver(broadcastReceiver,new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
+        //התאמה בין רכיב תצוגה למשתנה
         importance_spAV = (Spinner) findViewById(R.id.importance_spAV);
         assignments_lvAV = (ListView) findViewById(R.id.assignments_lvAV);
 
-        assignment = new Assignment();
-        messageAssignment = true;
+        messageAssignment = true;//הגדרת ערך בוליאני לאתחול רשימת עצמי Assignment
 
         currentUser = authRef.getCurrentUser(); //קבלת UID של משתמש מחובר
 
+        //יצירת רשימת ערכי Assignment והגדרת Adapter
         assignmentArrayList = new ArrayList<>();
         assignmentAdapter = new AssignmentAdapter(this,assignmentArrayList);
         assignments_lvAV.setAdapter(assignmentAdapter);
 
+        //ייבוא String לSpinner וקישור לAdapter
         Resources resources = getResources();
         priorities = resources.getStringArray(R.array.priorities);
-        setArrayPriorities();
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, androidx.appcompat.R.layout.support_simple_spinner_dropdown_item,priorities);
+        importance_spAV.setAdapter(arrayAdapter);
         importance_spAV.setOnItemSelectedListener(this);
 
     }
 
-    private void setArrayPriorities() {
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, androidx.appcompat.R.layout.support_simple_spinner_dropdown_item,priorities);
-        importance_spAV.setAdapter(arrayAdapter);
+    //כאשר פריט נבחר נקה רשימה והכנס ערכים חדשים לרשימה בהתאם לרמת חשיבות
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+        messageAssignment = true;
+        importance = priorities[i];
+        showSelectedPriorityData(importance);
     }
 
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {}
+
+
+    // הצגה בListView של כל העצמים במשוייכים לרמת חשיבות נבחרת
+    private void showSelectedPriorityData(String importance) {
+        assignmentsDBR = assignmentsRef.child(currentUser.getUid()).child(importance);
+        assignmentQuery = assignmentsDBR.orderByChild("dateTime_goal");
+
+        final ProgressDialog progressDialog = ProgressDialog.show(this,"downloads data", "downloading...",true);//יצירת תצוגת טעינה
+        assignmentQuery.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(messageAssignment){
+                    assignmentArrayList.clear();
+                    assignmentAdapter.notifyDataSetChanged();
+                }
+                if (snapshot.exists()) {
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                        Assignment assignmentDataSnapshot = dataSnapshot.getValue(Assignment.class);
+                        assignmentArrayList.add(assignmentDataSnapshot);
+                    }
+                }
+                progressDialog.dismiss();
+                messageAssignment = false;
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                adb = new AlertDialog.Builder(AssignmentsView.this);
+                adb.setTitle("Error Occurred");
+                adb.setMessage("There is a problem importing the data. Please try again later.");
+                AlertDialog ad = adb.create();
+                ad.show();
+            }
+        });
+    }
+
+    //מעבר למסך יצירת רשימה חדשה
+    public void addAssignment(View view) {
+        Intent newActivity;
+        newActivity = new Intent(AssignmentsView.this, AssignmentsEdit.class);
+        newActivity.putExtra("originalAssignment_title", "Null"); //השמת ערך כדי לא להפעיל ייבוא מטלה
+        startActivity(newActivity);
+    }
+
+    //תפריט מסכים
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
@@ -112,50 +169,4 @@ public class AssignmentsView extends AppCompatActivity implements AdapterView.On
         return super.onOptionsItemSelected(item);
     }
 
-    public void addAssignment(View view) {
-        Intent newActivity;
-        newActivity = new Intent(AssignmentsView.this, AssignmentsEdit.class);
-        newActivity.putExtra("originalAssignment_title", "Null"); //השמת ערך כדי לא להפעיל ייבוא מטלה
-        startActivity(newActivity);
-    }
-
-    @Override
-    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-        assignmentArrayList.clear();
-        importance = priorities[i];
-        showSelectedPriorityData(importance);
-    }
-
-    private void showSelectedPriorityData(String importance) {
-        assignmentsDBR = assignmentsRef.child(currentUser.getUid()).child(importance);
-        assignmentQuery = assignmentsDBR.orderByChild("dateTime_goal");
-
-        assignmentQuery.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(messageAssignment){
-                    assignmentArrayList.clear();
-                    assignmentAdapter.notifyDataSetChanged();
-                }
-                if (snapshot.exists()) {
-                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                        Assignment assignmentDataSnapshot = dataSnapshot.getValue(Assignment.class);
-                        assignmentArrayList.add(assignmentDataSnapshot);
-                    }
-                }
-                messageAssignment = false;
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-    }
-
-
-    @Override
-    public void onNothingSelected(AdapterView<?> adapterView) {
-
-    }
 }

@@ -24,17 +24,17 @@
                 android:id="@+id/title_tvAC"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="60"
+                android:layout_weight="70"
                 android:gravity="left"
                 android:text="Assignment"
                 android:textColor="@color/black"
-                android:textSize="25dp" />
+                android:textSize="30dp" />
 
             <TextView
                 android:id="@+id/dateAndTime_tvAC"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="40"
+                android:layout_weight="30"
                 android:gravity="left"
                 android:text="Time And Date" />
 

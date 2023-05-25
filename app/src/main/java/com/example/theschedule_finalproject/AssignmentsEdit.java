@@ -140,6 +140,9 @@ public class AssignmentsEdit extends AppCompatActivity implements AdapterView.On
 
             getTitleAndTxt();//ייצוג תוכן שהתקבל בכותרת ותיבת טקסט
             getDateAndTime();
+
+            int position = arrayAdapter.getPosition(assignment_former.getPriority());
+            importance_spAE.setSelection(position);
         }
     }
 
@@ -147,7 +150,7 @@ public class AssignmentsEdit extends AppCompatActivity implements AdapterView.On
     private void getTitleAndTxt() {
         title_etAE.setText(assignment_former.getTitle());//ייצוג כותרת בTV
 
-        final ProgressDialog progressDialog = ProgressDialog.show(this,"Imports data", "downloading...",true);//יצירת אובייקט טעינה
+        final ProgressDialog progressDialog = ProgressDialog.show(this,"downloads data", "downloading...",true);//יצירת תצוגת טעינה
 
         //הורדת קבוץ מFirebase Storage
         originalTxtFile = null;
@@ -281,25 +284,24 @@ public class AssignmentsEdit extends AppCompatActivity implements AdapterView.On
 
     }
 
+    //יצירת TimePicker
     public void openTimePicker(View view) {
         new TimePickerDialog(AssignmentsEdit.this,timeSetListener,calendar.get(HOUR_OF_DAY),calendar.get(MINUTE),true).show();
     }
 
+    //יצירת DataPicker
     public void openDatePicker(View view) {
         new DatePickerDialog(AssignmentsEdit.this, dateSetListener ,calendar.get(Calendar.YEAR),calendar.get(Calendar.MONTH),calendar.get(Calendar.DAY_OF_MONTH)).show();
     }
 
+    //השמת ערך בעצם Assignment בהתאם לרמת החשיבות שנחבחרה
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
         assignment.setPriority(priorities[i]);
     }
 
     @Override
-    public void onNothingSelected(AdapterView<?> adapterView) {
-        int position = arrayAdapter.getPosition(assignment_former.getPriority());
-        importance_spAE.setSelection(position);
-
-    }
+    public void onNothingSelected(AdapterView<?> adapterView) {}
 
     // שמירת משימה חדשה ומחיקה של הקודמת (אם קיימת)
     public void saveAssignment(View view) {
@@ -333,7 +335,9 @@ public class AssignmentsEdit extends AppCompatActivity implements AdapterView.On
             storageRef.child(txt_path).putBytes(assignment_byte);
             assignment.setTxt(txt_path);
 
+
             assignmentsRef.child(currentUser.getUid()).child(assignment.getPriority()).child(assignment.getDateTime_goal() + String.valueOf(assignment.getCount())).setValue(assignment);
+
 
             Intent newActivity;
             newActivity = new Intent(AssignmentsEdit.this, AssignmentsView.class);
@@ -367,6 +371,7 @@ public class AssignmentsEdit extends AppCompatActivity implements AdapterView.On
         return true;
     }
 
+    //מחיקת משימה קודמת
     private void deleteFormerAssignment() {
         FBST.getReference(assignment_former.getTxt()).delete(); //מחיקת תוכן txt של עצם Note מStorage
 
@@ -377,10 +382,10 @@ public class AssignmentsEdit extends AppCompatActivity implements AdapterView.On
     }
 
 
+    //מחיקת משימה קיימת
     public void deleteAssignment(View view) {
         if(!(originalTitle.matches("Null"))){
             deleteFormerAssignment();
-
         }
 
         Intent newActivity;
