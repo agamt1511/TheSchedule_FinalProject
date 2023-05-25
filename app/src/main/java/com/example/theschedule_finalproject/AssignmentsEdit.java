@@ -366,6 +366,9 @@ public class AssignmentsEdit extends AppCompatActivity implements AdapterView.On
         if(!(originalTitle.matches("Null"))){
             deleteFormerAssignment();
         }
+        AssignmentsView.messageAssignment = false;
+        AssignmentsView.assignmentArrayList.clear();
+        AssignmentsView.assignmentAdapter.notifyDataSetChanged();
         Intent newActivity;
         newActivity = new Intent(AssignmentsEdit.this, AssignmentsView.class);
         startActivity(newActivity);
