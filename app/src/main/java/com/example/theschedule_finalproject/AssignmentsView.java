@@ -142,7 +142,6 @@ public class AssignmentsView extends AppCompatActivity implements AdapterView.On
                         Assignment assignmentDataSnapshot = dataSnapshot.getValue(Assignment.class);
                         assignmentArrayList.add(assignmentDataSnapshot);
                     }
-                    //assignmentAdapter.notifyDataSetChanged();
                 }
                 messageAssignment = false;
             }
