@@ -155,7 +155,7 @@
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="5" />
+                android:layout_weight="2" />
 
             <Button
                 android:layout_width="match_parent"
@@ -171,7 +171,24 @@
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="10" />
+                android:layout_weight="1" />
+
+            <Button
+                android:id="@+id/delete_btnAE"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="10"
+                android:backgroundTint="#FFEA00"
+                android:onClick="deleteAssignment"
+                android:text="Delete"
+                android:textColor="@color/primary_darkBlue"
+                android:textSize="20dp"
+                android:textStyle="bold" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="2" />
 
         </LinearLayout>
 

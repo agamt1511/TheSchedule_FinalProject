@@ -73,6 +73,7 @@ public class AssignmentsEdit extends AppCompatActivity implements AdapterView.On
 
     ArrayAdapter<String>arrayAdapter;
     DatabaseReference assignmentsDBR_delete;
+    Button delete_btnAE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +90,7 @@ public class AssignmentsEdit extends AppCompatActivity implements AdapterView.On
         time_tvAE = (TextView) findViewById(R.id.time_tvAE);
         date_tvAE = (TextView) findViewById(R.id.date_tvAE);
         importance_spAE = (Spinner) findViewById(R.id.importance_spAE);
+        delete_btnAE = (Button) findViewById(R.id.delete_btnAE);
 
         assignment = new Assignment();
         assignment_former =new Assignment();
@@ -99,6 +101,8 @@ public class AssignmentsEdit extends AppCompatActivity implements AdapterView.On
         //אתחול תוכן משתמים ועצמי בסיס
         time_str = "Null";
         date_str = "Null";
+
+        delete_btnAE.setVisibility(View.INVISIBLE);
 
         Resources resources = getResources();
         priorities = resources.getStringArray(R.array.priorities);
@@ -114,6 +118,7 @@ public class AssignmentsEdit extends AppCompatActivity implements AdapterView.On
     private void checkGetAssignment() {
         originalTitle = assignmentContent.getStringExtra("originalAssignment_title");
         if (!(originalTitle.matches("Null"))){
+            delete_btnAE.setVisibility(View.VISIBLE);
             assignment_former.setTitle(originalTitle);
             assignment_former.setTxt(assignmentContent.getStringExtra("originalAssignment_txt"));
             assignment_former.setDateTime_goal(assignmentContent.getStringExtra("originalAssignment_dateAndTime"));
@@ -355,5 +360,14 @@ public class AssignmentsEdit extends AppCompatActivity implements AdapterView.On
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
 
+    }
+
+    public void deleteAssignment(View view) {
+        if(!(originalTitle.matches("Null"))){
+            deleteFormerAssignment();
+        }
+        Intent newActivity;
+        newActivity = new Intent(AssignmentsEdit.this, AssignmentsView.class);
+        startActivity(newActivity);
     }
 }

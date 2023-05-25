@@ -70,13 +70,6 @@ public class AssignmentsView extends AppCompatActivity implements AdapterView.On
         assignmentAdapter = new AssignmentAdapter(this,assignmentArrayList);
         assignments_lvAV.setAdapter(assignmentAdapter);
 
-        assignments_lvAV.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
-            @Override
-            public void onCreateContextMenu(ContextMenu contextMenu, View view, ContextMenu.ContextMenuInfo contextMenuInfo) {
-
-            }
-        });
-
         Resources resources = getResources();
         priorities = resources.getStringArray(R.array.priorities);
         setArrayPriorities();
