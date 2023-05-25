@@ -60,11 +60,9 @@ public class DailyScheduleView extends AppCompatActivity {
     PendingIntent pendingIntent;
     Intent newActivity;
 
-    AlarmManager alarmManager;
     AlertDialog.Builder adb;
 
     String selectedDay;
-    Boolean message;
 
 
     @Override
@@ -107,7 +105,6 @@ public class DailyScheduleView extends AppCompatActivity {
             }
         });
 
-        message = true;// איפשור שינוי ListView
         eventArrayList = new ArrayList<>(); // יצירת רשימה חדשה
         eventAdapter = new EventAdapter(this, eventArrayList); //קישור בין רשימה לAdapter
         events_lvDSV.setAdapter(eventAdapter); //קישור בין Adapter לListView
@@ -131,16 +128,14 @@ public class DailyScheduleView extends AppCompatActivity {
         eventQuery.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (message) { //אם לא שונה כבר בפונקציית מחיקה
-                    if (snapshot.exists()) {
-                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                            Event event = dataSnapshot.getValue(Event.class);//צור ערך Event חדש והשמה בו ערך שהתקבל בפונקציה
-                            eventArrayList.add(event); //השמת ערך Event חדש ברשימה
-                        }
-                        eventAdapter.notifyDataSetChanged(); //עדכו Adapter
+                if (snapshot.exists()) {
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                        Event event = dataSnapshot.getValue(Event.class);//צור ערך Event חדש והשמה בו ערך שהתקבל בפונקציה
+                        eventArrayList.add(event); //השמת ערך Event חדש ברשימה
                     }
+                    eventAdapter.notifyDataSetChanged(); //עדכו Adapter
                 }
-                message = true;
+
             }
 
             @Override
@@ -167,53 +162,6 @@ public class DailyScheduleView extends AppCompatActivity {
                 newActivity.putExtra("originalEvent_count",event.getCount());
                 newActivity.putExtra("originalEvent_alarm",event.getAlarm());
                 startActivity(newActivity);
-            }
-        });
-
-        //מאזין ללחיצה ארוכה - מחיקת ערך Event
-        events_lvDSV.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long l) {
-                //תיבת דיאלוג לווידוא מחיקה
-                adb = new AlertDialog.Builder(DailyScheduleView.this);
-                adb.setTitle("Delete Note");
-                adb.setMessage("Are you sure you want to delete this note?");
-
-                adb.setPositiveButton("YES", new DialogInterface.OnClickListener() {//כפתור אישור
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        Event event = (Event) (events_lvDSV.getItemAtPosition(position)); //קבלת ערך Note נבחר
-                        eventAdapter.notifyDataSetChanged(); //התראה בAdapter
-                        message = false;//הגדרת משתנה כדי שלא יופעלו מאזיני הquery כי כבר ביצענו את המחיקה מהתצוגה
-
-                        if(event.getAlarm()!=0){ //מחיקת התראה אם קיימת
-                            Intent intent = new Intent(DailyScheduleView.this, AlarmReceiver.class);
-                            pendingIntent = PendingIntent.getBroadcast(DailyScheduleView.this, event.getAlarm(), intent, 0);
-                            if (alarmManager == null){
-                                alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-                            }
-                            alarmManager.cancel(pendingIntent);
-                        }
-
-                        eventArrayList.remove(event); //מחיקת ערך Event מרשימה
-                        FBST.getReference(event.getTxt()).delete();// מחיקת ערך Txt של Eהקמא מStorage
-
-                        eventsDBR_delete = eventsRef.child(currentUser.getUid()).child(event.getEvent_date()).child(event.getEvent_time()+event.getCount());
-                        eventsDBR_delete.removeValue(); //מחיקת ערך Event מDB
-
-
-                    }
-                });
-
-                adb.setNegativeButton("NO", new DialogInterface.OnClickListener() {// כפתור יציאה
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {}}
-                );
-
-                //יצירת והצגת דיאלוג
-                AlertDialog ad = adb.create();
-                ad.show();
-                return false;
             }
         });
     }

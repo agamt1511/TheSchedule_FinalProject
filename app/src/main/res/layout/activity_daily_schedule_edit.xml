@@ -72,7 +72,7 @@
                 android:id="@+id/txt_etDSE"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="32.5"
+                android:layout_weight="20.5"
                 android:ems="10"
                 android:gravity="start|top"
                 android:hint="Write Your Assignment Here ..."
@@ -162,6 +162,23 @@
                 android:backgroundTint="#FF3D00"
                 android:onClick="saveEvent"
                 android:text="SAVE"
+                android:textColor="@color/primary_teal"
+                android:textSize="20dp"
+                android:textStyle="bold" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="2" />
+
+            <Button
+                android:id="@+id/delete_btnDSE"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="10"
+                android:backgroundTint="#FF3D00"
+                android:onClick="deleteEvent"
+                android:text="Delete"
                 android:textColor="@color/primary_teal"
                 android:textSize="20dp"
                 android:textStyle="bold" />

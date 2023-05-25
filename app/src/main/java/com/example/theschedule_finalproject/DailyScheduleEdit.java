@@ -30,6 +30,7 @@ import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -60,6 +61,7 @@ public class DailyScheduleEdit extends AppCompatActivity {
     EditText title_etDSE, txt_etDSE;
     TextView date_tvDSE, time_tvDSE;
     CheckBox alert_cbDSE;
+    Button delete_btnDSE;
 
     Event event;
     Calendar calendar;
@@ -93,6 +95,9 @@ public class DailyScheduleEdit extends AppCompatActivity {
         date_tvDSE = (TextView) findViewById(R.id.date_tvDSE);
         time_tvDSE = (TextView) findViewById(R.id.time_tvDSE);
         alert_cbDSE = (CheckBox) findViewById(R.id.alert_cbDSE);
+        delete_btnDSE = (Button) findViewById(R.id.delete_btnDSE);
+
+        delete_btnDSE.setVisibility(View.INVISIBLE);
 
         createNotificationChannel();// יצירת ערוץ להתראה
 
@@ -117,6 +122,7 @@ public class DailyScheduleEdit extends AppCompatActivity {
     private void checkGetEvent() {
         originalTitle = eventContent.getStringExtra("originalEvent_title");
         if (!(originalTitle.matches("Null"))){
+            delete_btnDSE.setVisibility(View.VISIBLE);
             event.setTitle(originalTitle);
             event.setTxt(eventContent.getStringExtra("originalEvent_txt"));
             event.setEvent_date(eventContent.getStringExtra("originalEvent_date"));
@@ -400,5 +406,13 @@ public class DailyScheduleEdit extends AppCompatActivity {
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(notificationChannel);
         }
+    }
+
+    public void deleteEvent(View view) {
+        deleteFormerEvent();
+
+        Intent newActivity;
+        newActivity = new Intent(DailyScheduleEdit.this, DailyScheduleView.class);
+        startActivity(newActivity);
     }
 }
