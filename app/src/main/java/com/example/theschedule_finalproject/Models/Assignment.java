@@ -1,7 +1,7 @@
 package com.example.theschedule_finalproject.Models;
-import java.util.ArrayList;
 
 public class Assignment {
+    //הכרזה על רכיבי תצוגה, משתנים וכדומה
     private String title;
     private String txt;// הפנייה לstorage
     private String dateTime_goal;
@@ -10,9 +10,12 @@ public class Assignment {
     private boolean completed;
 
 
+    //בנאי ריק
     public Assignment() {
     }
 
+
+    //בנאי
     public Assignment(String title, String txt, String dateTime_goal, int count, String priority, boolean completed) {
         this.title = title;
         this.txt = txt;
@@ -21,6 +24,7 @@ public class Assignment {
         this.priority = priority;
         this.completed = completed;
     }
+
 
     public String getTitle() {
         return title;
@@ -57,6 +61,7 @@ public class Assignment {
         this.count = count;
     }
 
+
     public String getPriority() {
         return priority;
     }
@@ -64,6 +69,7 @@ public class Assignment {
     public void setPriority(String priority) {
         this.priority = priority;
     }
+
 
     public boolean isCompleted() {
         return completed;

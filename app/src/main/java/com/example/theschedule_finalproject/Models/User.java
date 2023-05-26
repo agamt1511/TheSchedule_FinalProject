@@ -1,15 +1,20 @@
 package com.example.theschedule_finalproject.Models;
 
 public class User {
+    //הכרזה על רכיבי תצוגה, משתנים וכדומה
     private String user_uid, user_name, user_image;
 
+    //בנאי ריק
     public User (){}
 
+
+    //בנאי
     public User (String user_uid, String user_name, String user_image){
         this.user_uid = user_uid;
         this.user_name = user_name;
         this.user_image = user_image;
     }
+
 
     public String getUser_uid() {
         return user_uid;
@@ -18,12 +23,14 @@ public class User {
         this.user_uid = user_uid;
     }
 
+
     public String getUser_name() {
         return user_name;
     }
     public void setUser_name(String user_name) {
         this.user_name = user_name;
     }
+
 
     public String getUser_image() {
         return user_image;

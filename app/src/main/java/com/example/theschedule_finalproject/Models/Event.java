@@ -1,6 +1,7 @@
 package com.example.theschedule_finalproject.Models;
 
 public class Event {
+    //הכרזה על רכיבי תצוגה, משתנים וכדומה
     private String title;
     private String txt;// הפנייה לstorage
     private String event_date;
@@ -9,9 +10,12 @@ public class Event {
     private int alarm; //request קוד ייחודי לכל התראה
 
 
+    //בנאי ריק
     public Event() {
     }
 
+
+    //בנאי
     public Event(String title, String txt, String event_date, String event_time, int count, int alarm) {
         this.title = title;
         this.txt = txt;
@@ -29,6 +33,7 @@ public class Event {
     public void setTitle(String title) {
         this.title = title;
     }
+
 
     public String getTxt() {
         return txt;

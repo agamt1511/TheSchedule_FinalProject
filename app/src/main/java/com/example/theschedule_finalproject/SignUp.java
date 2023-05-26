@@ -5,6 +5,7 @@ import static com.example.theschedule_finalproject.FBref.currentUser;
 import static com.example.theschedule_finalproject.FBref.usersRef;
 import androidx.annotation.NonNull;
 
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -60,10 +61,12 @@ public class SignUp extends AppCompatActivity {
         //אם הנתונים מאושרים לבצע הרשמה והוספה למערך הנתונים
         if (authenticated){
             //יצית משתמש חדש ויצירת מאזין לפעולה
+            final ProgressDialog progressDialog = ProgressDialog.show(this,"Create Account", "creates a user...",true);
             authRef.createUserWithEmailAndPassword(email_str,password_str).addOnCompleteListener(SignUp.this, new OnCompleteListener<AuthResult>() {
                 @Override
                 //אם הפעולה הושלמה בהצלחה
                 public void onComplete(@NonNull Task<AuthResult> task) {
+                    progressDialog.dismiss();
                     //אם המשימה צלחה
                     if (task.isSuccessful()){
                         //יצירת עצם User בfirebase realtime database

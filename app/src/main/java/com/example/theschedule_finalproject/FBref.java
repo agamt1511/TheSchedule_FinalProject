@@ -20,6 +20,5 @@ public class FBref {
 
     public static FirebaseStorage FBST = FirebaseStorage.getInstance();
     public static StorageReference storageRef = FBST.getReference();
-    public static StorageReference profilePic_ref;
 
 }

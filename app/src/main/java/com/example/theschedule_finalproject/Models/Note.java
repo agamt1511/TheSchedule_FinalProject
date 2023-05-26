@@ -1,22 +1,26 @@
 package com.example.theschedule_finalproject.Models;
 
-import java.util.ArrayList;
-
 public class Note {
+    //הכרזה על רכיבי תצוגה, משתנים וכדומה
     private String title;
     private String txt;// הפנייה לstorage
     private String dateTime_created;
     private Boolean thumbtack;
 
+
+    //בנאי ריק
     public Note() {
     }
 
+
+    //בנאי
     public Note(String title, String txt, String dateTime_created, Boolean thumbtack) {
         this.title = title;
         this.txt = txt;
         this.dateTime_created = dateTime_created;
         this.thumbtack = thumbtack;
     }
+
 
     public String getTitle() {
         return title;

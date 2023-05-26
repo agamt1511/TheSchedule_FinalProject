@@ -23,8 +23,6 @@ public class Credits extends AppCompatActivity {
     Intent newActivity;
     TextView showCredits;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,7 +32,6 @@ public class Credits extends AppCompatActivity {
         writeIF();
         readIF();
     }
-
 
     //כתיבה לקובץ פנימי
     private void writeIF() {
@@ -51,7 +48,6 @@ public class Credits extends AppCompatActivity {
             throw new RuntimeException(e);
         }
     }
-
 
     //קריאה מקובץ פנימי
     private void readIF() {
