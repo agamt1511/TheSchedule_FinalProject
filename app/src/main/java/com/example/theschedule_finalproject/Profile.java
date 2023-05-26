@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -83,6 +84,7 @@ public class Profile extends AppCompatActivity {
         user_uid = currentUser.getUid();
         email_etP.setText(currentUser.getEmail());
         Query query = usersRef.orderByChild("user_uid").equalTo(user_uid);
+        final ProgressDialog progressDialog = ProgressDialog.show(this,"Loading Data", "loading ...",true);
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -90,14 +92,22 @@ public class Profile extends AppCompatActivity {
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()){
                         user = dataSnapshot.getValue(User.class);
                         name_etP.setText(user.getUser_name());
+                        progressDialog.dismiss();
                         if (!(user.getUser_image().matches("Null"))){
                             uploadProfileImage();
                         }
                     }
                 }
+
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                progressDialog.dismiss();
+                adb = new AlertDialog.Builder(Profile.this);
+                adb.setTitle("Error Occurred");
+                adb.setMessage("There is a problem importing the data. Please try again later.");
+                AlertDialog ad = adb.create();
+                ad.show();
             }
         });
     }
@@ -115,6 +125,7 @@ public class Profile extends AppCompatActivity {
                     profilePic.setImageBitmap(bitmap);
                 }
             });
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -255,11 +266,6 @@ public class Profile extends AppCompatActivity {
                      }
                  });
              }
-             /*
-              עבור תמונה ממצלמה
-              מספיק else כי אם עשינו activityForReult סימן שבחרנו בגלריה (ואז משתמשים בקוד) או שבחרנו במצלמה, אין אופציה אחרת.
-              עדיין יש קוד לתמונה כי כדי שיגיעelase חייב להכניס קוד שונה מזה של הגלריה.
-              */
              else{
                  Bitmap bitmap = (Bitmap) data.getExtras().get("data");
                  ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -340,9 +346,5 @@ public class Profile extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-    /*
-    הערות:
-    - ניתן בכל פעם להשתמש באותו ad כי ניותר להצהיר מחדש, אומנם כל פעם עושיםnew זה כדי למחוק את הכפתורים והתוכן הקודמים של ההתראה.
-     */
 
 }

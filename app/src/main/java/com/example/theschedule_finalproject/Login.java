@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -49,9 +50,11 @@ public class Login extends AppCompatActivity {
 
         //אם הנתונים מאושרים לבצע כניסת משתמש
         if (authenticated){
+            final ProgressDialog progressDialog = ProgressDialog.show(this,"Logging Account", "Logging ...",true);
             authRef.signInWithEmailAndPassword(email_str,password_str).addOnCompleteListener(Login.this, new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
+                    progressDialog.dismiss();
                     //אם המשימה צלחה
                     if (task.isSuccessful()){
                         //שינוי ערך בוליאני userHasLoggedIn של SharedPrefrance

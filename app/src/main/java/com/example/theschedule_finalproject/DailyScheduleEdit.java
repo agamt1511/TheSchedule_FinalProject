@@ -14,6 +14,7 @@ import static java.util.Calendar.MONTH;
 import static java.util.Calendar.YEAR;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlarmManager;
@@ -78,6 +79,8 @@ public class DailyScheduleEdit extends AppCompatActivity {
 
     String originalTitle, time_str, date_str;
 
+    public static boolean allowed;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,6 +98,7 @@ public class DailyScheduleEdit extends AppCompatActivity {
         time_tvDSE = (TextView) findViewById(R.id.time_tvDSE);
         alert_cbDSE = (CheckBox) findViewById(R.id.alert_cbDSE);
         delete_btnDSE = (Button) findViewById(R.id.delete_btnDSE);
+
 
         delete_btnDSE.setVisibility(View.INVISIBLE);//כםתור מחיקה בלתי נראה
 
@@ -294,9 +298,11 @@ public class DailyScheduleEdit extends AppCompatActivity {
             //השמת עצם Event בDB
             eventsRef.child(currentUser.getUid()).child(event.getEvent_date()).child(event.getEvent_time()+ String.valueOf(event.getCount())).setValue(event);
 
-            Intent newActivity;
-            newActivity = new Intent(DailyScheduleEdit.this, DailyScheduleView.class);
-            startActivity(newActivity);
+            if(allowed) {
+                Intent newActivity;
+                newActivity = new Intent(DailyScheduleEdit.this, DailyScheduleView.class);
+                startActivity(newActivity);
+            }
         }
     }
 
@@ -347,6 +353,16 @@ public class DailyScheduleEdit extends AppCompatActivity {
         }
         else {
             event.setAlarm(0);
+            allowed = true;
+        }
+
+        if(!allowed){
+            AlertDialog.Builder adb;
+            adb = new AlertDialog.Builder(DailyScheduleEdit.this);
+            adb.setTitle("Error Occurred");
+            adb.setMessage("Please allow the app to send you notifications. Change permissions.");
+            AlertDialog ad = adb.create();
+            ad.show();
         }
     }
 

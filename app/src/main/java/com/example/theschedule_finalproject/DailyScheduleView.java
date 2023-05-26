@@ -128,7 +128,6 @@ public class DailyScheduleView extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                progressDialog.dismiss();
                 adb = new AlertDialog.Builder(DailyScheduleView.this);
                 adb.setTitle("Error Occurred");
                 adb.setMessage("There is a problem importing the data. Please try again later.");
