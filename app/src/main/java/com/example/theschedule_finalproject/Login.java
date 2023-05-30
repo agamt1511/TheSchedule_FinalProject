@@ -54,7 +54,6 @@ public class Login extends AppCompatActivity {
             authRef.signInWithEmailAndPassword(email_str,password_str).addOnCompleteListener(Login.this, new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
-                    progressDialog.dismiss();
                     //אם המשימה צלחה
                     if (task.isSuccessful()){
                         //שינוי ערך בוליאני userHasLoggedIn של SharedPrefrance
@@ -76,6 +75,7 @@ public class Login extends AppCompatActivity {
                         AlertDialog ad = adb.create();
                         ad.show();
                     }
+                    progressDialog.dismiss();
                 }
             });
         }
