@@ -122,8 +122,8 @@ public class DailyScheduleView extends AppCompatActivity {
                         eventArrayList.add(event); //השמת ערך Event חדש ברשימה
                     }
                     eventAdapter.notifyDataSetChanged(); //עדכון Adapter
-                    progressDialog.dismiss();
                 }
+                progressDialog.dismiss();
             }
 
             @Override

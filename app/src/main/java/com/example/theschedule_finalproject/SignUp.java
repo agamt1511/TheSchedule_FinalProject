@@ -125,6 +125,10 @@ public class SignUp extends AppCompatActivity {
             passwordConfirm_etS.setError("ERROR! Passwords do not match");
             errorExist++;
         }
+        if (confirmPassword.length()==0){
+            passwordConfirm_etS.setError("ERROR! The field cannot be left blank.");
+            errorExist++;
+        }
 
         if(errorExist > 0){
             return false;

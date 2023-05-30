@@ -117,9 +117,8 @@ public class NotesView extends AppCompatActivity{
                     }
                     Collections.reverse(noteArrayList_noThumbtack);// הפיכת רשימת Note נעוצים - מגדול לקטן
                     updateNoteAdapter();// עדכון רשימה מחוברת של Note נעוצים ולא נעוצים ועדכון Adapter
-                    progressDialog.dismiss();
                 }
-
+                progressDialog.dismiss();
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
