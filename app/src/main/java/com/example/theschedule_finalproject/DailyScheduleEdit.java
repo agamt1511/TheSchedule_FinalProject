@@ -14,7 +14,6 @@ import static java.util.Calendar.MONTH;
 import static java.util.Calendar.YEAR;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlarmManager;
@@ -79,8 +78,6 @@ public class DailyScheduleEdit extends AppCompatActivity {
 
     String originalTitle, time_str, date_str;
 
-    public static boolean allowed; // האם ההרשאות אושרו?
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,7 +96,6 @@ public class DailyScheduleEdit extends AppCompatActivity {
         alert_cbDSE = (CheckBox) findViewById(R.id.alert_cbDSE);
         delete_btnDSE = (Button) findViewById(R.id.delete_btnDSE);
 
-        allowed = true;
 
         delete_btnDSE.setVisibility(View.INVISIBLE);//כםתור מחיקה בלתי נראה
 
@@ -262,7 +258,7 @@ public class DailyScheduleEdit extends AppCompatActivity {
                 calendar.set(HOUR_OF_DAY, hour);
                 calendar.set(Calendar.MINUTE,minute);
                 calendar.set(Calendar.SECOND,0);
-                calendar.set(Calendar.MILLISECOND,0);
+                calendar.set(MILLISECOND,0);
                 if(hour<10){
                     hour_str = "0" + hour;
                 }
@@ -296,24 +292,12 @@ public class DailyScheduleEdit extends AppCompatActivity {
             setTitleAndTxt();
             setAlarm();
 
-            if(!allowed){
-                event.setAlarm(0);
-                AlertDialog.Builder adb;
-                adb = new AlertDialog.Builder(DailyScheduleEdit.this);
-                adb.setTitle("Error Occurred");
-                adb.setMessage("Mission saved without notification. Change permissions in settings, exit and re-enter the app for notification.");
-                AlertDialog ad = adb.create();
-                ad.show();
-            }
-
             //השמת עצם Event בDB
             eventsRef.child(currentUser.getUid()).child(event.getEvent_date()).child(event.getEvent_time()+ String.valueOf(event.getCount())).setValue(event);
 
-            if(allowed){
-                Intent newActivity;
-                newActivity = new Intent(DailyScheduleEdit.this, DailyScheduleView.class);
-                startActivity(newActivity);
-            }
+            Intent newActivity;
+            newActivity = new Intent(DailyScheduleEdit.this, DailyScheduleView.class);
+            startActivity(newActivity);
 
         }
     }
