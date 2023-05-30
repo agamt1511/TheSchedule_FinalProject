@@ -58,6 +58,7 @@ public class Profile extends AppCompatActivity {
     StorageReference selectedImage_ref;
     AlertDialog.Builder adb;
     BroadcastReceiver broadcastReceiver;
+    ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,7 +85,7 @@ public class Profile extends AppCompatActivity {
         user_uid = currentUser.getUid();
         email_etP.setText(currentUser.getEmail());
         Query query = usersRef.orderByChild("user_uid").equalTo(user_uid);
-        final ProgressDialog progressDialog = ProgressDialog.show(this,"Loading Data", "loading ...",true);
+        progressDialog = ProgressDialog.show(this,"Loading Data", "loading ...",true);
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -92,9 +93,11 @@ public class Profile extends AppCompatActivity {
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()){
                         user = dataSnapshot.getValue(User.class);
                         name_etP.setText(user.getUser_name());
-                        progressDialog.dismiss();
                         if (!(user.getUser_image().matches("Null"))){
                             uploadProfileImage();
+                        }
+                        else {
+                            progressDialog.dismiss();
                         }
                     }
                 }
@@ -123,9 +126,9 @@ public class Profile extends AppCompatActivity {
                 public void onComplete(@NonNull Task<FileDownloadTask.TaskSnapshot> task) {
                     Bitmap bitmap = BitmapFactory.decodeFile(profileImage.getAbsolutePath());
                     profilePic.setImageBitmap(bitmap);
+                    progressDialog.dismiss();
                 }
             });
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

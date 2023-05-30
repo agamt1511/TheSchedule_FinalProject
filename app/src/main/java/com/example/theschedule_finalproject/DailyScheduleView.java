@@ -109,10 +109,10 @@ public class DailyScheduleView extends AppCompatActivity {
 
     // הצגת אירועי יום נבחר בList View
     private void selectedDayData() {
+        final ProgressDialog progressDialog = ProgressDialog.show(this,"downloads data", "downloading...",true);
         eventsDBR = eventsRef.child(currentUser.getUid()).child(selectedDay);
         eventQuery = eventsDBR.orderByChild("event_time");
 
-        final ProgressDialog progressDialog = ProgressDialog.show(this,"Imports data", "fetching data...",true);
         eventQuery.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -122,12 +122,13 @@ public class DailyScheduleView extends AppCompatActivity {
                         eventArrayList.add(event); //השמת ערך Event חדש ברשימה
                     }
                     eventAdapter.notifyDataSetChanged(); //עדכון Adapter
+                    progressDialog.dismiss();
                 }
-
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                progressDialog.dismiss();
                 adb = new AlertDialog.Builder(DailyScheduleView.this);
                 adb.setTitle("Error Occurred");
                 adb.setMessage("There is a problem importing the data. Please try again later.");
@@ -136,7 +137,6 @@ public class DailyScheduleView extends AppCompatActivity {
             }
         });
         eventAdapter.notifyDataSetChanged(); //עדכון Adapter
-        progressDialog.dismiss();
     }
 
     // יצירת מאזיני לחיצה
