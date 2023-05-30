@@ -117,6 +117,7 @@ public class NotesView extends AppCompatActivity{
                     }
                     Collections.reverse(noteArrayList_noThumbtack);// הפיכת רשימת Note נעוצים - מגדול לקטן
                     updateNoteAdapter();// עדכון רשימה מחוברת של Note נעוצים ולא נעוצים ועדכון Adapter
+                    progressDialog.dismiss();
                 }
 
             }
@@ -130,7 +131,6 @@ public class NotesView extends AppCompatActivity{
                 ad.show();
             }
         });
-        progressDialog.dismiss();
 
         updateNoteArray();
         noteAdapter = new NoteAdapter(this,noteArrayList_complete); //הגדרת Adapter חדש עם ערכי הרשימה המאוחדת
