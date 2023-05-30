@@ -16,6 +16,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
+/**
+ * @author Agam Toledano
+ */
 public class Credits extends AppCompatActivity {
     Intent newActivity;
     TextView showCredits;
