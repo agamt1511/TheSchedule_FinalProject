@@ -21,56 +21,91 @@ import com.example.theschedule_finalproject.R;
 
 import java.util.ArrayList;
 
+/**
+ * @author Agam Toledano
+ * @version 1.0
+ * @since 02/01/2023
+ * short description - Assignments Adapter.
+ */
 public class AssignmentAdapter extends BaseAdapter {
-    //הכרזה על רכיבי תצוגה, משתנים וכדומה
     Context context;
     ArrayList<Assignment> assignmentArrayList;
     LayoutInflater layoutInflater;
 
-    //בנאי
+    /**
+     * Instantiates a new Assignment adapter.
+     * <p>
+     * @param context             the context
+     * @param assignmentArrayList the assignment array list
+     */
     public AssignmentAdapter(Context context, ArrayList<Assignment> assignmentArrayList) {
         this.context = context;
         this.assignmentArrayList = assignmentArrayList;
         this.layoutInflater = (LayoutInflater.from(context.getApplicationContext()));;
     }
 
-    //קבלת אורך רשימת עצמים
+    /**
+     * getCount.
+     * Short description - Getting the length of a list of Assignments.
+     * <p>
+     *
+     * @return int list size;
+     */
     @Override
     public int getCount() {
         return assignmentArrayList.size();
     }
 
-    //קבלת עצם במיקום i
+    /**
+     * getItem.
+     * Short description - Getting a value of Assignment at a given location.
+     * <p>
+     * @param i
+     * @return Assignment object
+     */
     @Override
     public Assignment getItem(int i) {
         return assignmentArrayList.get(i);
     }
 
-    // קבלת id של המשתנה - מחזיר 0 לכולם
+    /**
+     * getItemId.
+     * Short description - Getting id of the variable - returns 0 for all.
+     * <p>
+     * @param i
+     * @return 0
+     */
     @Override
     public long getItemId(int i) {
         return 0;
     }
 
-    //הגדרת תצוגת של התא בו מוצג העצם
+    /**
+     * getView.
+     * Short description - Display definition of the cell in which the object is displayed.
+     * + Changes the status of the task according to the user's click.
+     * <p>
+     * @param i
+     * @param view
+     * @param viewGroup
+     * @return view
+     */
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         layoutInflater = ((AppCompatActivity)context).getLayoutInflater();
         view = layoutInflater.inflate(R.layout.assignment_cell,viewGroup,false);
 
-        Assignment assignment = getItem(i); //קבלת ערך במיקום נבחר
+        Assignment assignment = getItem(i);
 
-        //התאמה בין רכיב תצוגה למשתנה
         TextView title_tvAC = (TextView) view.findViewById(R.id.title_tvAC);
         TextView isCompleted_tvAC = (TextView) view.findViewById(R.id.isCompleted_tvAC);
         TextView dateAndTime_tvAC = (TextView) view.findViewById(R.id.dateAndTime_tvAC);
 
 
-        title_tvAC.setText(assignment.getTitle());//הצגת כותרת של עצם
+        title_tvAC.setText(assignment.getTitle());
 
-        dateAndTime_tvAC.setText(convertToDateAndTime(assignment.getDateTime_goal()));//הצגת תאריך של עצם
+        dateAndTime_tvAC.setText(convertToDateAndTime(assignment.getDateTime_goal()));
 
-        //הגדרת סטטוס עצם התחלתי
         if(assignment.isCompleted()){
             isCompleted_tvAC.setText("Completed");
         }
@@ -78,9 +113,8 @@ public class AssignmentAdapter extends BaseAdapter {
             isCompleted_tvAC.setText("Not Complete");
         }
 
-        currentUser = authRef.getCurrentUser(); //קבלת UID של משתמש מחובר
+        currentUser = authRef.getCurrentUser();
 
-        //שינוי ערך של העצם בהתאם ללחיצת המשתש
         isCompleted_tvAC.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -93,14 +127,12 @@ public class AssignmentAdapter extends BaseAdapter {
                     isCompleted_tvAC.setText("Completed");
                 }
 
-                AssignmentsView.messageAssignment = true; // משתנה לאתחול רשימה
-                //הגדרת סטטוס חדש בAssignment
+                AssignmentsView.messageAssignment = true;
                 assignmentsRef.child(currentUser.getUid()).child(assignment.getPriority()).child(assignment.getDateTime_goal() + String.valueOf(assignment.getCount())).setValue(assignment);
             }
         });
 
 
-        // מעבר לActivity עריכת עצם נבחר
         title_tvAC.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -118,7 +150,13 @@ public class AssignmentAdapter extends BaseAdapter {
         return view;
     }
 
-    //המרה של תאריך ושעה מחוברים שהתקבלו לצורה נוחה ומסודרת לקריאה
+    /**
+     * convertToDateAndTime.
+     * Short description - Conversion of received connected date and time into a convenient and orderly form for reading.
+     * <p>
+     * @param dateAndTime
+     * @return String date and time - new format
+     */
     private String convertToDateAndTime(String dateAndTime) {
         String dateAndTime_new = "Date: " + dateAndTime.substring(6,8) +"/" + dateAndTime.substring(4,6) +"/" + dateAndTime.substring(0,4) + " --- "+
                 "Time: " + dateAndTime.substring(8,10) +":" + dateAndTime.substring(10,12);

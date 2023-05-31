@@ -50,9 +50,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-
+/**
+ * @author Agam Toledano
+ * @version 1.0
+ * @since 13/12/2022
+ * short description - AssignmentEdit Screen
+ */
 public class AssignmentsEdit extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
-    //הכרזה על רכיבי תצוגה, משתנים וכדומה
     BroadcastReceiver broadcastReceiver;
 
     EditText title_etAE, txt_etAE;
@@ -84,11 +88,14 @@ public class AssignmentsEdit extends AppCompatActivity implements AdapterView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_assignments_edit);
 
-        //בדיקת חיבור לאינטרנט באמצעות BrodcastReciever
+
+        /**
+         * Internet connection test using BroadcastReceiver.
+         * <p>
+         */
         broadcastReceiver = new NetworkConnectionReceiver();
         registerReceiver(broadcastReceiver,new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
-        //התאמה בין רכיב תצוגה למשתנה
         title_etAE = (EditText) findViewById(R.id.title_etAE);
         txt_etAE = (EditText) findViewById(R.id.txt_etAE);
         time_tvAE = (TextView) findViewById(R.id.time_tvAE);
@@ -96,39 +103,39 @@ public class AssignmentsEdit extends AppCompatActivity implements AdapterView.On
         importance_spAE = (Spinner) findViewById(R.id.importance_spAE);
         delete_btnAE = (Button) findViewById(R.id.delete_btnAE);
 
-        currentUser = authRef.getCurrentUser(); //קבלת UID של משתמש מחובר
-        calendar = Calendar.getInstance(); //יישום לוח שנה
+        currentUser = authRef.getCurrentUser();
+        calendar = Calendar.getInstance();
 
-        //אתחול תוכן משתמים ועצמי בסיס
         time_str = "Null";
         date_str = "Null";
 
-        delete_btnAE.setVisibility(View.INVISIBLE);//הגדרת כפתור מחיקה - בלתי נראה
+        delete_btnAE.setVisibility(View.INVISIBLE);
 
-        //יבוא string של priorities
         Resources resources = getResources();
         priorities = resources.getStringArray(R.array.priorities);
 
-        //קישור בין priorities לspinner
         arrayAdapter = new ArrayAdapter<String>(this, androidx.appcompat.R.layout.support_simple_spinner_dropdown_item,priorities);
         importance_spAE.setAdapter(arrayAdapter);
 
-        importance_spAE.setOnItemSelectedListener(this);//יצירת מאזין לחיצה לSpinner
+        importance_spAE.setOnItemSelectedListener(this);
 
-        //יצירת עצמי Assignment לקבלת ערך וליצירת ערך חדש
         assignment = new Assignment();
         assignment_former = new Assignment();
 
-        assignmentContent = getIntent();//קבלת Intent מפעילות קודמת
-        checkGetAssignment();//קבלת נתונים מIntent פעילות קודמת
+        assignmentContent = getIntent();
+        checkGetAssignment();
 
-        setListeners();//הגדרת מאזינים
+        setListeners();
     }
 
+    /**
+     * checkGetAssignment.
+     * Short description - check whether an assignment was imported from a previous screen and change display accordingly.
+     * <p>
+     */
     private void checkGetAssignment() {
         originalTitle = assignmentContent.getStringExtra("originalAssignment_title");
 
-        // קבלת ערכי Assignment נבחר והתאמה של המסך בהתאם
         if (!(originalTitle.matches("Null"))){
             delete_btnAE.setVisibility(View.VISIBLE);
             assignment_former.setTitle(originalTitle);
@@ -138,7 +145,7 @@ public class AssignmentsEdit extends AppCompatActivity implements AdapterView.On
             assignment_former.setPriority(assignmentContent.getStringExtra("originalAssignment_priority"));
             assignment_former.setCompleted(assignmentContent.getBooleanExtra("originalAssignment_isCompleted", false));
 
-            getTitleAndTxt();//ייצוג תוכן שהתקבל בכותרת ותיבת טקסט
+            getTitleAndTxt();
             getDateAndTime();
 
             int position = arrayAdapter.getPosition(assignment_former.getPriority());
@@ -146,25 +153,29 @@ public class AssignmentsEdit extends AppCompatActivity implements AdapterView.On
         }
     }
 
-    //ייצוג תוכן שהתקבל בכותרת ותיבת טקסט
+
+    /**
+     * getTitleAndTxt
+     * Short description - Representation of downloaded content in header and text box.
+     * <p>
+     */
     private void getTitleAndTxt() {
-        title_etAE.setText(assignment_former.getTitle());//ייצוג כותרת בTV
+        title_etAE.setText(assignment_former.getTitle());
 
-        final ProgressDialog progressDialog = ProgressDialog.show(this,"downloads data", "downloading...",true);//יצירת תצוגת טעינה
+        final ProgressDialog progressDialog = ProgressDialog.show(this,"downloads data", "downloading...",true);
 
-        //הורדת קבוץ מFirebase Storage
         originalTxtFile = null;
         try {
-            originalTxtFile = File.createTempFile("assignment", ".txt"); //יצירת קובץ לקבלת נתונים
-            StorageReference originalTxtFile_ref = FBST.getReference(assignment_former.getTxt());//יצירת הפנייה למיקום של קובץ txt
+            originalTxtFile = File.createTempFile("assignment", ".txt");
+            StorageReference originalTxtFile_ref = FBST.getReference(assignment_former.getTxt());
             originalTxtFile_ref.getFile(originalTxtFile).addOnCompleteListener(new OnCompleteListener<FileDownloadTask.TaskSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<FileDownloadTask.TaskSnapshot> task) {
                     progressDialog.dismiss();
-                    if (task.isSuccessful()) { //כאשר ההורדה הסתיימה בהצלחה
-                        readFile(); //קריאה והצגה של קובץ txt
+                    if (task.isSuccessful()) {
+                        readFile();
                     }
-                    else{ //אם ההורדה לא הסתיימה בהצלחה הצג הודעה מתאימה
+                    else{
                         adb = new AlertDialog.Builder(AssignmentsEdit.this);
                         adb.setTitle("Error Occurred");
                         adb.setMessage("Files were not downloaded properly. Please come back later to try to complete the operation you started.");
@@ -179,7 +190,11 @@ public class AssignmentsEdit extends AppCompatActivity implements AdapterView.On
         }
     }
 
-    //קריאת קובץ טקסט
+    /**
+     * readFile.
+     * Short description - Reading a local file.
+     * <p>
+     */
     private void readFile() {
         try {
             FileInputStream fis= new FileInputStream (new File(originalTxtFile.getPath()));
@@ -194,18 +209,21 @@ public class AssignmentsEdit extends AppCompatActivity implements AdapterView.On
             String strrd = sb.toString();
             br.close();
 
-            txt_etAE.setText(strrd);// הצגת מחרוזת Txt
+            txt_etAE.setText(strrd);
 
-            originalTxtFile.delete(); // מחיקת קובץ מהמכשיר
+            originalTxtFile.delete();
         }
         catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    //הצגת תאריך ושעה
+    /**
+     * getDateAndTime.
+     * Short description - Date and time display.
+     * <p>
+     */
     private void getDateAndTime() {
-        //הגדרת תאריך
         calendar.set(Calendar.YEAR, Integer.parseInt(assignment_former.getDateTime_goal().substring(0,4)));
         calendar.set(Calendar.MONTH,Integer.parseInt(assignment_former.getDateTime_goal().substring(4,6))-1);
         calendar.set(Calendar.DAY_OF_MONTH,Integer.parseInt(assignment_former.getDateTime_goal().substring(6,8)));
@@ -214,7 +232,6 @@ public class AssignmentsEdit extends AppCompatActivity implements AdapterView.On
 
         date_tvAE.setText(date_str);
 
-        //הגדרת זמן
         String hour_str, minute_str;
         calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(assignment_former.getDateTime_goal().substring(8,10)));
         calendar.set(Calendar.MINUTE,Integer.parseInt(assignment_former.getDateTime_goal().substring(10,12)));
@@ -239,9 +256,12 @@ public class AssignmentsEdit extends AppCompatActivity implements AdapterView.On
     }
 
 
-
+    /**
+     * setListeners.
+     * Short description - listener for date and time pickers.
+     * <p>
+     */
     private void setListeners() {
-        //מאזין לבחירת תאריך
         dateSetListener = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker datePicker, int year, int month, int day) {
@@ -255,7 +275,6 @@ public class AssignmentsEdit extends AppCompatActivity implements AdapterView.On
             }
         };
 
-        //מאזין לבחירת זמן
         timeSetListener = new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker timePicker, int hour, int minute) {
@@ -284,26 +303,55 @@ public class AssignmentsEdit extends AppCompatActivity implements AdapterView.On
 
     }
 
-    //יצירת TimePicker
+    /**
+     * openTimePicker.
+     * Short description - openTimePicker.
+     * <p>
+     * @param view
+     */
     public void openTimePicker(View view) {
         new TimePickerDialog(AssignmentsEdit.this,timeSetListener,calendar.get(HOUR_OF_DAY),calendar.get(MINUTE),true).show();
     }
 
-    //יצירת DataPicker
+    /**
+     * openDatePicker.
+     * Short description - openDatePicker.
+     * <p>
+     * @param view
+     */
     public void openDatePicker(View view) {
         new DatePickerDialog(AssignmentsEdit.this, dateSetListener ,calendar.get(Calendar.YEAR),calendar.get(Calendar.MONTH),calendar.get(Calendar.DAY_OF_MONTH)).show();
     }
 
-    //השמת ערך בעצם Assignment בהתאם לרמת החשיבות שנחבחרה
+    /**
+     * onItemSelected.
+     * Short description - Put a value in the Assignment element according to the chosen level of importance.
+     * <p>
+     * @param adapterView
+     * @param view
+     * @param i
+     * @param l
+     */
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
         assignment.setPriority(priorities[i]);
     }
 
+    /**
+     * onNothingSelected.
+     * Short description - onNothingSelected.
+     * <p>
+     * @param adapterView
+     */
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {}
 
-    // שמירת משימה חדשה ומחיקה של הקודמת (אם קיימת)
+    /**
+     * Save assignment.
+     * Short description - Saving a new task and deleting the previous one (if there is one).
+     * <p>
+     * @param view the view
+     */
     public void saveAssignment(View view) {
         if (dataVerification()) {
             if (!(originalTitle.matches("Null"))) {
@@ -311,20 +359,16 @@ public class AssignmentsEdit extends AppCompatActivity implements AdapterView.On
             }
 
 
-            //הגרדת תאריך ושעה
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmm");
             assignment.setDateTime_goal(dateFormat.format(calendar.getTime()));
 
 
-            //הגדרת קבוע ספירה
             assignment.setCount(((int) (Math.random()*898)+101));
 
 
-            //הגדרת סטטוס משימה
             assignment.setCompleted(false);
 
 
-            //הגדרת כותרת ותוכן טקסט
             String title  = title_etAE.getText().toString();
             assignment.setTitle(title);
 
@@ -346,7 +390,12 @@ public class AssignmentsEdit extends AppCompatActivity implements AdapterView.On
     }
 
 
-    //אימות נתונים
+    /**
+     * dataVerification.
+     * Short description - Verification that the data entered is proper.
+     * <p>
+     * @return the boolean
+     */
     private boolean dataVerification() {
         int errorExist = 0;
         if (title_etAE.getText().toString().length()<1){
@@ -371,18 +420,27 @@ public class AssignmentsEdit extends AppCompatActivity implements AdapterView.On
         return true;
     }
 
-    //מחיקת משימה קודמת
-    private void deleteFormerAssignment() {
-        FBST.getReference(assignment_former.getTxt()).delete(); //מחיקת תוכן txt של עצם Note מStorage
 
-        //מחיקת עצם Note מDB
+    /**
+     * deleteFormerAssignment.
+     * Short description - Deleting an original task.
+     * <p>
+     */
+    private void deleteFormerAssignment() {
+        FBST.getReference(assignment_former.getTxt()).delete();
+
         assignmentsDBR_delete = assignmentsRef.child(currentUser.getUid()).child(assignment_former.getPriority()).child(assignment_former.getDateTime_goal() + String.valueOf(assignment_former.getCount()));
         assignmentsDBR_delete.removeValue();
 
     }
 
 
-    //מחיקת משימה קיימת
+    /**
+     * deleteAssignment.
+     * Short description - Deleting an existing task and leaves the screen.
+     * <p>
+     * @param view
+     */
     public void deleteAssignment(View view) {
         if(!(originalTitle.matches("Null"))){
             deleteFormerAssignment();

@@ -18,9 +18,13 @@ import android.widget.EditText;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
-
+/**
+ * @author Agam Toledano
+ * @version 1.0
+ * @since 13/12/2022
+ * short description - Login Screen
+ */
 public class Login extends AppCompatActivity {
-    //הכרזה על רכיבי תצוגה, משתנים וכדומה
     EditText email_etL, password_etL;
     Intent intent;
     BroadcastReceiver broadcastReceiver;
@@ -31,42 +35,43 @@ public class Login extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        //בדיקת חיבור לאינטרנט באמצעות BrodcastReciever
+        /**
+         * Internet connection test using BroadcastReceiver.
+         * <p>
+         */
         broadcastReceiver = new NetworkConnectionReceiver();
         registerReceiver(broadcastReceiver,new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
-        //התאמה בין רכיב תצוגה למשתנה
         email_etL = (EditText) findViewById(R.id.email_etL);
         password_etL = (EditText) findViewById(R.id.password_etL);
     }
 
+    /**
+     * log_in.
+     * Short description - Login to an existing user.
+     * <p>
+     * @param view
+     */
     public void log_in(View view) {
-        //המרת פרטים מרכיבי תצוגה לString
         String email_str = email_etL.getText().toString();
         String password_str = password_etL.getText().toString();
 
-        //שליחה לפעולת בדיקה ואישור נתונים
         Boolean authenticated = dataVerification(email_str, password_str);
 
-        //אם הנתונים מאושרים לבצע כניסת משתמש
         if (authenticated){
             final ProgressDialog progressDialog = ProgressDialog.show(this,"Logging Account", "Logging ...",true);
             authRef.signInWithEmailAndPassword(email_str,password_str).addOnCompleteListener(Login.this, new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
-                    //אם המשימה צלחה
                     if (task.isSuccessful()){
-                        //שינוי ערך בוליאני userHasLoggedIn של SharedPrefrance
                         SharedPreferences sharedPreferences = getSharedPreferences(Splash.PREFS_NAME,MODE_PRIVATE);
                         SharedPreferences.Editor editor = sharedPreferences.edit();
                         editor.putBoolean(Splash.userHasLoggedIn,true);
                         editor.commit();
 
-                        //מעבר למסך הבית
                         intent = new Intent(Login.this,DailyScheduleView.class);
                         startActivity(intent);
                     }
-                    //אם כניסת המשתמש לא צלחה
                     else {
                         AlertDialog.Builder adb;
                         adb = new AlertDialog.Builder(Login.this);
@@ -81,19 +86,34 @@ public class Login extends AppCompatActivity {
         }
     }
 
-    //מעבר למסך הרשמה
+    /**
+     * toSignUpAct.
+     * Short description - Go to the registration screen.
+     * <p>
+     * @param view
+     */
     public void toSignUpAct(View view) {
         intent = new Intent(Login.this,SignUp.class);
         startActivity(intent);
     }
 
-    //מעבר למסך שכחתי סיסמה
+    /**
+     * forgotPassword.
+     * Short description - Go to the forgot password screen.
+     * <p>
+     * @param view
+     */
     public void forgotPassword(View view) {
         intent = new Intent(Login.this,ResetPassword.class);
         startActivity(intent);
     }
 
-    //בדיקת האם הפרטים שהוכנסו נכונים
+    /**
+     * dataVerification.
+     * Short description - Verification that the data entered is proper.
+     * <p>
+     * @return the boolean
+     */
     public Boolean dataVerification(String email, String password) {
         int errorExist = 0;
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()){

@@ -11,7 +11,19 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+/**
+ * @author Agam Toledano
+ * @version 1.0
+ * @since 24/02/2022
+ * short description - AlarmReceiver
+ */
 public class AlarmReceiver extends BroadcastReceiver {
+    /**
+     * onReceive.
+     * Short description - Create an alert.
+     * @param context
+     * @param intent
+     */
     @Override
     public void onReceive(Context context, Intent intent) {
         Intent alarmReceiver_intent = new Intent(context, DailyScheduleView.class);

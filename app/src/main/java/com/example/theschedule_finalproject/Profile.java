@@ -46,15 +46,21 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * @author Agam Toledano
+ * @version 1.0
+ * @since 02 /01/2023
+ * short description - Profile Screen.
+ */
 public class Profile extends AppCompatActivity {
-    //הכרזה על רכיבי תצוגה, משתנים וכדומה
     ImageView profilePic;
-    EditText email_etP, name_etP;
+    EditText email_etP,
+    name_etP;
     Intent intent;
     String user_uid;
     User user;
-    int GALLERY_IMAGE = 3333;//קוד גלריה
-    int CAMERA_IMAGE = 2222;//קוד תמונה
+    int GALLERY_IMAGE = 3333;
+    int CAMERA_IMAGE = 2222;
     StorageReference selectedImage_ref;
     AlertDialog.Builder adb;
     BroadcastReceiver broadcastReceiver;
@@ -65,21 +71,25 @@ public class Profile extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        //בדיקת חיבור לאינטרנט באמצעות BrodcastReciever
+        /**
+         * Internet connection test using BroadcastReceiver.
+         * <p>
+         */
         broadcastReceiver = new NetworkConnectionReceiver();
         registerReceiver(broadcastReceiver,new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
-        //התאמה בין רכיב תצוגה למשתנה
         name_etP = (EditText) findViewById(R.id.name_etP);
         email_etP = (EditText) findViewById(R.id.email_etP);
         profilePic = (ImageView) findViewById (R.id.profilePic);
 
-
-        // פעולת פתיחה - הצגת נתונים מקוריים
         showOriginalData();
     }
 
-    //הצגת נתונים מקוריים ישר כשנכנסים למסך הפרופיל
+    /**
+     * showOriginalData.
+     * Short description - Displaying user information.
+     * <p>
+     */
     private void showOriginalData() {
         currentUser = authRef.getCurrentUser();
         user_uid = currentUser.getUid();
@@ -116,7 +126,11 @@ public class Profile extends AppCompatActivity {
     }
 
 
-    //הורדת קובץ תמונה מFirebase Storage
+    /**
+     * uploadProfileImage.
+     * Short description - Downloading a profile picture from Firebase and displaying it.
+     * <p>
+     */
     private void uploadProfileImage() {
         try {
             File profileImage = File.createTempFile("profileImage",".jpg");
@@ -135,7 +149,12 @@ public class Profile extends AppCompatActivity {
     }
 
 
-    //שמירת נתונים חדשים שהמשתמש הכניס
+    /**
+     * saveChanges.
+     * Short description - Saving changes the user made to the profile.
+     * <p>
+     * @param view the view
+     */
     public void saveChanges(View view) {
         String name_str = name_etP.getText().toString();
         String email_str = email_etP.getText().toString();
@@ -160,7 +179,6 @@ public class Profile extends AppCompatActivity {
             adb.setNegativeButton("NO", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    // אפשר לעשות finish כי המסך הקודם לא יכול להיות התחברות/ הרשמה ומסך זה הוא לא מסך הבית
                     finish();
                 }
             });
@@ -170,7 +188,12 @@ public class Profile extends AppCompatActivity {
     }
 
 
-    //שינוי תמונת פרופיל
+    /**
+     * Change profile image.
+     * Short description - Change profile picture.
+     * <p>
+     * @param view the view
+     */
     public void change_profileImage(View view) {
         adb = new AlertDialog.Builder(Profile.this);
         adb.setTitle("Profile Picture");
@@ -201,7 +224,11 @@ public class Profile extends AppCompatActivity {
         ad.show();
     }
 
-    //הרשאות לגלריה ומצלמה
+    /**
+     * onRequestPermissionsResult.
+     * Short description - Checking permissions and opening a component by code.
+     * <p>
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -223,7 +250,11 @@ public class Profile extends AppCompatActivity {
         }
     }
 
-    //התראה על אי נתינת הרשאות
+    /**
+     * problemGettingPernissions.
+     * Short description - Notification of not granting permissions.
+     * <p>
+     */
     private void problemGettingPernissions() {
         adb = new AlertDialog.Builder(Profile.this);
         adb.setTitle("Problem Getting Permissions");
@@ -232,7 +263,11 @@ public class Profile extends AppCompatActivity {
         ad.show();
     }
 
-    //פתיחת גלריה ובחירת תמונה
+    /**
+     * chooseFromGallery.
+     * Short description - Opening a gallery and selecting an image.
+     * <p>
+     */
     private void chooseFromGallery() {
         Intent profilePic_GalleryIntent = new Intent();
         profilePic_GalleryIntent.setType("image/*");
@@ -241,13 +276,22 @@ public class Profile extends AppCompatActivity {
         startActivityForResult(Intent.createChooser(profilePic_GalleryIntent, "Gallery Image"), GALLERY_IMAGE);
     }
 
-    //פתיחת מצלמה וצילום תמונה
+    /**
+     * chooseFromCamera.
+     * Short description - Receiving data for each intent - Opening the camera and taking a picture.
+     * <p>
+     */
     private void chooseFromCamera() {
         Intent profilePic_CameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(profilePic_CameraIntent, CAMERA_IMAGE);
     }
 
-    //קבלת נתונים עבור כל אחד מהintent - אחסון והצגת נתונים
+
+    /**
+     * onActivityResult.
+     * Short description - Receiving data for each intent - storing and displaying data.
+     * <p>
+     */
     @Override
      protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
          super.onActivityResult(requestCode, resultCode, data);
@@ -258,7 +302,6 @@ public class Profile extends AppCompatActivity {
                  user.setUser_image(selectedImage_path);
                  usersRef.child(user_uid).setValue(user);
              }
-             //עבור תמונה מגלריה
              if (requestCode == GALLERY_IMAGE){
                  Uri selectedImageUri;
                  selectedImageUri = data.getData();
@@ -286,13 +329,23 @@ public class Profile extends AppCompatActivity {
          }
      }
 
-    //מעבר למסך שכחתי סיסמה
+    /**
+     * Reset password.
+     * Short description - go to ResetPassword screen.
+     * <p>
+     * @param view the view
+     */
     public void resetPassword(View view) {
         intent = new Intent(Profile.this, ResetPassword.class);
         startActivity(intent);
     }
 
-    //התנתקות מהאפליקציה
+    /**
+     * Logout.
+     * Short description - Logout from this account.
+     * <p>
+     * @param view the view
+     */
     public void logout(View view) {
         SharedPreferences sharedPreferences = getSharedPreferences(Splash.PREFS_NAME, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -303,7 +356,14 @@ public class Profile extends AppCompatActivity {
         startActivity(intent);
     }
 
-    //בדיקה האם הפרטים שהוכנסו נכונים
+    /**
+     * Data verification boolean.
+     * Short description - Verification that the data entered is proper.
+     * <p>
+     * @param name  the name
+     * @param email the email
+     * @return the boolean
+     */
     public Boolean dataVerification(String name, String email) {
         int errorExist = 0;
         if (name.length() < 1) {
@@ -321,7 +381,12 @@ public class Profile extends AppCompatActivity {
         return true;
     }
 
-    //תפריט מסכים
+    /**
+     * Screen menu.
+     * <p>
+     * @param menu
+     * @return super.onOptionsItemSelected(item)
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);

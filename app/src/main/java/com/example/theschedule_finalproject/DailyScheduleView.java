@@ -31,7 +31,12 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-
+/**
+ * @author Agam Toledano
+ * @version 1.0
+ * @since 13/12/2022
+ * short description - DailyScheduleEdit Screen
+ */
 public class DailyScheduleView extends AppCompatActivity {
     BroadcastReceiver broadcastReceiver;
 
@@ -57,17 +62,18 @@ public class DailyScheduleView extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_daily_schedule_view);
 
-        //בדיקת חיבור לאינטרנט באמצעות BrodcastReciever
+        /**
+         * Internet connection test using BroadcastReceiver.
+         * <p>
+         */
         broadcastReceiver = new NetworkConnectionReceiver();
         registerReceiver(broadcastReceiver,new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
-        //התאמה בין רכיב תצוגה למשתנה
         calender_cvDSV = (CalendarView) findViewById(R.id.calender_cvDSV);
         events_lvDSV = (ListView) findViewById(R.id.events_lvDSV);
 
-        currentUser = authRef.getCurrentUser(); //קבלת UID של משתמש מחובר
+        currentUser = authRef.getCurrentUser();
 
-        //מאזין - לשינוי תאריך לחוץ בלוח חודש
         calender_cvDSV.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView calendarView, int year, int month, int day) {
@@ -86,28 +92,37 @@ public class DailyScheduleView extends AppCompatActivity {
                     day_str = Integer.toString(day);
                 }
 
-                selectedDay = year_str + month_str + day_str; //קבלת תאריך של יום לחוץ
-                eventArrayList.clear(); //ניקוי רשימת ערכי Event
-                selectedDayData();// הצגת אירועי יום נבחר בList View
+                selectedDay = year_str + month_str + day_str;
+                eventArrayList.clear();
+                selectedDayData();
             }
         });
 
-        eventArrayList = new ArrayList<>(); // יצירת רשימה חדשה
-        eventAdapter = new EventAdapter(this, eventArrayList); //קישור בין רשימה לAdapter
-        events_lvDSV.setAdapter(eventAdapter); //קישור בין Adapter לListView
+        eventArrayList = new ArrayList<>();
+        eventAdapter = new EventAdapter(this, eventArrayList);
+        events_lvDSV.setAdapter(eventAdapter);
 
-        startCalender(); //קבלת יום נבחר והצגה בהתאם
-        setListeners();// יצירת מאזינים
+        startCalender();
+        setListeners();
     }
 
-    //שינוי תאריך שהתקבל לפורמט תאריך נבחר
+
+    /**
+     * startCalender.
+     * Short description - Change received date to selected date format.
+     * <p>
+     */
     private void startCalender() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
         selectedDay = dateFormat.format(calender_cvDSV.getDate());
         selectedDayData();
     }
 
-    // הצגת אירועי יום נבחר בList View
+    /**
+     * selectedDayData.
+     * Short description - Presentation of selected day events.
+     * <p>
+     */
     private void selectedDayData() {
         final ProgressDialog progressDialog = ProgressDialog.show(this,"downloads data", "downloading...",true);
         eventsDBR = eventsRef.child(currentUser.getUid()).child(selectedDay);
@@ -118,10 +133,10 @@ public class DailyScheduleView extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                        Event event = dataSnapshot.getValue(Event.class);//צור ערך Event חדש והשמה בו ערך שהתקבל בפונקציה
-                        eventArrayList.add(event); //השמת ערך Event חדש ברשימה
+                        Event event = dataSnapshot.getValue(Event.class);
+                        eventArrayList.add(event);
                     }
-                    eventAdapter.notifyDataSetChanged(); //עדכון Adapter
+                    eventAdapter.notifyDataSetChanged();
                 }
                 progressDialog.dismiss();
             }
@@ -136,16 +151,19 @@ public class DailyScheduleView extends AppCompatActivity {
                 ad.show();
             }
         });
-        eventAdapter.notifyDataSetChanged(); //עדכון Adapter
+        eventAdapter.notifyDataSetChanged();
     }
 
-    // יצירת מאזיני לחיצה
+    /**
+     * setListeners.
+     * Short description - Listens for clicking on a event in the list.
+     * <p>
+     */
     private void setListeners() {
-        //מאזין ללחיצה רגילה - פתיחה ועריכה של Event
         events_lvDSV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                Event event = (Event) (events_lvDSV.getItemAtPosition(position)); //קבלת ערך Note נבחר
+                Event event = (Event) (events_lvDSV.getItemAtPosition(position));
                 newActivity = new Intent(DailyScheduleView.this, DailyScheduleEdit.class);
                 newActivity.putExtra("originalEvent_title",event.getTitle());
                 newActivity.putExtra("originalEvent_txt",event.getTxt());
@@ -158,15 +176,25 @@ public class DailyScheduleView extends AppCompatActivity {
         });
     }
 
-    //מעבר לActivity יצירת אירוע חדש
+    /**
+     * addEvent.
+     * Short description - Go to the create a new event screen.
+     * <p>
+     * @param view the view
+     */
     public void addEvent(View view) {
         Intent newActivity;
         newActivity = new Intent(DailyScheduleView.this, DailyScheduleEdit.class);
-        newActivity.putExtra("originalEvent_title", "Null"); //השמת ערך כדי לא להפעיל ייבוא פתק
+        newActivity.putExtra("originalEvent_title", "Null");
         startActivity(newActivity);
     }
 
-    //תפריט מסכים
+    /**
+     * Screen menu.
+     * <p>
+     * @param menu
+     * @return super.onOptionsItemSelected(item)
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);

@@ -34,9 +34,13 @@ import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-
+/**
+ * @author Agam Toledano
+ * @version 1.0
+ * @since 13/12/2022
+ * short description - Notes Edit Screen
+ */
 public class NotesEdit extends AppCompatActivity {
-    //הכרזה על רכיבי תצוגה, משתנים וכדומה
     BroadcastReceiver broadcastReceiver;
 
     EditText title_etNE, txt_etNE;
@@ -51,66 +55,70 @@ public class NotesEdit extends AppCompatActivity {
 
     String originalTitle;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notes_edit);
 
-        //בדיקת חיבור לאינטרנט באמצעות BrodcastReciever
+        /**
+         * Internet connection test using BroadcastReceiver.
+         * <p>
+         */
         broadcastReceiver = new NetworkConnectionReceiver();
         registerReceiver(broadcastReceiver,new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
-        //התאמה בין רכיב תצוגה למשתנה
         title_etNE = (EditText) findViewById(R.id.title_etNE);
         txt_etNE = (EditText) findViewById(R.id.txt_etNE);
         thumbtack_cbNE = (CheckBox) findViewById(R.id.thumbtack_cbNE);
         delete_btnNE = (Button) findViewById(R.id.delete_btnNE);
 
-        delete_btnNE.setVisibility(View.INVISIBLE);//הגדרת כפתור מחיקה - בלתי נראה
+        delete_btnNE.setVisibility(View.INVISIBLE);
 
-        //אתחול והגדרת תוכן למשתנים ועצמים
         note = new Note();
 
-        currentUser = authRef.getCurrentUser(); //קבלת UID של משתמש מחובר
+        currentUser = authRef.getCurrentUser();
 
-        noteContent = getIntent();//קבלת Intent מפעילות קודמת
-        checkGetNote();//קבלת נתונים מIntent פעילות קודמת
+        noteContent = getIntent();
+        checkGetNote();
     }
 
+    /**
+     * checkGetNote.
+     * Short description - check whether an note was imported from a previous screen and change display accordingly.
+     * <p>
+     */
     private void checkGetNote() {
-        originalTitle = noteContent.getStringExtra("originalNote_title"); //קבלת ערך כותרת של הפתק/ משתנה בדיקה מאיפה הגיע הפתק
+        originalTitle = noteContent.getStringExtra("originalNote_title");
 
-        //בדיקה: האם הIntent התקבל מלחמיצה על note או מלחציה על כפתור של new note
         if (!(originalTitle.matches("Null"))) {
-            delete_btnNE.setVisibility(View.VISIBLE);//הגדרת כפתור מחיקה - נראה
+            delete_btnNE.setVisibility(View.VISIBLE);
 
-            note.setTitle(originalTitle); //השמת כותרת בעצם Note
-            title_etNE.setText(originalTitle);// הצגה כותרת בActivity
+            note.setTitle(originalTitle);
+            title_etNE.setText(originalTitle);
 
-            String originalTxt = noteContent.getStringExtra("originalNote_txt");//קבלת ערך כתובת txt של הפתק
-            note.setTxt(originalTxt);//השמת כתובת txt בעצם Note
+            String originalTxt = noteContent.getStringExtra("originalNote_txt");
+            note.setTxt(originalTxt);
 
-            note.setDateTime_created(noteContent.getStringExtra("originalNote_dateTime"));//השמת תאריך יצירה בעצם Note
+            note.setDateTime_created(noteContent.getStringExtra("originalNote_dateTime"));
 
-            note.setThumbtack(noteContent.getBooleanExtra("originalNote_thumbtack", false));//השמת ערך בוליאני של נעץ בעצם Note
-            if (note.getThumbtack()) { // סימון check box בהתאם לערך בוליאני של נעץ
+            note.setThumbtack(noteContent.getBooleanExtra("originalNote_thumbtack", false));
+            if (note.getThumbtack()) {
                 thumbtack_cbNE.setChecked(true);
             }
 
-            //קבלת תוכן txt של העצם Note
+
             originalTxtFile = null;
             try {
-                originalTxtFile = File.createTempFile("note", ".txt"); //יצירת קובץ לקבלת נתונים
-                StorageReference originalTxtFile_ref = FBST.getReference(originalTxt);//יצירת הפנייה למיקום של קובץ txt
+                originalTxtFile = File.createTempFile("note", ".txt");
+                StorageReference originalTxtFile_ref = FBST.getReference(originalTxt);
 
                 final ProgressDialog progressDialog = ProgressDialog.show(this,"downloads data", "downloading...",true);
                 originalTxtFile_ref.getFile(originalTxtFile).addOnCompleteListener(new OnCompleteListener<FileDownloadTask.TaskSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<FileDownloadTask.TaskSnapshot> task) {
                         progressDialog.dismiss();
-                        if (task.isSuccessful()) { //כאשר ההורדה הסתיימה בהצלחה
-                            readFile(); //קריאה והצגה של קובץ txt
+                        if (task.isSuccessful()) {
+                            readFile();
                         }
                     }
                 });
@@ -120,9 +128,13 @@ public class NotesEdit extends AppCompatActivity {
         }
     }
 
+    /**
+     * readFile.
+     * Short description - Reading a local file.
+     * <p>
+     */
     private void readFile() {
         try {
-            //קריאת קובץ מקומי
             FileInputStream fis= new FileInputStream (new File(originalTxtFile.getPath()));
             InputStreamReader isr = new InputStreamReader(fis);
             BufferedReader br = new BufferedReader(isr);
@@ -135,58 +147,69 @@ public class NotesEdit extends AppCompatActivity {
             String strrd = sb.toString();
             br.close();
 
-            txt_etNE.setText(strrd);// הצגת מחרוזת Txt
+            txt_etNE.setText(strrd);
 
-            originalTxtFile.delete(); // מחיקת קובץ מהמכשיר
+            originalTxtFile.delete();
         }
         catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    //מחיקת Note מקורי
+    /**
+     * deleteNoteContext.
+     * Short description - Deleting the original note.
+     * <p>
+     */
     private void deleteNoteContext() {
         String originalNote_thumbtack = getThumbtackStatus(note.getThumbtack());
-        FBST.getReference(note.getTxt()).delete();// מחיקת קובץ Note של txt מStorage
-        notesRef.child(currentUser.getUid()).child(originalNote_thumbtack).child(note.getDateTime_created()).removeValue(); //מחיקת ערך Note מהDB
+        FBST.getReference(note.getTxt()).delete();
+        notesRef.child(currentUser.getUid()).child(originalNote_thumbtack).child(note.getDateTime_created()).removeValue();
 
     }
 
-    //שמירה של Note חדש
+    /**
+     * saveNote.
+     * Short description - Saving a new note and deleting the previous one (if there is one).
+     * <p>
+     * @param view
+     */
     public void saveNote(View view) {
         if (!(originalTitle.matches("Null"))) {
-            deleteNoteContext();// מחיקת עצם Note קודם מDB ומחיקת קובץ txt מStorage
+            deleteNoteContext();
         }
 
-        //קליטת נתונים בסיסיים
         String title = title_etNE.getText().toString();
         String note_txt = txt_etNE.getText().toString();
         Boolean thumbtack = thumbtack_cbNE.isChecked();
 
-        // אם הנתונים תקניים שמירה והעלאה של הקובץ
         if (dataVerification(title,note_txt)){
-            note.setTitle(title);//השמה של כותרת בDB
+            note.setTitle(title);
 
-            String dateTime_created = getDateAndTime();//יצירת תבנית של תאריך וזמן
-            note.setDateTime_created(dateTime_created);//השמה של מחרזות תאריך וזמן בDB
+            String dateTime_created = getDateAndTime();
+            note.setDateTime_created(dateTime_created);
 
-            note.setThumbtack(thumbtack);//השמת ערך בוליאני של נעץ
-            String noteThumbtack = getThumbtackStatus(thumbtack); // יצירת מחרוזת נעץ בהתאם לערכו הבוליאני
+            note.setThumbtack(thumbtack);
+            String noteThumbtack = getThumbtackStatus(thumbtack);
 
-            String txt = "Notes/" + currentUser.getUid() + "/" + noteThumbtack +"/" + dateTime_created + ".txt"; //יצירת כתובת להשמה בSTORAGE
-            createTxtFile(note_txt, txt); //יצירת קובץ TXT
-            note.setTxt(txt); // השמה של כתובת TXT בDB
+            String txt = "Notes/" + currentUser.getUid() + "/" + noteThumbtack +"/" + dateTime_created + ".txt";
+            createTxtFile(note_txt, txt);
+            note.setTxt(txt);
 
-            notesRef.child(currentUser.getUid()).child(noteThumbtack).child(dateTime_created).setValue(note);// השמת ערך Note בDB
+            notesRef.child(currentUser.getUid()).child(noteThumbtack).child(dateTime_created).setValue(note);
 
-            //סיום ויצאה מהActivity
             Intent newActivity;
             newActivity = new Intent(NotesEdit.this, NotesView.class);
             startActivity(newActivity);
         }
     }
 
-    //בדיקה האם הפרטים שהוכנסו נכונים
+    /**
+     * dataVerification.
+     * Short description - Verification that the data entered is proper.
+     * <p>
+     * @return the boolean
+     */
     private boolean dataVerification(String title, String txt) {
         int errorExist = 0;
         if (title.length()<1){
@@ -203,14 +226,25 @@ public class NotesEdit extends AppCompatActivity {
         return true;
     }
 
-    //המרת תאריך ושעה לפורמט רצוי
+    /**
+     * getDateAndTime.
+     * Short description - Getting the date and time of the current day.
+     * <p>
+     * @return Date object - new format
+     */
     private String getDateAndTime() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss"); // יצירת פורמט של זמן ותאריך
-        Date date = Calendar.getInstance().getTime(); //קבלת זמן ותאריך מהלוח שנה
-        return dateFormat.format(date); //שליחה חזרה של תאריך
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+        Date date = Calendar.getInstance().getTime();
+        return dateFormat.format(date);
     }
 
-    //יצירת String לנעץ בהתאם לערכו הבוליאני
+    /**
+     * getThumbtackStatus.
+     * Short description - Creating a string according to the boolean value of the thumbtack.
+     * <p>
+     * @param thumbtack
+     * @return String describes thumbtack.
+     */
     private String getThumbtackStatus(Boolean thumbtack) {
         if (thumbtack){
             return "Thumbtack";
@@ -218,17 +252,27 @@ public class NotesEdit extends AppCompatActivity {
         return "NoThumbtack";
     }
 
-    //יצירה וההעלאה של קובץ Txt לFBST
+    /**
+     * createTxtFile.
+     * Short description - upload txt file.
+     * <p>
+     * @param note_txt
+     * @param txtPath
+     */
     private void createTxtFile(String note_txt, String txtPath) {
         byte[] note_byte = note_txt.getBytes();
         storageRef.child(txtPath).putBytes(note_byte);
     }
 
-    //מחיקת פתק נוכחי
+    /**
+     * deleteNote
+     * Short description - Delete current note.
+     * <p>
+     * @param view
+     */
     public void deleteNote(View view) {
         deleteNoteContext();
 
-        //סיום ויצאה מהActivity
         Intent newActivity;
         newActivity = new Intent(NotesEdit.this, NotesView.class);
         startActivity(newActivity);

@@ -18,8 +18,12 @@ import java.io.OutputStreamWriter;
 
 /**
  * @author Agam Toledano
+ * @version 1.0
+ * @since 13/12/2022
+ * short description - Credits Screen.
  */
 public class Credits extends AppCompatActivity {
+
     Intent newActivity;
     TextView showCredits;
 
@@ -33,7 +37,11 @@ public class Credits extends AppCompatActivity {
         readIF();
     }
 
-    //כתיבה לקובץ פנימי
+    /**
+     * writeIF.
+     * Short description - Writing to an internal file.
+     * <p>
+     */
     private void writeIF() {
         try {
             FileOutputStream fos = openFileOutput("credits.txt",MODE_PRIVATE);
@@ -49,7 +57,11 @@ public class Credits extends AppCompatActivity {
         }
     }
 
-    //קריאה מקובץ פנימי
+    /**
+     * readIF.
+     * Short description - Reading an internal file.
+     * <p>
+     */
     private void readIF() {
         try {
             FileInputStream fis= openFileInput("credits.txt");
@@ -72,7 +84,12 @@ public class Credits extends AppCompatActivity {
     }
 
 
-    //תפריט מסכים
+    /**
+     * Screen menu.
+     * <p>
+     * @param menu
+     * @return super.onOptionsItemSelected(item)
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);

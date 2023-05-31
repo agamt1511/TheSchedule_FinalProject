@@ -32,9 +32,14 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+/**
+ * @author Agam Toledano
+ * @version 1.0
+ * @since 13/12/2022
+ * short description - Assignment View Screen
+ */
 
 public class AssignmentsView extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
-    //הכרזה על רכיבי תצוגה, משתנים וכדומה
     BroadcastReceiver broadcastReceiver;
 
     Spinner importance_spAV;
@@ -59,24 +64,24 @@ public class AssignmentsView extends AppCompatActivity implements AdapterView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_assignments_view);
 
-        //בדיקת חיבור לאינטרנט באמצעות BrodcastReciever
+        /**
+         * Internet connection test using BroadcastReceiver.
+         * <p>
+         */
         broadcastReceiver = new NetworkConnectionReceiver();
         registerReceiver(broadcastReceiver,new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
-        //התאמה בין רכיב תצוגה למשתנה
         importance_spAV = (Spinner) findViewById(R.id.importance_spAV);
         assignments_lvAV = (ListView) findViewById(R.id.assignments_lvAV);
 
-        messageAssignment = true;//הגדרת ערך בוליאני לאתחול רשימת עצמי Assignment
+        messageAssignment = true;
 
-        currentUser = authRef.getCurrentUser(); //קבלת UID של משתמש מחובר
+        currentUser = authRef.getCurrentUser();
 
-        //יצירת רשימת ערכי Assignment והגדרת Adapter
         assignmentArrayList = new ArrayList<>();
         assignmentAdapter = new AssignmentAdapter(this,assignmentArrayList);
         assignments_lvAV.setAdapter(assignmentAdapter);
 
-        //ייבוא String לSpinner וקישור לAdapter
         Resources resources = getResources();
         priorities = resources.getStringArray(R.array.priorities);
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, androidx.appcompat.R.layout.support_simple_spinner_dropdown_item,priorities);
@@ -85,7 +90,15 @@ public class AssignmentsView extends AppCompatActivity implements AdapterView.On
 
     }
 
-    //כאשר פריט נבחר נקה רשימה והכנס ערכים חדשים לרשימה בהתאם לרמת חשיבות
+    /**
+     * onItemSelected.
+     * Short description - When an item is selected, clear a list and insert new values into the list according to the level of importance.
+     * <p>
+     * @param adapterView
+     * @param view
+     * @param i
+     * @param l
+     */
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
         messageAssignment = true;
@@ -93,11 +106,20 @@ public class AssignmentsView extends AppCompatActivity implements AdapterView.On
         showSelectedPriorityData(importance);
     }
 
+    /**
+     * onNothingSelected.
+     * <p>
+     * @param adapterView
+     */
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {}
 
-
-    // הצגה בListView של כל העצמים במשוייכים לרמת חשיבות נבחרת
+    /**
+     * showSelectedPriorityData.
+     * Short description - Presentation in ListView of all objects associated with a selected level of importance.
+     * <p>
+     * @param importance
+     */
     private void showSelectedPriorityData(String importance) {
         assignmentsDBR = assignmentsRef.child(currentUser.getUid()).child(importance);
         assignmentQuery = assignmentsDBR.orderByChild("dateTime_goal");
@@ -131,15 +153,25 @@ public class AssignmentsView extends AppCompatActivity implements AdapterView.On
         });
     }
 
-    //מעבר למסך יצירת רשימה חדשה
+    /**
+     * addAssignment.
+     * Short description - Go to the add task screen.
+     * <p>
+     * @param view
+     */
     public void addAssignment(View view) {
         Intent newActivity;
         newActivity = new Intent(AssignmentsView.this, AssignmentsEdit.class);
-        newActivity.putExtra("originalAssignment_title", "Null"); //השמת ערך כדי לא להפעיל ייבוא מטלה
+        newActivity.putExtra("originalAssignment_title", "Null");
         startActivity(newActivity);
     }
 
-    //תפריט מסכים
+    /**
+     * Screen menu.
+     * <p>
+     * @param menu
+     * @return super.onOptionsItemSelected(item)
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);

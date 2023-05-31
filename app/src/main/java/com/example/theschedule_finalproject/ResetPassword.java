@@ -15,7 +15,12 @@ import android.view.View;
 import android.widget.EditText;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-
+/**
+ * @author Agam Toledano
+ * @version 1.0
+ * @since 02/01/2023
+ * short description - ResetPassword Screen
+ */
 public class ResetPassword extends AppCompatActivity {
     EditText email_etF;
     BroadcastReceiver broadcastReceiver;
@@ -25,15 +30,21 @@ public class ResetPassword extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reset_password);
 
-        //בדיקת חיבור לאינטרנט באמצעות BrodcastReciever
+        /**
+         * Internet connection test using BroadcastReceiver.
+         * <p>
+         */
         broadcastReceiver = new NetworkConnectionReceiver();
         registerReceiver(broadcastReceiver,new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
         email_etF = (EditText) findViewById(R.id.email_etF);
     }
 
-    /*קבלת String של אימייל ושליחת מייל לשחזור סיסמה למייל זה
-    הערה: אם למשתמש אין חשבון קיים באפליקציה אז לא יישלח אימייל.
+    /**
+     * Reset password.
+     * Short description - Receiving an email and sending a password recovery email to this email.
+     * <p>
+     * @param view the view
      */
     public void resetPassword(View view) {
         String email = email_etF.getText().toString();

@@ -8,11 +8,20 @@ import android.net.NetworkInfo;
 
 import androidx.appcompat.app.AlertDialog;
 
+/**
+ * @author Agam Toledano
+ * @version 1.0
+ * @since 13/12/2022
+ * short description - Network Connection Receiver
+ */
 public class NetworkConnectionReceiver extends BroadcastReceiver {
 
-    //שליחה לפעולת בדיקת חיבור לאינטרנט והצגת הודעה מתאימה
     @Override
     public void onReceive(Context context, Intent intent) {
+        /**
+         * Sending to the Internet connection test operation and displaying an appropriate message.
+         * <p>
+         */
         try {
             if (!(isConnected(context))){
                 AlertDialog.Builder adb = new AlertDialog.Builder(context);
@@ -27,7 +36,13 @@ public class NetworkConnectionReceiver extends BroadcastReceiver {
         }
     }
 
-    //בדיקת חיבור לאינטרנט ושליחת ערך בוליאני כתשובה
+    /**
+     * Is connected boolean.
+     * Checking internet connection and sending boolean value as reply.
+     * @param context the context
+     * @return the boolean
+     * <p>
+     */
     public boolean isConnected(Context context){
         try {
             ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
