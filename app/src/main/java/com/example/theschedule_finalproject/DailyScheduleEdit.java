@@ -428,7 +428,7 @@ public class DailyScheduleEdit extends AppCompatActivity {
         alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(DailyScheduleEdit.this, AlarmReceiver.class);
         pendingIntent = PendingIntent.getBroadcast(DailyScheduleEdit.this, requestCode, intent, 0);
-        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis()-120, AlarmManager.INTERVAL_DAY, pendingIntent);
     }
 
     /**

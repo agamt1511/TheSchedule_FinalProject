@@ -75,7 +75,7 @@
                 android:layout_weight="20.5"
                 android:ems="10"
                 android:gravity="start|top"
-                android:hint="Write Your Assignment Here ..."
+                android:hint="Write Your Event Here ..."
                 android:inputType="textMultiLine" />
 
             <Space

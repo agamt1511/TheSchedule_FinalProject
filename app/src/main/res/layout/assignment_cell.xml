@@ -28,7 +28,7 @@
                 android:gravity="left"
                 android:text="Assignment"
                 android:textColor="@color/black"
-                android:textSize="30dp" />
+                android:textSize="24dp" />
 
             <TextView
                 android:id="@+id/dateAndTime_tvAC"
